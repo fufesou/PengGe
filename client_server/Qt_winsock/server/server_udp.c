@@ -19,6 +19,7 @@ extern "C" {
 
 extern const char* g_loginmsg_header;
 extern const char* g_loginmsg_SUCCESS;
+extern const char* g_loginmsg_FAIL;
 extern const char g_login_delimiter;
 
 static char* s_serv_msgheader = "server";
@@ -43,9 +44,7 @@ static void s_process_communication(struct server_udp* serv_udp, int msglen, con
 
 static int s_login_verification(const char* username, const char* password);
 
-static void s_create_socket(struct server_udp* serv_udp);
-
-static void s_bind_socket(struct server_udp* serv_udp, int af, u_short port, u_long addr);
+static void s_create_server(struct server_udp* serv_udp, int af, u_short port, u_long addr);
 
 static void s_print_info(struct server_udp* serv_udp);
 
@@ -71,14 +70,13 @@ void check_args(int argc, char* argv[])
 void init_server_udp(struct server_udp *serv_udp)
 {
     serv_udp->msgheader = s_serv_msgheader;
-    serv_udp->create_socket = s_create_socket;
-    serv_udp->bind_socket = s_bind_socket;
+    serv_udp->create_server = s_create_server;
     serv_udp->print_info = s_print_info;
     serv_udp->communicate = s_communicate;
     serv_udp->clear = s_clear;
 }
 
-void s_create_socket(struct server_udp *serv_udp)
+void s_create_server(struct server_udp *serv_udp, int af, u_short port, u_long addr)
 {
     if (strcmp(serv_udp->msgheader, s_serv_msgheader) != 0) {
         init_server_udp(serv_udp);
@@ -89,10 +87,7 @@ void s_create_socket(struct server_udp *serv_udp)
         U_errexit_value(1, "%s: error at socket(), error code: %d\n", serv_udp->msgheader, WSAGetLastError());
     }
     printf("%s: socket() is OK!\n", serv_udp->msgheader);
-}
 
-void s_bind_socket(struct server_udp *serv_udp, int af, u_short port, u_long addr)
-{
     if (port == 0) {
         printf("invalid port!\n");
         closesocket(serv_udp->socket);
@@ -109,13 +104,11 @@ void s_bind_socket(struct server_udp *serv_udp, int af, u_short port, u_long add
     else {
         printf("server: bind() is OK\n");
     }
-
 }
 
 void s_print_info(struct server_udp *serv_udp)
 {
-    if (U_printf_sockinfo(serv_udp->socket, serv_udp->msgheader) != 0)
-    {
+    if (U_printf_sockinfo(serv_udp->socket, serv_udp->msgheader) != 0) {
         U_errexit_value(1, "%s: some error occured before communication begin.\n", serv_udp->msgheader);
     }
 }
@@ -157,12 +150,10 @@ void s_clear(struct server_udp *serv_udp)
 
 void s_process_msg(struct server_udp* serv_udp, int msglen, const SOCKADDR_IN* to_sockaddr, int sockaddr_len)
 {
-    if (strncmp(serv_udp->msgbuf, g_loginmsg_header, strlen(g_loginmsg_header)) == 0)
-    {
+    if (strncmp(serv_udp->msgbuf, g_loginmsg_header, strlen(g_loginmsg_header)) == 0) {
         s_process_login(serv_udp, msglen, to_sockaddr, sockaddr_len);
     }
-    else
-    {
+    else {
         s_process_communication(serv_udp, msglen, to_sockaddr, sockaddr_len);
     }
 }
@@ -182,16 +173,17 @@ void s_process_login(struct server_udp *serv_udp, int msglen, const SOCKADDR_IN 
     *delimiter = '\0';
     password = delimiter + 1;
 
-    if (s_login_verification(username, password))
-    {
-        sendto(serv_udp->socket, g_loginmsg_SUCCESS, sizeof(g_loginmsg_SUCCESS) + 1, 0, (SOCKADDR*)&to_sockaddr, sockaddr_len);
+    if (s_login_verification(username, password)) {
+        sendto(serv_udp->socket, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1, 0, (SOCKADDR*)&to_sockaddr, sockaddr_len);
+    }
+    else  {
+        sendto(serv_udp->socket, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1, 0, (SOCKADDR*)&to_sockaddr, sockaddr_len);
     }
 }
 
 int s_login_verification(const char* username, const char* password)
 {
-    if (strcmp(username, "64bit") == 0)
-    {
+    if (strcmp(username, "64bit") == 0) {
         return (strcmp(password, "8-15bytes") == 0);
     }
     return 0;

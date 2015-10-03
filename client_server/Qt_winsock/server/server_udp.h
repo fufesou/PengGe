@@ -22,9 +22,7 @@ struct server_udp
     char* msgheader;
     char msgbuf[1024];
 
-    void (*create_socket)(struct server_udp* serv_udp);
-
-    void (*bind_socket)(struct server_udp* serv_udp, int af, u_short port, u_long addr);
+    void (*create_server)(struct server_udp* serv_udp, int af, u_short port, u_long addr);
 
     void (*print_info)(struct server_udp* serv_udp);
 
