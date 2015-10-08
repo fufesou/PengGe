@@ -19,14 +19,11 @@ extern const char* g_loginmsg_FAIL;
 extern const char g_login_delimiter;
 
 static char* s_cli_msgheader = "client";
-static struct rtt_info s_rttinfo;
-static int rttinit = 0;
-static struct msghdr msgsend, msgrecv;
 
 static void s_create_client(struct client_udp* cli_udp);
 static void s_print_info(struct client_udp* cli_udp);
 static void s_clear(struct client_udp* cli_udp);
-static int s_dg_send_recv(struct clinet_udp* cli_udp, const void* to_addr, int to_addr_len);
+static int s_dg_send_recv(struct client_udp* cli_udp, const void* to_addr, int to_addr_len);
 
 #ifdef WIN32
 // http://www.intervalzero.com/library/RTX/WebHelp/Content/PROJECTS/SDK%20Reference/WinsockRef/WSASendTo.htm
@@ -45,27 +42,22 @@ void check_args(int argc, char* argv[])
 void init_client_udp(struct client_udp *cli_udp)
 {
     cli_udp->msgheader = s_cli_msgheader;
-    cli_udp->create_server = s_create_client;
+    cli_udp->create_client = s_create_client;
     cli_udp->print_info = s_print_info;
-    cli_udp->communicate = s_dg_send_recv;
+    cli_udp->dg_send_recv = s_dg_send_recv;
     cli_udp->clear = s_clear;
 }
 
 void s_print_info(struct client_udp *cli_udp)
 {
-    if (U_printf_sockinfo(serv_udp->socket, serv_udp->msgheader) != 0) {
+    if (U_printf_sockinfo(cli_udp->socket, cli_udp->msgheader) != 0) {
         U_errexit_value(1, "%s: some error occured before communication begin.\n", cli_udp->msgheader);
     }
 }
 
-void s_dg_send_recv(struct client_udp* cli_udp)
+void s_create_client(struct client_udp *cli_udp)
 {
-
-}
-
-void s_create_client(client_udp *cli_udp)
-{
-    if (strcmp(cli_udp->msgheader, s_serv_msgheader) != 0) {
+    if (strcmp(cli_udp->msgheader, s_cli_msgheader) != 0) {
         init_client_udp(cli_udp);
     }
 
@@ -82,7 +74,7 @@ void s_clear(struct client_udp *cli_udp)
     U_close_socket(cli_udp->socket);
 }
 
-int s_dg_send_recv(struct clinet_udp* cli_udp, const void* to_addr, int to_addr_len)
+int s_dg_send_recv(struct client_udp* cli_udp, const void* to_addr, int to_addr_len)
 {
 
 }
