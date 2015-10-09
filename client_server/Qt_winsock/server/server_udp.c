@@ -10,7 +10,7 @@
 #include "server_udp.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "utility.h"
+#include "udp_utility.h"
 
 
 #ifdef __cplusplus

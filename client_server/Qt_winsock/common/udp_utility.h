@@ -1,14 +1,14 @@
 
 /**
- * @file utility.h
+ * @file udp_utility.h
  * @brief Utility functions. The prefix "U_" stands for utility.
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
  */
 
-#ifndef  UTILITY_H
-#define  UTILITY_H
+#ifndef  UDP_UTILITY_H
+#define  UDP_UTILITY_H
 
 
 #ifdef __cplusplus
@@ -64,4 +64,4 @@ int U_printf_sockinfo(SOCKET sockfd, char* msgheader);
 #endif
 
 
-#endif  // UTILITY_H
+#endif  // UDP_UTILITY_H

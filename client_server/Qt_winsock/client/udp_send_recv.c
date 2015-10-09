@@ -61,7 +61,7 @@ static void recv_msg(SOCKET fd, struct WSASendRecvMsg* msg);
 static sigjmp_buf jmpbuf;
 
 /**
- * @TODO implement later
+ * @todo implement later
  */
 static void send_msg(SOCKET fd, struct msghdr* msg);
 #endif

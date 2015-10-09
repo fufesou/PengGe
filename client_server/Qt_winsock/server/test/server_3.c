@@ -12,8 +12,6 @@
 #include "utility.h"
 
 
-int recvTimeoutTCP(SOCKET sockfd, long sec, long usec);
-
 int main(int argc, char* argv[])
 {
     WSADATA wsadata;
@@ -78,18 +76,4 @@ int main(int argc, char* argv[])
     cleanup_winsock2();
 
     return 0;
-}
-
-int recvTimeoutTCP(SOCKET sockfd, long sec, long usec)
-{
-    struct timeval timeout;
-    struct fd_set fds;
-
-    timeout.tv_sec = sec;
-    timeout.tv_usec = usec;
-
-    FD_ZERO(&fds);
-    FD_SET(sockfd, &fds);
-
-    return select(1, &fds, 0, 0, &timeout);
 }

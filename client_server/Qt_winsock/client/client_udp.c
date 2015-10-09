@@ -7,7 +7,8 @@
  */
 
 #include "client_udp.h"
-#include "utility.h"
+#include "udp_utility.h"
+#include "udp_send_recv.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +24,8 @@ static char* s_cli_msgheader = "client";
 static void s_create_client(struct client_udp* cli_udp);
 static void s_print_info(struct client_udp* cli_udp);
 static void s_clear(struct client_udp* cli_udp);
-static int s_dg_send_recv(struct client_udp* cli_udp, const void* to_addr, int to_addr_len);
+static void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
+
 
 #ifdef WIN32
 // http://www.intervalzero.com/library/RTX/WebHelp/Content/PROJECTS/SDK%20Reference/WinsockRef/WSASendTo.htm
@@ -44,7 +46,7 @@ void init_client_udp(struct client_udp *cli_udp)
     cli_udp->msgheader = s_cli_msgheader;
     cli_udp->create_client = s_create_client;
     cli_udp->print_info = s_print_info;
-    cli_udp->dg_send_recv = s_dg_send_recv;
+    cli_udp->dg_client = s_dg_client;
     cli_udp->clear = s_clear;
 }
 
@@ -68,15 +70,33 @@ void s_create_client(struct client_udp *cli_udp)
     printf("%s: socket() is OK!\n", cli_udp->msgheader);
 }
 
-
 void s_clear(struct client_udp *cli_udp)
 {
     U_close_socket(cli_udp->socket);
 }
 
-int s_dg_send_recv(struct client_udp* cli_udp, const void* to_addr, int to_addr_len)
+void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len)
 {
-
+    ssize_t numbytes;
+    while (fgets(cli_udp->sendbuf, sizeof(cli_udp->sendbuf), fp) != NULL) {
+        numbytes = U_send_recv(
+                    cli_udp->socket,
+                    cli_udp->sendbuf,
+                    sizeof(cli_udp->sendbuf),
+                    cli_udp->recvbuf,
+                    sizeof(cli_udp->recvbuf),
+                    (struct sockaddr*)serveraddr,
+                    serveraddr_len);
+        if (numbytes > 0) {
+            if (numbytes >= (ssize_t)(sizeof(cli_udp->recvbuf))) {
+                fflush(stdout);
+                fputs("client: recived msg cut off", stderr);
+                fflush(stderr);
+            }
+            cli_udp->recvbuf[numbytes] = 0;
+            fputs(cli_udp->recvbuf, stdout);
+        }
+    }
 }
 
 #ifdef __cplusplus

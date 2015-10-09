@@ -1,5 +1,14 @@
-#ifndef	__unp_rtt_h
-#define	__unp_rtt_h
+/**
+ * @file unprtt.h
+ * @brief 
+ * @author cxl
+ * @version 0.1
+ * @date 2015-10-09
+ */
+
+#ifndef  UNPRTT_H
+#define  UNPRTT_H
+
 
 #include  <stdint.h>
 
@@ -27,4 +36,5 @@ uint32_t rtt_ts(struct rtt_info *);
 
 extern int	rtt_d_flag;	/* can be set to nonzero for addl info */
 
-#endif	/* __unp_rtt_h */
+
+#endif  // UNPRTT_H

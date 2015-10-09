@@ -6,6 +6,10 @@
  * @date 2015-09-30
  */
 
+#ifndef  CLIENT_UDP_H
+#define  CLIENT_UDP_H
+
+#include <stdio.h>
 #include <winsock2.h>
 
 #ifdef __cplusplus
@@ -27,9 +31,8 @@ struct client_udp
      */
     void (*create_client)(struct client_udp* cli_udp);
     void (*print_info)(struct client_udp* cli_udp);
-    void (*dg_send_recv)(struct client_udp* cli_udp, const void* to_addr, int to_addr_len);
+    void (*dg_client)(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
     void (*clear)(struct client_udp* cli_udp);
-
 };
 
 
@@ -38,7 +41,10 @@ void check_args(int argc, char* argv[]);
 void init_client_udp(struct client_udp *cli_udp);
 
 
-
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif  // CLIENT_UDP_H
+
