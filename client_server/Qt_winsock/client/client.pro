@@ -6,17 +6,18 @@ CONFIG -= qt
 INCLUDEPATH += ../common
 
 HEADERS += \
-    client_udp.h \
     unprtt.h \
     udp_send_recv.h \
-    ../common/udp_utility.h
+    ../common/udp_utility.h \
+    client_sendrecv.h \
+    ../common/udp_types.h
 
 SOURCES += \
     client_udp.c \
     main.c \
     rtt.c \
-    udp_send_recv.c \
-    ../common/udp_utility.c
+    ../common/udp_utility.c \
+    client_sendrecv.c
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 

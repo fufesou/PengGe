@@ -1,13 +1,10 @@
 /**
- * @file udp_send_recv.c
+ * @file client_sendrecv.c
  * @brief 
  * @author cxl
  * @version 0.1
  * @date 2015-10-03
  */
-
-#include "unprtt.h"
-#include <stdio.h>
 
 #ifdef WIN32
 #include <winsock2.h>
@@ -16,6 +13,11 @@
 #include <setjmp.h>
 #include <signal.h>
 #endif
+
+#include <stdio.h>
+#include "unprtt.h"
+#include "udp_types.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,14 +34,7 @@ static struct hdr {
 static void sig_alarm(int signo);
 
 #ifdef WIN32
-static struct WSASendRecvMsg {
-    LPWSABUF msg_iov;
-    DWORD msg_iovlen;
-    DWORD numbytes;
-    DWORD flags;
-    struct sockaddr* msg_name;
-    int msg_namelen;
-}msgsend, msgrecv;
+static struct WSASendRecvMsg msgsend, msgrecv;
 #else
 static struct msghdr msgsend, msgrecv;
 #endif
