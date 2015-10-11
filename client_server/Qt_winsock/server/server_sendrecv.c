@@ -90,7 +90,7 @@ void server_send(
         SOCKET fd,
         const void* outbuf,
         size_t outbytes,
-        struct hdr* hdrdata,
+        const struct hdr* hdrdata,
         const struct sockaddr* cli_addr,
         int cli_addrlen)
 {
@@ -141,7 +141,7 @@ void s_send_msg(SOCKET fd, struct WSASendRecvMsg* msg)
                 msg->msg_iovlen,
                 &msg->numbytes,
                 msg->flags,
-                (void*)&msg->msg_name,
+                (struct sockaddr*)&msg->msg_name,
                 msg->msg_namelen,
                 NULL,
                 NULL))
@@ -158,7 +158,7 @@ ssize_t s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
                 msg->msg_iovlen,
                 &msg->numbytes,
                 &msg->flags,
-                (void*)&msg->msg_name,
+                (struct sockaddr*)&msg->msg_name,
                 &msg->msg_namelen,
                 NULL,
                 NULL))

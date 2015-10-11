@@ -11,6 +11,7 @@
 #define  UDP_TYPES_H
 
 
+#ifdef WIN32
 struct WSASendRecvMsg {
     LPWSABUF msg_iov;
     DWORD msg_iovlen;
@@ -19,6 +20,7 @@ struct WSASendRecvMsg {
     struct sockaddr_in msg_name;
     int msg_namelen;
 };
+#endif
 
 struct hdr {
     uint32_t seg;

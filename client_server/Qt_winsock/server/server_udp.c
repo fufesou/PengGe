@@ -10,7 +10,10 @@
 #include "server_udp.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include "udp_utility.h"
+#include "udp_types.h"
+#include "server_sendrecv.h"
 
 
 #ifdef __cplusplus
@@ -32,15 +35,15 @@ static char* s_serv_msgheader = "server";
  * @param msg
  * @param len
  */
-static void s_process_msg(struct server_udp* serv_udp, int msglen, const SOCKADDR_IN* to_sockaddr, int sockaddr_len);
+static void s_process_msg(struct server_udp* serv_udp, int msglen, const struct hdr* hdrdata, const SOCKADDR_IN* to_sockaddr, int sockaddr_len);
 
 /**
  * @TODO Thread should be created here to do this slow work.
  *
  */
-static void s_process_login(struct server_udp* serv_udp, int msglen, const SOCKADDR_IN* to_sockaddr, int sockaddr_len);
+static void s_process_login(struct server_udp* serv_udp, int msglen, const struct hdr* hdrdata, const SOCKADDR_IN* to_sockaddr, int sockaddr_len);
 
-static void s_process_communication(struct server_udp* serv_udp, int msglen, const SOCKADDR_IN* to_sockaddr, int sockaddr_len);
+static void s_process_communication(struct server_udp* serv_udp, int msglen, const struct hdr* hdrdata, const SOCKADDR_IN* to_sockaddr, int sockaddr_len);
 
 static int s_login_verification(const char* username, const char* password);
 
@@ -115,30 +118,37 @@ void s_print_info(struct server_udp *serv_udp)
 
 void s_communicate(struct server_udp *serv_udp)
 {
-    int cli_sockaddr_len;
-    int byte_received;
-    SOCKADDR_IN cli_sockaddr_in;
+    int cli_addrlen;
+    struct hdr hdrdata;
+    ssize_t byte_received;
+    SOCKADDR_IN cli_addr;
 
     printf("%s: I\'m ready to receive a datagram...\n", serv_udp->msgheader);
 
-    cli_sockaddr_len = sizeof(cli_sockaddr_in);
-    byte_received = recvfrom(serv_udp->socket, serv_udp->msgbuf, sizeof(serv_udp->msgbuf) - 1, 0, (SOCKADDR*)&cli_sockaddr_in, &cli_sockaddr_len);
-    if (byte_received > 0) {
-        printf("%s: total bytes received: %d\n", serv_udp->msgheader, byte_received);
-        printf("%s: the data is \"%s\"\n", serv_udp->msgheader, serv_udp->msgbuf);
+    while (1) {
+        cli_addrlen = sizeof(cli_addr);
+        byte_received = server_recv(
+                    serv_udp->socket,
+                    serv_udp->msgbuf,
+                    sizeof(serv_udp->msgbuf),
+                    &hdrdata,
+                    (struct sockaddr*)&cli_addr,
+                    &cli_addrlen);
+        if (byte_received > 0) {
+            printf("%s: total bytes received: %d\n", serv_udp->msgheader, byte_received);
+            printf("%s: the data is \"%s\"\n", serv_udp->msgheader, serv_udp->msgbuf);
 
-        s_process_msg(serv_udp, byte_received, &cli_sockaddr_in, cli_sockaddr_len);
+            s_process_msg(serv_udp, byte_received, &hdrdata, &cli_addr, cli_addrlen);
+        }
+        else if (byte_received <= 0) {
+            printf("%s: connection closed with error code: %d\n", serv_udp->msgheader, WSAGetLastError());
+            break;
+        }
+        else {
+            printf("%s: recvfrom() failed with error code: %d\n", serv_udp->msgheader, WSAGetLastError());
+            break;
+        }
     }
-    else if (byte_received <= 0) {
-        printf("%s: connection closed with error code: %d\n", serv_udp->msgheader, WSAGetLastError());
-    }
-    else {
-        printf("%s: recvfrom() failed with error code: %d\n", serv_udp->msgheader, WSAGetLastError());
-    }
-
-    getpeername(serv_udp->socket, (SOCKADDR*)&cli_sockaddr_in, &cli_sockaddr_len);
-    printf("%s: sending IP used: %s\n", serv_udp->msgheader, inet_ntoa(cli_sockaddr_in.sin_addr));
-    printf("%s: sending port used: %d\n", serv_udp->msgheader, htons(cli_sockaddr_in.sin_port));
 
     printf("%s: finish receiving. closing the listening socket...\n", serv_udp->msgheader);
 }
@@ -148,17 +158,17 @@ void s_clear(struct server_udp *serv_udp)
     U_close_socket(serv_udp->socket);
 }
 
-void s_process_msg(struct server_udp* serv_udp, int msglen, const SOCKADDR_IN* to_sockaddr, int sockaddr_len)
+void s_process_msg(struct server_udp* serv_udp, int msglen, const struct hdr* hdrdata, const SOCKADDR_IN* to_sockaddr, int sockaddr_len)
 {
     if (strncmp(serv_udp->msgbuf, g_loginmsg_header, strlen(g_loginmsg_header)) == 0) {
-        s_process_login(serv_udp, msglen, to_sockaddr, sockaddr_len);
+        s_process_login(serv_udp, msglen, hdrdata, to_sockaddr, sockaddr_len);
     }
     else {
-        s_process_communication(serv_udp, msglen, to_sockaddr, sockaddr_len);
+        s_process_communication(serv_udp, msglen, hdrdata, to_sockaddr, sockaddr_len);
     }
 }
 
-void s_process_login(struct server_udp *serv_udp, int msglen, const SOCKADDR_IN *to_sockaddr, int sockaddr_len)
+void s_process_login(struct server_udp *serv_udp, int msglen, const struct hdr* hdrdata, const SOCKADDR_IN *to_sockaddr, int sockaddr_len)
 {
     char* username = NULL;
     char* password = NULL;
@@ -173,11 +183,15 @@ void s_process_login(struct server_udp *serv_udp, int msglen, const SOCKADDR_IN 
     *delimiter = '\0';
     password = delimiter + 1;
 
+    getpeername(serv_udp->socket, (SOCKADDR*)to_sockaddr, &sockaddr_len);
+    printf("%s: sending IP used: %s\n", serv_udp->msgheader, inet_ntoa(to_sockaddr->sin_addr));
+    printf("%s: sending port used: %d\n", serv_udp->msgheader, htons(to_sockaddr->sin_port));
+
     if (s_login_verification(username, password)) {
-        sendto(serv_udp->socket, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1, 0, (SOCKADDR*)&to_sockaddr, sockaddr_len);
+        server_send(serv_udp->socket, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1, hdrdata, (SOCKADDR*)to_sockaddr, sockaddr_len);
     }
     else  {
-        sendto(serv_udp->socket, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1, 0, (SOCKADDR*)&to_sockaddr, sockaddr_len);
+        server_send(serv_udp->socket, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1, hdrdata, (SOCKADDR*)to_sockaddr, sockaddr_len);
     }
 }
 
@@ -189,10 +203,16 @@ int s_login_verification(const char* username, const char* password)
     return 0;
 }
 
-void s_process_communication(struct server_udp *serv_udp, int msglen, const SOCKADDR_IN *to_sockaddr, int sockaddr_len)
+void s_process_communication(struct server_udp *serv_udp, int msglen, const struct hdr* hdrdata, const SOCKADDR_IN *to_sockaddr, int sockaddr_len)
 {
     (void)serv_udp;
     (void)msglen;
+    (void)hdrdata;
     (void)to_sockaddr;
     (void)sockaddr_len;
+
+    getpeername(serv_udp->socket, (SOCKADDR*)to_sockaddr, &sockaddr_len);
+    printf("%s: sending IP used: %s\n", serv_udp->msgheader, inet_ntoa(to_sockaddr->sin_addr));
+    printf("%s: sending port used: %d\n", serv_udp->msgheader, htons(to_sockaddr->sin_port));
+
 }
