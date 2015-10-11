@@ -215,4 +215,5 @@ void s_process_communication(struct server_udp *serv_udp, int msglen, const stru
     printf("%s: sending IP used: %s\n", serv_udp->msgheader, inet_ntoa(to_sockaddr->sin_addr));
     printf("%s: sending port used: %d\n", serv_udp->msgheader, htons(to_sockaddr->sin_port));
 
+    server_send(serv_udp->socket, serv_udp->msgbuf, strlen(serv_udp->msgbuf) + 1, hdrdata, (SOCKADDR*)to_sockaddr, sockaddr_len);
 }

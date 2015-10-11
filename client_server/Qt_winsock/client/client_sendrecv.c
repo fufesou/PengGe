@@ -119,6 +119,7 @@ ssize_t client_sendrecv(
 
     rtt_newpack(&rttinfo);
 
+    recv_status = 0;
     while (recv_status!=RECV_OK && recv_status!=RECV_TIMEOUT) {
         s_send_msg(fd, &msgsend);
         while (!recv_status) {
