@@ -23,7 +23,6 @@ int main(int argc, char* argv[])
 
     init_client_udp(&udpclient);
     udpclient.create_client(&udpclient);
-    udpclient.print_info(&udpclient);
 
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons((unsigned short)atoi(argv[1]));

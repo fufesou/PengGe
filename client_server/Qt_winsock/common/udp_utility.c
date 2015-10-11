@@ -50,17 +50,9 @@ void U_errexit_value(int exit_value, const char* format, ...)
 
 void U_init_winsock2(WSADATA* wsadata)
 {
-    // Initialize Winsock version 2.2
     if (WSAStartup(MAKEWORD(2,2), wsadata) != 0)
     {
-         // MSDN: An application can call the WSAGetLastError() function to determine the
-         // extended error code for other Windows sockets functions as is normally
-         // done in Windows Sockets even if the WSAStartup function fails or the WSAStartup
-         // function was not called to properly initialize Windows Sockets before calling a
-         // Windows Sockets function. The WSAGetLastError() function is one of the only functions
-         // in the Winsock 2.2 DLL that can be called in the case of a WSAStartup failure
          printf("Server: WSAStartup failed with error %d\n", WSAGetLastError());
-         // Exit with error
          exit(-1);
     }
     else
@@ -71,12 +63,9 @@ void U_init_winsock2(WSADATA* wsadata)
 
     if (LOBYTE(wsadata->wVersion) != 2 || HIBYTE(wsadata->wVersion) != 2 )
     {
-         //Tell the user that we could not find a usable WinSock DLL
          printf("Server: The dll do not support the Winsock version %u.%u!\n",
                    LOBYTE(wsadata->wVersion),HIBYTE(wsadata->wVersion));
-         // Do the clean up
          WSACleanup();
-         // and exit with error
          exit(-1);
     }
     else

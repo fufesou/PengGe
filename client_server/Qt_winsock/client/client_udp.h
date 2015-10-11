@@ -30,11 +30,9 @@ struct client_udp
      * @param client_udp
      */
     void (*create_client)(struct client_udp* cli_udp);
-    void (*print_info)(struct client_udp* cli_udp);
     void (*dg_client)(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
     void (*clear)(struct client_udp* cli_udp);
 };
-
 
 void check_args(int argc, char* argv[]);
 

@@ -8,7 +8,7 @@
 
 #include <winsock2.h>
 #include <stdio.h>
-#include "utility.h"
+#include "udp_utility.h"
 
 
 int main(int argc, char* argv[])
@@ -47,9 +47,12 @@ int main(int argc, char* argv[])
     memset(&srcinfo, 0, sizeof(srcinfo));
     nlen = sizeof(srcinfo);
 
-    getsockname(sending_socket, (SOCKADDR*)&srcinfo, &nlen);
-    printf("client: sending IS(s) used: %s\n", inet_ntoa(srcinfo.sin_addr));
-    printf("client: sending port used: %d\n", htons(srcinfo.sin_port));
+    if (getsockname(sending_socket, (SOCKADDR*)&srcinfo, &nlen) == 0) {
+        printf("client: sending IS(s) used: %s\n", inet_ntoa(srcinfo.sin_addr));
+        printf("client: sending port used: %d\n", htons(srcinfo.sin_port));
+    } else {
+        printf("clinet: error code %d\n", WSAGetLastError());
+    }
 
     nlen = sizeof(receiver_addr);
     getpeername(sending_socket, (SOCKADDR*)&receiver_addr, &nlen);

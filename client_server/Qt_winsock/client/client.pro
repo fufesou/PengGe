@@ -17,7 +17,7 @@ SOURCES += \
     main.c \
     rtt.c \
     ../common/udp_utility.c \
-    client_sendrecv.c
+    client_sendrecv.c \
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 

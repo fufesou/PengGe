@@ -22,7 +22,8 @@ extern const char g_login_delimiter;
 static char* s_cli_msgheader = "client";
 
 static void s_create_client(struct client_udp* cli_udp);
-static void s_print_info(struct client_udp* cli_udp);
+static void s_connect_serv(struct client_udp* cli_udp, const struct sockaddr* serveraddr, int serveraddr_len);
+static void s_print_info(const struct client_udp* cli_udp);
 static void s_clear(struct client_udp* cli_udp);
 static void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
 
@@ -45,12 +46,11 @@ void init_client_udp(struct client_udp *cli_udp)
 {
     cli_udp->msgheader = s_cli_msgheader;
     cli_udp->create_client = s_create_client;
-    cli_udp->print_info = s_print_info;
     cli_udp->dg_client = s_dg_client;
     cli_udp->clear = s_clear;
 }
 
-void s_print_info(struct client_udp *cli_udp)
+void s_print_info(const struct client_udp *cli_udp)
 {
     if (U_printf_sockinfo(cli_udp->socket, cli_udp->msgheader) != 0) {
         U_errexit_value(1, "%s: some error occured before communication begin.\n", cli_udp->msgheader);
@@ -70,6 +70,15 @@ void s_create_client(struct client_udp *cli_udp)
     printf("%s: socket() is OK!\n", cli_udp->msgheader);
 }
 
+void s_connect_serv(struct client_udp* cli_udp, const struct sockaddr* serveraddr, int serveraddr_len)
+{
+    if (connect(cli_udp->socket, serveraddr, serveraddr_len) != 0) {
+        U_errexit_value(1, "%s: cannot connect server. error code: %d.\n", cli_udp->msgheader, WSAGetLastError());
+    } else {
+        s_print_info(cli_udp);
+    }
+}
+
 void s_clear(struct client_udp *cli_udp)
 {
     U_close_socket(cli_udp->socket);
@@ -78,6 +87,9 @@ void s_clear(struct client_udp *cli_udp)
 void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len)
 {
     ssize_t numbytes;
+
+    s_connect_serv(cli_udp, serveraddr, serveraddr_len);
+
     while (fgets(cli_udp->sendbuf, sizeof(cli_udp->sendbuf), fp) != NULL) {
         numbytes = client_sendrecv(
                     cli_udp->socket,
