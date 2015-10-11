@@ -79,7 +79,7 @@ void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* se
 {
     ssize_t numbytes;
     while (fgets(cli_udp->sendbuf, sizeof(cli_udp->sendbuf), fp) != NULL) {
-        numbytes = U_send_recv(
+        numbytes = client_sendrecv(
                     cli_udp->socket,
                     cli_udp->sendbuf,
                     sizeof(cli_udp->sendbuf),

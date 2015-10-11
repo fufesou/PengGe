@@ -7,14 +7,17 @@ INCLUDEPATH += ../common
 
 HEADERS += \
     server_udp.h \
-    ../common/udp_utility.h
+    ../common/udp_utility.h \
+    server_sendrecv.h \
+    ../common/udp_types.h
 
 SOURCES += \
     main.c \
     server_udp.c \
-    ../common/udp_utility.c
+    ../common/udp_utility.c \
+    server_sendrecv.c
 
-LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32
+LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 
 include(deployment.pri)
 qtcAddDeployment()

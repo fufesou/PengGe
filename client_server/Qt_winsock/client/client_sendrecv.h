@@ -15,9 +15,9 @@ extern "C" {
 #endif
 
 #ifdef WIN32
-ssize_t U_send_recv(SOCKET fd, const void* outbuf, size_t outbytes, void* inbuf, size_t inbytes, const struct sockaddr* destaddr, int destlen);
+ssize_t client_sendrecv(SOCKET fd, const void* outbuf, size_t outbytes, void* inbuf, size_t inbytes, const struct sockaddr* destaddr, int destlen);
 #else
-ssize_t U_send_recv(int fd, const void* outbuf, size_t outbytes, void* inbuf, size_t inbytes, const struct sockaddr* destaddr, int destlen);
+ssize_t client_sendrecv(int fd, const void* outbuf, size_t outbytes, void* inbuf, size_t inbytes, const struct sockaddr* destaddr, int destlen);
 #endif
 
 

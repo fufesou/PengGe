@@ -11,6 +11,19 @@
 #define  UDP_TYPES_H
 
 
+struct WSASendRecvMsg {
+    LPWSABUF msg_iov;
+    DWORD msg_iovlen;
+    DWORD numbytes;
+    DWORD flags;
+    struct sockaddr_in msg_name;
+    int msg_namelen;
+};
+
+struct hdr {
+    uint32_t seg;
+    uint32_t ts;
+};
 
 
 #endif  // UDP_TYPES_H

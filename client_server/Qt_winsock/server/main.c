@@ -22,10 +22,10 @@ int main(int argc, char* argv[])
     U_init_winsock2(&wsadata);
 
     init_server_udp(&udpserver);
-    udpserver.create_socket(&udpserver);
-    udpserver.bind_socket(&udpserver, AF_INET, atoi(argv[1]), htonl(INADDR_ANY));
 
+    udpserver.create_server(&udpserver, AF_INET, atoi(argv[1]), htonl(INADDR_ANY));
     udpserver.print_info(&udpserver);
+
     udpserver.communicate(&udpserver);
 
     udpserver.clear(&udpserver);

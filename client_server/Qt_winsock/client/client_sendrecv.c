@@ -15,6 +15,7 @@
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include "unprtt.h"
 #include "udp_types.h"
 
@@ -24,14 +25,10 @@ extern "C" {
 #endif
 
 static struct rtt_info rttinfo;
+static struct hdr sendhdr, recvhdr;
 static int rttinit = 0;
 
-static struct hdr {
-    uint32_t seg;
-    uint32_t ts;
-} sendhdr, recvhdr;
-
-static void sig_alarm(int signo);
+static void s_sig_alarm(int signo);
 
 #ifdef WIN32
 static struct WSASendRecvMsg msgsend, msgrecv;
@@ -47,22 +44,23 @@ static MMRESULT time_event_id = 0;
 #define RECV_RESEND  3
 static int recv_status = 0;
 
-static void start_time_event(int msec);
-static void recv_msg_fail(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
-static void kill_time_event(void);
-static void send_msg(SOCKET fd, struct WSASendRecvMsg* msg);
-static void recv_msg(SOCKET fd, struct WSASendRecvMsg* msg);
+static void s_start_timeevent(int msec);
+static void s_recvmsg_fail(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
+static void s_kill_timeevent(void);
+static void s_send_msg(SOCKET fd, struct WSASendRecvMsg* msg);
+static void s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg);
 #else
 static sigjmp_buf jmpbuf;
 
 /**
  * @todo implement later
  */
-static void send_msg(SOCKET fd, struct msghdr* msg);
+static void s_send_msg(int fd, struct msghdr* msg);
+static void s_recv_msg(int fd, struct WSASendRecvMsg* msg);
 #endif
 
 
-ssize_t U_send_recv(
+ssize_t client_sendrecv(
         SOCKET fd, 
         const void* outbuf, size_t outbytes,
         void* inbuf, size_t inbytes,
@@ -90,7 +88,11 @@ ssize_t U_send_recv(
 #define bufptr void*
 #endif
 
-    msgsend.msg_name = (struct sockaddr*)destaddr;
+#ifdef WIN32
+    memcpy_s(&msgsend.msg_name, sizeof(msgsend.msg_name), destaddr, destlen);
+#else
+    memcpy(&msgsend.msg_name, destaddr, destlen);
+#endif
     msgsend.msg_namelen = destlen;
     msgsend.msg_iov = iovsend;
     msgsend.msg_iovlen = 2;
@@ -100,11 +102,10 @@ ssize_t U_send_recv(
     iovsend[1].iov_base = (bufptr)outbuf;
     iovsend[1].iov_len = outbytes;
 
-    msgrecv.msg_name = NULL;
-    msgrecv.msg_namelen = 0;
+    msgrecv.msg_namelen = sizeof(msgrecv.msg_name);
     msgrecv.msg_iov = iovrecv;
     msgrecv.msg_iovlen = 2;
-    msgsend.flags = 0;
+    msgrecv.flags = 0;
     iovrecv[0].iov_base = (bufptr)&recvhdr;
     iovrecv[0].iov_len = sizeof(struct hdr);
     iovrecv[1].iov_base = (bufptr)inbuf;
@@ -119,12 +120,12 @@ ssize_t U_send_recv(
     rtt_newpack(&rttinfo);
 
     while (recv_status!=RECV_OK && recv_status!=RECV_TIMEOUT) {
-        send_msg(fd, &msgsend);
+        s_send_msg(fd, &msgsend);
         while (!recv_status) {
-            recv_msg(fd, &msgrecv);
+            s_recv_msg(fd, &msgrecv);
             if ((msgrecv.numbytes > sizeof(struct hdr)) && (recvhdr.seg == sendhdr.seg)) {
                 recv_status = RECV_OK;
-                kill_time_event();
+                s_kill_timeevent();
             }
         }
     }
@@ -138,7 +139,7 @@ ssize_t U_send_recv(
     return msgrecv.numbytes - sizeof(struct hdr);
 }
 
-void sig_alarm(int signo)
+void s_sig_alarm(int signo)
 {
     (void)signo;
 #ifndef WIN32
@@ -147,7 +148,7 @@ void sig_alarm(int signo)
 }
 
 #ifdef WIN32
-void recv_msg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1, DWORD_PTR dw2)
+void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1, DWORD_PTR dw2)
 {
     (void)timer_id;
     (void)msg;
@@ -165,12 +166,12 @@ void recv_msg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1, 
     }
 }
 
-void start_time_event(int msec)
+void s_start_timeevent(int msec)
 {
-    time_event_id = timeSetEvent(msec, 500, (LPTIMECALLBACK)recv_msg_fail, 0, TIME_CALLBACK_FUNCTION | TIME_ONESHOT);
+    time_event_id = timeSetEvent(msec, 500, (LPTIMECALLBACK)s_recvmsg_fail, 0, TIME_CALLBACK_FUNCTION | TIME_ONESHOT);
 }
 
-void kill_time_event(void)
+void s_kill_timeevent(void)
 {
     if (time_event_id) {
         timeKillEvent(time_event_id);
@@ -178,21 +179,40 @@ void kill_time_event(void)
     }
 }
 
-void send_msg(SOCKET fd, struct WSASendRecvMsg* msg)
+void s_send_msg(SOCKET fd, struct WSASendRecvMsg* msg)
 {
     sendhdr.ts = rtt_ts(&rttinfo);
-    if (0 != WSASendTo(fd, msg->msg_iov, msg->msg_iovlen, &msg->numbytes, msg->flags, msg->msg_name, msg->msg_namelen, NULL, NULL)) {
-        printf("send_msg error.\n");
+    if (0 != WSASendTo(
+                fd,
+                msg->msg_iov,
+                msg->msg_iovlen,
+                &msg->numbytes,
+                msg->flags,
+                (void*)&msg->msg_name,
+                msg->msg_namelen,
+                NULL,
+                NULL))
+    {
+        printf("s_send_msg error.\n");
     }
     recv_status = 0;
-    start_time_event(rtt_start(&rttinfo) * 1000);
+    s_start_timeevent(rtt_start(&rttinfo) * 1000);
 }
 
-void recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
+void s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
 {
-    if (0 != WSARecvFrom(fd, msg->msg_iov, msg->msg_iovlen, &msg->numbytes, &msg->flags, msg->msg_name, &msg->msg_namelen, NULL, NULL))
+    if (0 != WSARecvFrom(
+                fd,
+                msg->msg_iov,
+                msg->msg_iovlen,
+                &msg->numbytes,
+                &msg->flags,
+                (void*)&msg->msg_name,
+                &msg->msg_namelen,
+                NULL,
+                NULL))
     {
-        printf("send_msg error.\n");
+        printf("s_recv_msg error.\n");
         msg->numbytes = 0;
     }
 }
