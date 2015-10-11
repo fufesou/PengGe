@@ -21,16 +21,12 @@ extern const char g_login_delimiter;
 
 static char* s_cli_msgheader = "client";
 
-static void s_create_client(struct client_udp* cli_udp);
-static void s_connect_serv(struct client_udp* cli_udp, const struct sockaddr* serveraddr, int serveraddr_len);
-static void s_print_info(const struct client_udp* cli_udp);
 static void s_clear(struct client_udp* cli_udp);
+static void s_create_client(struct client_udp* cli_udp);
+static void s_print_info(const struct client_udp* cli_udp);
+static void s_connect_serv(struct client_udp* cli_udp, const struct sockaddr* serveraddr, int serveraddr_len);
 static void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
-
-
-#ifdef WIN32
-// http://www.intervalzero.com/library/RTX/WebHelp/Content/PROJECTS/SDK%20Reference/WinsockRef/WSASendTo.htm
-#endif
+static void s_login_session(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
 
 
 void check_args(int argc, char* argv[])
@@ -106,10 +102,47 @@ void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* se
                 fflush(stderr);
             }
             cli_udp->recvbuf[numbytes] = 0;
-            fputs(cli_udp->recvbuf, stdout);
+
+            if (strncmp(cli_udp->recvbuf, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1)) {
+                s_login_session(cli_udp, fp, serveraddr, serveraddr_len);
+            } else if (strncmp(cli_udp->recvbuf, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1)) {
+                printf("%s: login failed.\n", cli_udp->msgheader);
+            } else {
+                printf("%s: unkown message.\n", cli_udp->msgheader);
+            }
         }
     }
 }
+
+void s_login_session(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len)
+{
+    ssize_t numbytes;
+
+    printf("%s: switch to login interface.\n", cli_udp->msgheader);
+
+    while (fgets(cli_udp->sendbuf, sizeof(cli_udp->sendbuf), fp) != NULL) {
+        numbytes = client_sendrecv(
+                    cli_udp->socket,
+                    cli_udp->sendbuf,
+                    sizeof(cli_udp->sendbuf),
+                    cli_udp->recvbuf,
+                    sizeof(cli_udp->recvbuf),
+                    (struct sockaddr*)serveraddr,
+                    serveraddr_len);
+        if (numbytes > 0) {
+            if (numbytes >= (ssize_t)(sizeof(cli_udp->recvbuf))) {
+                fflush(stdout);
+                fputs("client: recived msg cut off", stderr);
+                fflush(stderr);
+            }
+            cli_udp->recvbuf[numbytes] = 0;
+            fputs(cli_udp->recvbuf, stdout);
+        }
+    }
+
+    printf("%s: exit login interface.\n", cli_udp->msgheader);
+}
+
 
 #ifdef __cplusplus
 }

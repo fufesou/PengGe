@@ -24,9 +24,9 @@
 extern "C" {
 #endif
 
+static int rttinit = 0;
 static struct rtt_info rttinfo;
 static struct hdr sendhdr, recvhdr;
-static int rttinit = 0;
 
 static void s_sig_alarm(int signo);
 
@@ -43,6 +43,7 @@ static MMRESULT time_event_id = 0;
 #define RECV_OK 2
 #define RECV_RESEND  3
 static int recv_status = 0;
+static int status_accesible = 1;
 
 static void s_start_timeevent(int msec);
 static void s_recvmsg_fail(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
@@ -72,6 +73,7 @@ ssize_t client_sendrecv(
     ssize_t n;
     struct iovec iovsend[2], iovrecv[2];
 #endif
+
     if (rttinit == 0) {
         rtt_init(&rttinfo);
         rttinit = 1;
@@ -120,6 +122,7 @@ ssize_t client_sendrecv(
     rtt_newpack(&rttinfo);
 
     recv_status = 0;
+    status_accesible = 1;
     while (recv_status!=RECV_OK && recv_status!=RECV_TIMEOUT) {
         s_send_msg(fd, &msgsend);
         while (!recv_status) {
@@ -127,6 +130,8 @@ ssize_t client_sendrecv(
             if ((msgrecv.numbytes > sizeof(struct hdr)) && (recvhdr.seg == sendhdr.seg)) {
                 recv_status = RECV_OK;
                 s_kill_timeevent();
+            } else {
+                status_accesible = 1;
             }
         }
     }
@@ -149,6 +154,11 @@ void s_sig_alarm(int signo)
 }
 
 #ifdef WIN32
+/**
+ * @brief s_recvmsg_fail is a callback function that will be called when assigned time elapsed.
+ * This function can set the 'recv_status' value.
+ * @note This function can read 'status_accesible' value, however it cannot change 'status_accesible'.
+ */
 void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1, DWORD_PTR dw2)
 {
     (void)timer_id;
@@ -156,6 +166,11 @@ void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1,
     (void)user_data;
     (void)dw1;
     (void)dw2;
+
+    if (!status_accesible) {
+        s_start_timeevent(100);
+        return;
+    }
 
     if (rtt_timeout(&rttinfo) < 0) {
         printf("no response from sever, giving up");
@@ -216,6 +231,7 @@ void s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
         printf("s_recv_msg error.\n");
         msg->numbytes = 0;
     }
+    status_accesible = 0;
 }
 
 #endif
