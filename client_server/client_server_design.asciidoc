@@ -1,0 +1,70 @@
+= 程序设计方案 =
+陈小龙 <34814491@qq.com>
+v1.0, 2015-9-19
+:library: Asciidoctor
+:imagesdir: images
+:lang: zh-cmn-Hans
+:doctype: article
+:description:
+:icons: font
+:source-highlighter: highlightjs
+:linkcss!:
+:numbered:
+:idprefix:
+:toc: right
+:toclevels: 3
+:experimental:
+
+:numbered!:
+[abstract]
+服务器客户端通信程序初步用于在windows上运行，以后移植到IOS和Android上，大部分代码用C完成。
+
+link:https://github.com/fufesou/PengGe[项目git地址]中的client_server/Qt_winsock(link:https://github.com/fufesou/PengGe/tree/master/client_server/Qt_winsock[点我])为服务器客户端的工程。
+
+
+:numbered:
+== 总述 ==
+--
+. 采用C语言写客户端和服务器程序。
+. 用Qt做界面，界面包括：
+. log。
+--
+
+.注意
+--
+. 目前编译的是windows64位的程序，程序需要winsock2版本的支持。
+. 现在只是用的IPv4，后面改成IPv6。
+--
+
+=== 服务器 ===
+
+我写的程序只监听一个端口，程序服务器要监听4个端口，就开4个程序。
+
+
+=== 客户端 ===
+
+客户端分为两个界面(界面还没开始做)，初始界面与登录界面，通过用户名和密码验证后，客户端由初始界面转入登录界面(目前的实现为打印enter login interface的信息)。
+
+登录方式为输入"login: 64bit 8-15bytes"，登录后客户端控制台会打印返回信息(现在的返回信息为输入信息)。
+
+客户端使用rtt算法确保消息送达服务器与消息的顺序。
+
+=== 界面 ===
+
+=== log ===
+
+== 详细设计 ==
+
+=== 服务器客户端 ===
+服务器客户端主要分成三个模块。
+--
+. 通用模块，包括一些错误处理函数，socket包裹函数，一些常用宏定义等。
+. 服务器，定义服务器对象数据结构及操作。
+. 客户端，定义客户端对象数据结构及操作。
+--
+
+==== 通用模块 ====
+
+==== 服务器 ====
+
+==== 客户端 ====
