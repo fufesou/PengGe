@@ -1,7 +1,9 @@
 /**
  * @file main.c
- * @brief 
- * @author cxl
+ * @brief Client must login before exchange message with server. 
+ * The format of login message is "login: <username> <password>".
+ * The format of logout message is "logout".
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-01
  */
@@ -22,7 +24,7 @@ int main(int argc, char* argv[])
     U_init_winsock2(&wsadata);
 
     init_client_udp(&udpclient);
-    udpclient.create_client(&udpclient);
+    udpclient.set_socket(&udpclient);
 
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons((unsigned short)atoi(argv[1]));

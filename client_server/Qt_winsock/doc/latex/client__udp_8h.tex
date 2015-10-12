@@ -1,0 +1,92 @@
+\hypertarget{client__udp_8h}{}\section{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/client/client\+\_\+udp.h File Reference}
+\label{client__udp_8h}\index{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/client/client\+\_\+udp.\+h@{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/client/client\+\_\+udp.\+h}}
+
+
+This file provide the interfaces of udp client.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$winsock2.\+h$>$}\\*
+Include dependency graph for client\+\_\+udp.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=214pt]{client__udp_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{client__udp_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structclient__udp}{client\+\_\+udp}
+\begin{DoxyCompactList}\small\item\em struct \hyperlink{structclient__udp}{client\+\_\+udp} contains necessary members and functions for client operations. This struct object must be initialized (by calling init\+\_\+client\+\_\+udp) before any operations applied to it. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{client__udp_8h_a3c6f803a771083053dac5e68b0f6d344}{check\+\_\+args} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em check\+\_\+args checks whether the arguments are correct. If invalid paramters are passed, this function will give some prompts. \end{DoxyCompactList}\item 
+void \hyperlink{client__udp_8h_a634ec1ea0f7527823a71d4c6a445425e}{init\+\_\+client\+\_\+udp} (struct \hyperlink{structclient__udp}{client\+\_\+udp} $\ast$cli\+\_\+udp)
+\begin{DoxyCompactList}\small\item\em init\+\_\+client\+\_\+udp sets basic members and function pointers to the client object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provide the interfaces of udp client. 
+
+\begin{DoxyAuthor}{Author}
+cxl 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/09-\/30 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{client__udp_8h_a3c6f803a771083053dac5e68b0f6d344}{}\index{client\+\_\+udp.\+h@{client\+\_\+udp.\+h}!check\+\_\+args@{check\+\_\+args}}
+\index{check\+\_\+args@{check\+\_\+args}!client\+\_\+udp.\+h@{client\+\_\+udp.\+h}}
+\subsubsection[{check\+\_\+args(int argc, char $\ast$argv[])}]{\setlength{\rightskip}{0pt plus 5cm}void check\+\_\+args (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{client__udp_8h_a3c6f803a771083053dac5e68b0f6d344}
+
+
+check\+\_\+args checks whether the arguments are correct. If invalid paramters are passed, this function will give some prompts. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & \\
+\hline
+{\em argv\mbox{[}$\,$\mbox{]}} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{client__udp_8h_a634ec1ea0f7527823a71d4c6a445425e}{}\index{client\+\_\+udp.\+h@{client\+\_\+udp.\+h}!init\+\_\+client\+\_\+udp@{init\+\_\+client\+\_\+udp}}
+\index{init\+\_\+client\+\_\+udp@{init\+\_\+client\+\_\+udp}!client\+\_\+udp.\+h@{client\+\_\+udp.\+h}}
+\subsubsection[{init\+\_\+client\+\_\+udp(struct client\+\_\+udp $\ast$cli\+\_\+udp)}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+client\+\_\+udp (
+\begin{DoxyParamCaption}
+\item[{struct {\bf client\+\_\+udp} $\ast$}]{cli\+\_\+udp}
+\end{DoxyParamCaption}
+)}\label{client__udp_8h_a634ec1ea0f7527823a71d4c6a445425e}
+
+
+init\+\_\+client\+\_\+udp sets basic members and function pointers to the client object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli\+\_\+udp} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+This function must be called immediately after W\+S\+A\+Startup being called. 
+\end{DoxyNote}

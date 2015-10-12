@@ -22,7 +22,7 @@ extern const char g_login_delimiter;
 static char* s_cli_msgheader = "client";
 
 static void s_clear(struct client_udp* cli_udp);
-static void s_create_client(struct client_udp* cli_udp);
+static void s_set_socket(struct client_udp* cli_udp);
 static void s_print_info(const struct client_udp* cli_udp);
 static void s_connect_serv(struct client_udp* cli_udp, const struct sockaddr* serveraddr, int serveraddr_len);
 static void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
@@ -41,7 +41,7 @@ void check_args(int argc, char* argv[])
 void init_client_udp(struct client_udp *cli_udp)
 {
     cli_udp->msgheader = s_cli_msgheader;
-    cli_udp->create_client = s_create_client;
+    cli_udp->set_socket = s_set_socket;
     cli_udp->dg_client = s_dg_client;
     cli_udp->clear = s_clear;
 }
@@ -53,7 +53,7 @@ void s_print_info(const struct client_udp *cli_udp)
     }
 }
 
-void s_create_client(struct client_udp *cli_udp)
+void s_set_socket(struct client_udp *cli_udp)
 {
     if (strcmp(cli_udp->msgheader, s_cli_msgheader) != 0) {
         init_client_udp(cli_udp);

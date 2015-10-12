@@ -1,0 +1,133 @@
+\hypertarget{udp__utility_8h}{}\section{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/common/udp\+\_\+utility.h File Reference}
+\label{udp__utility_8h}\index{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/common/udp\+\_\+utility.\+h@{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/common/udp\+\_\+utility.\+h}}
+
+
+Utility functions. The prefix \char`\"{}\+U\+\_\+\char`\"{} stands for utility.  
+
+
+{\ttfamily \#include $<$stdarg.\+h$>$}\\*
+{\ttfamily \#include $<$winsock2.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+Include dependency graph for udp\+\_\+utility.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=280pt]{udp__utility_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{udp__utility_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{udp__utility_8h_aded12ee524c5f45b7d4c0392e14c6d9b}{U\+\_\+errexit} (const char $\ast$format,...)
+\begin{DoxyCompactList}\small\item\em U\+\_\+errexit Print error information and exit(1). \end{DoxyCompactList}\item 
+void \hyperlink{udp__utility_8h_ac4419ec449365c1ef66d1386686f55b3}{U\+\_\+errexit\+\_\+value} (int exit\+\_\+value, const char $\ast$format,...)
+\begin{DoxyCompactList}\small\item\em U\+\_\+errexit\+\_\+value Print error information and exit(exit\+\_\+value). \end{DoxyCompactList}\item 
+void \hyperlink{udp__utility_8h_adb05a762c0dc472cf20efee8d3a6433f}{U\+\_\+init\+\_\+winsock2} (W\+S\+A\+D\+A\+T\+A $\ast$wsadata)
+\begin{DoxyCompactList}\small\item\em U\+\_\+init\+\_\+winsock2 Wrapped function of W\+S\+A\+Startup with error checking. \end{DoxyCompactList}\item 
+void \hyperlink{udp__utility_8h_aeb6a91ab17e7927f3a4c046e637d66af}{U\+\_\+close\+\_\+socket} (S\+O\+C\+K\+E\+T sockfd)
+\begin{DoxyCompactList}\small\item\em U\+\_\+close\+\_\+socket closesocket() wrapper with error checking. \end{DoxyCompactList}\item 
+\hypertarget{udp__utility_8h_a40fe718aed79325649f9488a38918e14}{}void \hyperlink{udp__utility_8h_a40fe718aed79325649f9488a38918e14}{U\+\_\+cleanup\+\_\+winsock2} (void)\label{udp__utility_8h_a40fe718aed79325649f9488a38918e14}
+
+\begin{DoxyCompactList}\small\item\em U\+\_\+cleanup\+\_\+winsock2 Wrapped function of W\+S\+A\+Cleanup with error checking When your application is finished handling the connections, call W\+S\+A\+Cleanup. \end{DoxyCompactList}\item 
+\hypertarget{udp__utility_8h_a73f1cfc1470e06a6cb8eafb0b65a8c89}{}int {\bfseries U\+\_\+printf\+\_\+sockinfo} (S\+O\+C\+K\+E\+T sockfd, char $\ast$msgheader)\label{udp__utility_8h_a73f1cfc1470e06a6cb8eafb0b65a8c89}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Utility functions. The prefix \char`\"{}\+U\+\_\+\char`\"{} stands for utility. 
+
+\begin{DoxyAuthor}{Author}
+cxl 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/09-\/20 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{udp__utility_8h_aeb6a91ab17e7927f3a4c046e637d66af}{}\index{udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}!U\+\_\+close\+\_\+socket@{U\+\_\+close\+\_\+socket}}
+\index{U\+\_\+close\+\_\+socket@{U\+\_\+close\+\_\+socket}!udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}}
+\subsubsection[{U\+\_\+close\+\_\+socket(\+S\+O\+C\+K\+E\+T sockfd)}]{\setlength{\rightskip}{0pt plus 5cm}void U\+\_\+close\+\_\+socket (
+\begin{DoxyParamCaption}
+\item[{S\+O\+C\+K\+E\+T}]{sockfd}
+\end{DoxyParamCaption}
+)}\label{udp__utility_8h_aeb6a91ab17e7927f3a4c046e637d66af}
+
+
+U\+\_\+close\+\_\+socket closesocket() wrapper with error checking. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sockfd} & socket to close \\
+\hline
+\end{DoxyParams}
+\hypertarget{udp__utility_8h_aded12ee524c5f45b7d4c0392e14c6d9b}{}\index{udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}!U\+\_\+errexit@{U\+\_\+errexit}}
+\index{U\+\_\+errexit@{U\+\_\+errexit}!udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}}
+\subsubsection[{U\+\_\+errexit(const char $\ast$format,...)}]{\setlength{\rightskip}{0pt plus 5cm}void U\+\_\+errexit (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{format, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{udp__utility_8h_aded12ee524c5f45b7d4c0392e14c6d9b}
+
+
+U\+\_\+errexit Print error information and exit(1). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em format} & \\
+\hline
+{\em ...} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{udp__utility_8h_ac4419ec449365c1ef66d1386686f55b3}{}\index{udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}!U\+\_\+errexit\+\_\+value@{U\+\_\+errexit\+\_\+value}}
+\index{U\+\_\+errexit\+\_\+value@{U\+\_\+errexit\+\_\+value}!udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}}
+\subsubsection[{U\+\_\+errexit\+\_\+value(int exit\+\_\+value, const char $\ast$format,...)}]{\setlength{\rightskip}{0pt plus 5cm}void U\+\_\+errexit\+\_\+value (
+\begin{DoxyParamCaption}
+\item[{int}]{exit\+\_\+value, }
+\item[{const char $\ast$}]{format, }
+\item[{}]{...}
+\end{DoxyParamCaption}
+)}\label{udp__utility_8h_ac4419ec449365c1ef66d1386686f55b3}
+
+
+U\+\_\+errexit\+\_\+value Print error information and exit(exit\+\_\+value). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em exit\+\_\+value} & value for exit() \\
+\hline
+{\em format} & \\
+\hline
+{\em ...} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{udp__utility_8h_adb05a762c0dc472cf20efee8d3a6433f}{}\index{udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}!U\+\_\+init\+\_\+winsock2@{U\+\_\+init\+\_\+winsock2}}
+\index{U\+\_\+init\+\_\+winsock2@{U\+\_\+init\+\_\+winsock2}!udp\+\_\+utility.\+h@{udp\+\_\+utility.\+h}}
+\subsubsection[{U\+\_\+init\+\_\+winsock2(\+W\+S\+A\+D\+A\+T\+A $\ast$wsadata)}]{\setlength{\rightskip}{0pt plus 5cm}void U\+\_\+init\+\_\+winsock2 (
+\begin{DoxyParamCaption}
+\item[{W\+S\+A\+D\+A\+T\+A $\ast$}]{wsadata}
+\end{DoxyParamCaption}
+)}\label{udp__utility_8h_adb05a762c0dc472cf20efee8d3a6433f}
+
+
+U\+\_\+init\+\_\+winsock2 Wrapped function of W\+S\+A\+Startup with error checking. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em wsadata} & \\
+\hline
+\end{DoxyParams}

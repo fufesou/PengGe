@@ -1,0 +1,60 @@
+\hypertarget{server__sendrecv_8c}{}\section{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/server/server\+\_\+sendrecv.c File Reference}
+\label{server__sendrecv_8c}\index{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/server/server\+\_\+sendrecv.\+c@{D\+:/\+Projects/\+Peng\+Ge/client\+\_\+server/\+Qt\+\_\+winsock/server/server\+\_\+sendrecv.\+c}}
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}udp\+\_\+types.\+h\char`\"{}}\\*
+Include dependency graph for server\+\_\+sendrecv.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{server__sendrecv_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{server__sendrecv_8c_af3b76ca76559f938a4f14abb1ad3e194}{}\#define {\bfseries bufptr}~void$\ast$\label{server__sendrecv_8c_af3b76ca76559f938a4f14abb1ad3e194}
+
+\item 
+\hypertarget{server__sendrecv_8c_af3b76ca76559f938a4f14abb1ad3e194}{}\#define {\bfseries bufptr}~void$\ast$\label{server__sendrecv_8c_af3b76ca76559f938a4f14abb1ad3e194}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+ssize\+\_\+t \hyperlink{server__sendrecv_8c_abbf550e967157f1f7a9435ecf62787c4}{server\+\_\+recv} (S\+O\+C\+K\+E\+T fd, void $\ast$inbuf, size\+\_\+t inbytes, struct \hyperlink{structhdr}{hdr} $\ast$hdrdata, struct sockaddr $\ast$cli\+\_\+addr, int $\ast$cli\+\_\+addrlen)
+\item 
+\hypertarget{server__sendrecv_8c_aa859f524235db38e2161366b5ab660c6}{}void {\bfseries server\+\_\+send} (S\+O\+C\+K\+E\+T fd, const void $\ast$outbuf, size\+\_\+t outbytes, const struct \hyperlink{structhdr}{hdr} $\ast$hdrdata, const struct sockaddr $\ast$cli\+\_\+addr, int cli\+\_\+addrlen)\label{server__sendrecv_8c_aa859f524235db38e2161366b5ab660c6}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+cxl 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/10 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{server__sendrecv_8c_abbf550e967157f1f7a9435ecf62787c4}{}\index{server\+\_\+sendrecv.\+c@{server\+\_\+sendrecv.\+c}!server\+\_\+recv@{server\+\_\+recv}}
+\index{server\+\_\+recv@{server\+\_\+recv}!server\+\_\+sendrecv.\+c@{server\+\_\+sendrecv.\+c}}
+\subsubsection[{server\+\_\+recv(\+S\+O\+C\+K\+E\+T fd, void $\ast$inbuf, size\+\_\+t inbytes, struct hdr $\ast$hdrdata, struct sockaddr $\ast$cli\+\_\+addr, int $\ast$cli\+\_\+addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}ssize\+\_\+t server\+\_\+recv (
+\begin{DoxyParamCaption}
+\item[{S\+O\+C\+K\+E\+T}]{fd, }
+\item[{void $\ast$}]{inbuf, }
+\item[{size\+\_\+t}]{inbytes, }
+\item[{struct {\bf hdr} $\ast$}]{hdrdata, }
+\item[{struct sockaddr $\ast$}]{cli\+\_\+addr, }
+\item[{int $\ast$}]{cli\+\_\+addrlen}
+\end{DoxyParamCaption}
+)}\label{server__sendrecv_8c_abbf550e967157f1f7a9435ecf62787c4}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000002}{Todo}]This call may be not safe without error checking. \end{DoxyRefDesc}

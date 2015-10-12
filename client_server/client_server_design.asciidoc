@@ -34,6 +34,8 @@ link:https://github.com/fufesou/PengGe[项目git地址]中的client_server/Qt_wi
 --
 . 目前编译的是windows64位的程序，程序需要winsock2版本的支持。
 . 现在只是用的IPv4，后面改成IPv6。
+. 代码中没写注释，这两天把注释补全。
+. 代码调试差不多的话，就开始做界面吗？
 --
 
 === 服务器 ===

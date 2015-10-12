@@ -1,6 +1,6 @@
 /**
  * @file unprtt.h
- * @brief 
+ * @brief This file comes from 'UNIX Network Programming' source code.
  * @author cxl
  * @version 0.1
  * @date 2015-10-09
