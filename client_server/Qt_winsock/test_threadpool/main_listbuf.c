@@ -1,3 +1,11 @@
+/**
+ * @file main_listbuf.c
+ * @brief  This demo routine use 'struct array_buf' as the buffer struct.
+ * @author cxl, <shuanglongchen@yeah.net>
+ * @version 0.1
+ * @date 2015-10-14
+ */
+
 #include  <stdio.h>
 #include  <windows.h>
 #include  <process.h>
@@ -12,7 +20,6 @@ HANDLE handle_thread[NUM_THREAD];
 HANDLE handle_semfilled;
 char buf[255];
 CRITICAL_SECTION cs_code;
-CRITICAL_SECTION cs_param;
 
 #ifdef _DEBUG
 int pullcount = 0;
@@ -38,7 +45,6 @@ int main(void)
     init_buflist(&empty_listbuf, numbuf, 255);
 
     InitializeCriticalSection(&cs_code);
-    InitializeCriticalSection(&cs_param);
 
     create_semophare(0, numbuf);
     create_threads(NUM_THREAD);
@@ -73,7 +79,6 @@ int main(void)
     }
     CloseHandle(handle_semfilled);
     DeleteCriticalSection(&cs_code);
-    DeleteCriticalSection(&cs_param);
 
     return 0;
 }

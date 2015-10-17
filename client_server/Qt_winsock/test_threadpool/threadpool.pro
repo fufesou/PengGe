@@ -6,12 +6,15 @@ CONFIG -= qt
 CONFIG(debug, release|debug):DEFINES +=  _DEBUG
 
 SOURCES += \
-    main.c \
+    main_arraybuf.c \
+    # main_listbuf.c \
     buflist.c \
-    list.c
+    list.c \
+    bufarray.c
 
 HEADERS += \
     buflist.h \
     list.h \
-    macros.h
+    macros.h \
+    bufarray.h
 
