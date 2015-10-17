@@ -60,7 +60,6 @@ int main(void)
             {
                 LeaveCriticalSection(&cs_code);
                 Sleep(10);
-                EnterCriticalSection(&cs_code);
                 continue;
             }
             sprintf(bufnode->buf, "%d", i);

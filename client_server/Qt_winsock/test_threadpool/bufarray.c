@@ -32,7 +32,7 @@ void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
 
     buf->head = 0;
     buf->len_item = TO_MULTIPLE_OF(lenitem, 512);
-    buf->num_item = TO_MULTIPLE_OF(numitem, 4);
+    buf->num_item = TO_MULTIPLE_OF(numitem, 4) + 1;
     buf->pull_item = s_pull_item;
     buf->push_item = s_push_item;
     buf->clear_buf = s_clear_buf;
@@ -43,9 +43,11 @@ void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
     }
 
     if (nmalloc < 0 || nmalloc >= numitem) {
-        nmalloc = buf->num_item;
+        nmalloc = buf->num_item - 1;
     }
-    nmalloc = TO_MULTIPLE_OF(nmalloc, 4);
+    else {
+        nmalloc = TO_MULTIPLE_OF(nmalloc, 4);
+    }
 
     buf->tail = nmalloc;
 
@@ -68,13 +70,16 @@ char* s_pull_item(struct array_buf* buf)
         return NULL;
     }
     item = buf->data[buf->head];
-    buf->head = (buf->head + 1) % buf->num_item;
+    buf->head = ((buf->head + 1) == buf->num_item) ?
+                    0 : (buf->head + 1);
     return item;
 }
 
 char* s_push_item(struct array_buf* buf, char* item)
 {
-    int ahead_tail = (buf->tail + 1) % buf->num_item;
+    int ahead_tail = ((buf->tail + 1) == buf->num_item) ?
+                            0 : (buf->tail + 1);
+
 #ifdef CHECK_PARAM
     if (item == NULL || buf == NULL) {
         return NULL;
@@ -84,6 +89,7 @@ char* s_push_item(struct array_buf* buf, char* item)
     if (ahead_tail == buf->head) {
         return NULL;
     }
+
     buf->data[buf->tail] = item;
     buf->tail = ahead_tail;
 

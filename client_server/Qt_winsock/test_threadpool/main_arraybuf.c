@@ -1,7 +1,7 @@
 /**
  * @file main_arraybuf.c
  * @brief  This demo routine use 'struct array_buf' as the buffer struct.
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-17
  */
@@ -48,7 +48,7 @@ int main(void)
 
     InitializeCriticalSection(&cs_code);
 
-    create_semophare(0, filled_arraybuf.num_item);
+    create_semophare(0, filled_arraybuf.num_item - 1);
     create_threads(NUM_THREAD);
 
     while (fgets(buf, sizeof(buf), stdin) != NULL)
@@ -57,15 +57,12 @@ int main(void)
         while (i < numbuf)
         {
             EnterCriticalSection(&cs_code);
-
             if ((bufitem = empty_arraybuf.pull_item(&empty_arraybuf)) == NULL)
             {
                 LeaveCriticalSection(&cs_code);
                 Sleep(10);
-                EnterCriticalSection(&cs_code);
                 continue;
             }
-            printf("head: %d, tail: %d.\n", empty_arraybuf.head, empty_arraybuf.tail);
             sprintf(bufitem, "%d", i);
             filled_arraybuf.push_item(&filled_arraybuf, bufitem);
 
@@ -146,11 +143,11 @@ unsigned int __stdcall processBufferData(void* pPM)
 #ifdef _DEBUG
         ++pullcount;
 #endif
-        // assert(bufitem != NULL);
-        // if (bufitem == NULL) continue;
+        assert(bufitem != NULL);
+        if (bufitem == NULL) continue;
         LeaveCriticalSection(&cs_code);
 
-        // process_msg(bufitem, GetCurrentThreadId());
+        process_msg(bufitem, GetCurrentThreadId());
         Sleep(200);
 
         EnterCriticalSection(&cs_code);
