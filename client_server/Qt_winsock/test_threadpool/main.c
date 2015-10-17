@@ -23,8 +23,8 @@ int countsem_wait = 0;
 static LIST_HEAD(filled_listbuf);
 static LIST_HEAD(empty_listbuf);
 
-static void create_semophare(void);
-static void create_threads(void);
+static void create_semophare(long count_init, long count_max);
+static void create_threads(int num_thread);
 static unsigned int __stdcall processBufferData(void* pPM);
 static void process_msg(struct buf_node* bufnode, long threadid);
 
@@ -40,8 +40,8 @@ int main(void)
     InitializeCriticalSection(&cs_code);
     InitializeCriticalSection(&cs_param);
 
-    create_semophare();
-    create_threads();
+    create_semophare(0, numbuf);
+    create_threads(NUM_THREAD);
 
     while (fgets(buf, sizeof(buf), stdin) != NULL)
     {
@@ -63,11 +63,6 @@ int main(void)
             LeaveCriticalSection(&cs_code);
             ReleaseSemaphore(handle_semfilled, 1, NULL);
             ++i;
-
-            // umcomment the following code.
-            // if commented, this program will result in error:
-            // the handler call times are less than 'numbuf'.
-            // Sleep(10);
         }
     }
 
@@ -83,9 +78,9 @@ int main(void)
     return 0;
 }
 
-void create_semophare(void)
+void create_semophare(long count_init, long count_max)
 {
-    handle_semfilled = CreateSemaphore(NULL, 0, 32*32, NULL);
+    handle_semfilled = CreateSemaphore(NULL, count_init, count_max, NULL);
     if (handle_semfilled == NULL)
     {
         printf("create semaphore error! errno: %ld\n", GetLastError());
@@ -93,10 +88,10 @@ void create_semophare(void)
     }
 }
 
-void create_threads(void)
+void create_threads(int num_thread)
 {
     int i;
-    for (i=0; i<NUM_THREAD; ++i)
+    for (i=0; i<num_thread; ++i)
     {
         handle_thread[i] = (HANDLE)_beginthreadex(NULL, 0, processBufferData, NULL, 0, NULL);
         while ((long)handle_thread[i] == 1L)
@@ -136,29 +131,21 @@ unsigned int __stdcall processBufferData(void* pPM)
 
         EnterCriticalSection(&cs_code);
         bufnode = pullbuf(&filled_listbuf);
-        LeaveCriticalSection(&cs_code);
-        while (bufnode != NULL) {
-
 #ifdef _DEBUG
-        EnterCriticalSection(&cs_code);
         ++pullcount;
+#endif
+        if (bufnode == NULL) continue;
         LeaveCriticalSection(&cs_code);
-#endif
 
-            process_msg(bufnode, GetCurrentThreadId());
-            Sleep(100);
+        process_msg(bufnode, GetCurrentThreadId());
+        Sleep(100);
 
-            EnterCriticalSection(&cs_code);
+        EnterCriticalSection(&cs_code);
 #ifdef _DEBUG
-            ++pushcount;
+        ++pushcount;
 #endif
-            pushbuf(bufnode, &empty_listbuf);
-            LeaveCriticalSection(&cs_code);
-
-            EnterCriticalSection(&cs_code);
-            bufnode = pullbuf(&filled_listbuf);
-            LeaveCriticalSection(&cs_code);
-        }
+        pushbuf(bufnode, &empty_listbuf);
+        LeaveCriticalSection(&cs_code);
     }
 
     return 0;

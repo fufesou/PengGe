@@ -10,9 +10,6 @@ SOURCES += \
     buflist.c \
     list.c
 
-include(deployment.pri)
-qtcAddDeployment()
-
 HEADERS += \
     buflist.h \
     list.h \
