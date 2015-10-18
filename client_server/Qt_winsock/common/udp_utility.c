@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 const char* g_loginmsg_header = "login: ";
+const char* g_logoutmsg_header = "logout";
 const char* g_loginmsg_SUCCESS = "login_success";
 const char* g_loginmsg_FAIL = "login_fail";
 const char g_login_delimiter = ' ';

@@ -51,14 +51,11 @@ int main(void)
     create_semophare(0, filled_arraybuf.num_item - 1);
     create_threads(NUM_THREAD);
 
-    while (fgets(buf, sizeof(buf), stdin) != NULL)
-    {
+    while (fgets(buf, sizeof(buf), stdin) != NULL) {
         i = 0;
-        while (i < numbuf)
-        {
+        while (i < numbuf) {
             EnterCriticalSection(&cs_code);
-            if ((bufitem = empty_arraybuf.pull_item(&empty_arraybuf)) == NULL)
-            {
+            if ((bufitem = empty_arraybuf.pull_item(&empty_arraybuf)) == NULL) {
                 LeaveCriticalSection(&cs_code);
                 Sleep(10);
                 continue;
@@ -74,8 +71,7 @@ int main(void)
     }
 
     WaitForMultipleObjects(NUM_THREAD, handle_thread, 1, INFINITE);
-    for (i=0; i<NUM_THREAD; ++i)
-    {
+    for (i=0; i<NUM_THREAD; ++i) {
         CloseHandle(handle_thread[i]);
     }
     CloseHandle(handle_semfilled);
@@ -90,8 +86,7 @@ int main(void)
 void create_semophare(long count_init, long count_max)
 {
     handle_semfilled = CreateSemaphore(NULL, count_init, count_max, NULL);
-    if (handle_semfilled == NULL)
-    {
+    if (handle_semfilled == NULL) {
         printf("create semaphore error! errno: %ld\n", GetLastError());
         exit(1);
     }
@@ -100,16 +95,13 @@ void create_semophare(long count_init, long count_max)
 void create_threads(int num_thread)
 {
     int i;
-    for (i=0; i<num_thread; ++i)
-    {
+    for (i=0; i<num_thread; ++i) {
         handle_thread[i] = (HANDLE)_beginthreadex(NULL, 0, processBufferData, NULL, 0, NULL);
-        while ((long)handle_thread[i] == 1L)
-        {
+        while ((long)handle_thread[i] == 1L) {
             printf("create thread error, try again now\n");
             handle_thread[i] = (HANDLE)_beginthreadex(NULL, 0, processBufferData, NULL, 0, NULL);
         }
-        if (handle_thread[i] == 0)
-        {
+        if (handle_thread[i] == 0) {
             printf("create thread error, errno: %d.\nexit(1)\n", errno);
             exit(1);
         }

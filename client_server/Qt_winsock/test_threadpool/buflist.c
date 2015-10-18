@@ -13,8 +13,18 @@
 #include  "buflist.h"
 #include  "macros.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-struct buf_node* create_bufnode(int buflen)
+static struct buf_node* s_create_bufnode(int buflen);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+struct buf_node* s_create_bufnode(int buflen)
 {
     struct buf_node* pnode = (struct buf_node*)malloc(sizeof(struct buf_node));
     pnode->buf = (char*)malloc(buflen);
@@ -26,8 +36,10 @@ void init_buflist(struct list_head* listhead, int listlen, int buflen)
 {
     int i = 0;
     struct buf_node* newnode = NULL;
+    buflen = TO_MULTIPLE_OF(buflen, 512);
+
     while (i < listlen) {
-        newnode = create_bufnode(buflen);
+        newnode = s_create_bufnode(buflen);
         list_add(&newnode->listnode, listhead);
         ++i;
     }
@@ -68,3 +80,4 @@ void pushbuf(struct buf_node* node, struct list_head* listhead)
     }
     list_add(&node->listnode, listhead);
 }
+
