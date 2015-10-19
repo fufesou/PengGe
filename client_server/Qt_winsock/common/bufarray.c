@@ -66,7 +66,7 @@ void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
 char* s_pull_item(struct array_buf* buf)
 {
     char* item = NULL;
-#ifdef CHECK_PARAM
+#ifdef _CHECK_ARGS
     if (buf == NULL) {
         return NULL;
     }
@@ -86,7 +86,7 @@ char* s_push_item(struct array_buf* buf, char* item)
     int ahead_tail = ((buf->tail + 1) == buf->num_item) ?
                             0 : (buf->tail + 1);
 
-#ifdef CHECK_PARAM
+#ifdef _CHECK_ARGS
     if (item == NULL || buf == NULL) {
         return NULL;
     }

@@ -16,6 +16,7 @@ HEADERS += \
     ../common/macros.h \
     msgdispatch.h \
     server_servroutine.h \
+    ../common/sendrecv_pool.h
 
 SOURCES += \
     main.c \
@@ -25,6 +26,7 @@ SOURCES += \
     ../common/bufarray.c \
     server_servroutine.c \
     msgdispatch.c \
+    ../common/sendrecv_pool.c
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 
