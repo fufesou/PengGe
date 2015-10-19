@@ -24,26 +24,56 @@
 extern "C" {
 #endif
 
+typedef unsigned int __stdcall (*ptr_process_sendrecv)(void*);
+
+/**
+ * @brief sendrecv_pool contains basic members for send receive buffer and thread operations.
+ * The members of struct sendrecv_pool should be set with configuration.
+ *
+ * @todo write a cofigure parser to set the members
+ */
 static struct sendrecv_pool {
-    HANDLE hsem_filled;
-    HANDLE* hthreads;
     int num_thread;
     int len_item;
     int num_item;
+    HANDLE* hthreads;
+    HANDLE hsem_filled;
     struct array_buf filled_buf;
     struct array_buf empty_buf;
-}send_buf, recv_buf;
+
+    ptr_process_sendrecv process_func;
+}send_pool, recv_pool;
 
 /**
  * @brief s_cscode is used to ensure some variable operation to be atom op. 
  */
 static CRITICAL_SECTION s_cscode;
 
-static void s_initbuf(struct sendrecv_pool* buf);
-static void s_clearbuf(struct sendrecv_pool* buf);
-static void s_create_semaphore(long count_init, long count_max);
-static void s_create_threads(int num_thread);
-static unsigned int __stdcall s_process_buffer(void* unused);
+/**
+ * @brief  s_configurate_sendpool should parse the config first, and then set data to send_pool.
+ */
+static void s_configurate_sendpool(void);
+/**
+ * @brief  s_configurate_recvpool should parse the config first, and then set data to recv_pool.
+ *
+ */
+static void s_configurate_recvpool(void);
+/**
+ * @brief  s_initpool This function will initialize buffers, create semaphore and threads.
+ *
+ * @param pool The send or receive pool to be initialized.
+ */
+static void s_initpool(struct sendrecv_pool* pool);
+/**
+ * @brief  s_clearpool This function will do some clear works such as free memory.
+ *
+ * @param pool The send or receive pool to clear.
+ */
+static void s_clearpool(struct sendrecv_pool* pool);
+static void s_create_semaphore(HANDLE* hsem, long count_init, long count_max);
+static void s_create_threads(HANDLE** arr_hthreads, int num_thread, ptr_process_sendrecv process_func);
+static unsigned int __stdcall s_process_recv(void* unused);
+static unsigned int __stdcall s_process_send(void* unused);
 
 #ifdef __cplusplus
 }
@@ -56,8 +86,16 @@ void process_communication(struct server_udp* serv_udp)
     ssize_t byte_received;
     SOCKADDR_IN cli_addr;
 
-    s_initbuf(&send_buf);
-    s_initbuf(&recv_buf);
+    /**
+     * @brief  critical section must be initialized first of all. 
+     *
+     */
+    InitializeCriticalSection(&s_cscode);
+
+    s_configurate_sendpool();
+    s_configurate_recvpool();
+    s_initpool(&send_pool);
+    s_initpool(&recv_pool);
 
     printf("%s: I\'m ready to receive a datagram...\n", serv_udp->msgheader);
     while (1) {
@@ -93,62 +131,91 @@ void process_communication(struct server_udp* serv_udp)
 
     printf("%s: finish receiving. closing the listening socket...\n", serv_udp->msgheader);
 
-    s_clearbuf(&send_buf);
-    s_clearbuf(&recv_buf);
+    s_clearpool(&send_pool);
+    s_clearpool(&recv_pool);
+
+    DeleteCriticalSection(&s_cscode);
 }
 
-void s_initbuf(struct sendrecv_pool* buf)
+void s_configurate_sendpool(void)
+{
+    send_pool.len_item = 512;
+    send_pool.num_item = 64;
+    send_pool.num_thread = 4;
+
+    send_pool.process_func = s_process_send;
+}
+
+void s_configurate_recvpool(void)
+{
+    recv_pool.len_item = 512;
+    recv_pool.num_item = 64;
+    recv_pool.num_thread = 4;
+
+    recv_pool.process_func = s_process_recv;
+}
+
+/**
+ * @brief  s_initpool This function will initialize buffers, create semaphore and threads.
+ *
+ * @param pool The send or receive pool to be initialized.
+ *
+ * @note Correct sequence for initialize is required here.
+ * 1. buffers
+ * 2. semaphare
+ * 3. threads
+ */
+void s_initpool(struct sendrecv_pool* pool)
 {
     const int init_fillednum = 0;
-    int init_emptynum = 0;
+    int num_items;
+    int init_emptynum;
 
-    init_buf(&s_filledbuf, s_bufnum, s_buflen, init_fillednum);
-    init_emptynum = s_filledbuf.num_item - 1 - s_filledbuf.get_num_contained_item(&s_filledbuf);
-    init_buf(&s_emptybuf, s_bufnum, s_buflen, init_emptynum);
+    init_buf(&pool->filled_buf, pool->num_item, pool->len_item, init_fillednum);
 
-    InitializeCriticalSection(&s_cscode);
+    num_items = pool->filled_buf.get_num_contained_item(&pool->filled_buf);
+    init_emptynum = pool->filled_buf.num_item - 1 - num_items;
+    init_buf(&pool->empty_buf, pool->num_item, pool->len_item, init_emptynum);
 
-    s_create_threads(s_threadnum);
-    s_create_semaphore(init_fillednum, s_filledbuf.num_item - 1);
+    s_create_semaphore(&pool->hsem_filled, 0, pool->filled_buf.num_item - 1);
+    s_create_threads(&pool->hthreads, pool->num_thread, pool->process_func);
 }
 
-void s_clearbuf(struct sendrecv_pool* buf)
+void s_clearpool(struct sendrecv_pool* pool)
 {
     int i = 0;
 
-    WaitForMultipleObjects(s_threadnum, s_hthreads, 1, INFINITE);
-    for (i=0; i<s_threadnum; ++i) {
-        CloseHandle(s_hthreads[i]);
+    WaitForMultipleObjects(pool->num_thread, pool->hthreads, 1, INFINITE);
+    for (i=0; i<pool->num_thread; ++i) {
+        CloseHandle(pool->hthreads[i]);
     }
 
-    CloseHandle(s_hsemfilled);
+    CloseHandle(pool->hsem_filled);
 
-    DeleteCriticalSection(&s_cscode);
-
-    s_filledbuf.clear_buf(&s_filledbuf);
-    s_emptybuf.clear_buf(&s_emptybuf);
+    pool->filled_buf.clear_buf(&pool->filled_buf);
+    pool->empty_buf.clear_buf(&pool->empty_buf);
 }
 
-void s_create_semaphore(long count_init, long count_max)
+void s_create_semaphore(HANDLE* hsem, long count_init, long count_max)
 {
-    s_hsemfilled = CreateSemaphore(NULL, count_init, count_max, NULL);
-    if (s_hsemfilled == NULL) {
+    *hsem = CreateSemaphore(NULL, count_init, count_max, NULL);
+    if ((*hsem) == NULL) {
         printf("create semaphore error! errno: %ld\n", GetLastError());
         exit(1);
     }
 }
 
-void s_create_threads(int num_thread)
+void s_create_threads(HANDLE** arr_hthreads, int num_thread, ptr_process_sendrecv process_func)
 {
     int i;
-    s_hthreads = (HANDLE*)malloc(sizeof(HANDLE) * num_thread);
+    *arr_hthreads = (HANDLE*)malloc(sizeof(HANDLE) * num_thread);
     for (i=0; i<num_thread; ++i) {
-        s_hthreads[i] = (HANDLE)_beginthreadex(NULL, 0, s_process_buffer, NULL, 0, NULL);
-        while ((long)s_hthreads[i] == 1L) {
+        (*arr_hthreads)[i] = (HANDLE)_beginthreadex(NULL, 0, process_func, NULL, 0, NULL);
+        while ((long)(*arr_hthreads)[i] == 1L) {
             printf("create thread error, try again now\n");
-            s_hthreads[i] = (HANDLE)_beginthreadex(NULL, 0, s_process_buffer, NULL, 0, NULL);
+            (*arr_hthreads)[i] = (HANDLE)_beginthreadex(NULL, 0, process_func, NULL, 0, NULL);
         }
-        if (s_hthreads[i] == 0) {
+        if ((*arr_hthreads)[i] == 0) {
             printf("create thread error, errno: %d.\nexit(1)\n", errno);
             exit(1);
         }
@@ -156,7 +223,7 @@ void s_create_threads(int num_thread)
     }
 }
 
-unsigned int __stdcall s_process_buffer(void* unused)
+unsigned int __stdcall s_process_recv(void* unused)
 {
     char* bufitem = NULL;
 
@@ -164,21 +231,50 @@ unsigned int __stdcall s_process_buffer(void* unused)
     printf("child thread %ld created.\n", GetCurrentThreadId());
 
     while (1) {
-        WaitForSingleObject(s_hsemfilled, INFINITE);
+        WaitForSingleObject(recv_pool.hsem_filled, INFINITE);
 
         EnterCriticalSection(&s_cscode);
-        bufitem = s_filledbuf.pull_item(&s_filledbuf);
+        bufitem = recv_pool.filled_buf.pull_item(&recv_pool.filled_buf);
         assert(bufitem != NULL);
         if (bufitem == NULL) continue;
         LeaveCriticalSection(&s_cscode);
 
 #ifdef _DEBUG
-        printf("thread id: %ld, handle message: %s.\n", GetCurrentThreadId(), bufitem);
+        printf("recv- thread id: %ld, handle message: %s.\n", GetCurrentThreadId(), bufitem);
 #endif
         Sleep(200);
 
         EnterCriticalSection(&s_cscode);
-        s_emptybuf.push_item(&s_emptybuf, bufitem);
+        recv_pool.empty_buf.push_item(&recv_pool.empty_buf, bufitem);
+        LeaveCriticalSection(&s_cscode);
+    }
+
+    return 0;
+}
+
+unsigned int __stdcall s_process_send(void* unused)
+{
+    char* bufitem = NULL;
+
+    (void)unused;
+    printf("child thread %ld created.\n", GetCurrentThreadId());
+
+    while (1) {
+        WaitForSingleObject(send_pool.hsem_filled, INFINITE);
+
+        EnterCriticalSection(&s_cscode);
+        bufitem = send_pool.filled_buf.pull_item(&send_pool.filled_buf);
+        assert(bufitem != NULL);
+        if (bufitem == NULL) continue;
+        LeaveCriticalSection(&s_cscode);
+
+#ifdef _DEBUG
+        printf("send- thread id: %ld, handle message: %s.\n", GetCurrentThreadId(), bufitem);
+#endif
+        Sleep(200);
+
+        EnterCriticalSection(&s_cscode);
+        send_pool.empty_buf.push_item(&send_pool.empty_buf, bufitem);
         LeaveCriticalSection(&s_cscode);
     }
 

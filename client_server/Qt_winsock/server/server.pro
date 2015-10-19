@@ -15,7 +15,7 @@ HEADERS += \
     ../common/bufarray.h \
     ../common/macros.h \
     msgdispatch.h \
-    server_servroutine.h
+    server_servroutine.h \
 
 SOURCES += \
     main.c \
@@ -24,7 +24,7 @@ SOURCES += \
     server_sendrecv.c \
     ../common/bufarray.c \
     server_servroutine.c \
-    msgdispatch.c
+    msgdispatch.c \
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 

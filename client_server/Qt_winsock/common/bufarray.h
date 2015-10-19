@@ -15,6 +15,10 @@ extern "C" {
 
 /**
  * @brief array_buf is used to hold data. This struct works like circle queue(tail-in head-out).
+ *
+ * @note For function members in the struct, the pointer of current owner struct (commonly the first parameter)
+ * can be omited, if i use 'container of' macro the in implementation. This will make the function called more intuitive.
+ * However i have not seen this usage, thus i am not sure whether this usage is harmful to efficiency.
  */
 struct array_buf {
     /**

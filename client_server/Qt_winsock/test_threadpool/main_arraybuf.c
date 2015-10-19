@@ -40,7 +40,7 @@ static void process_msg(char* bufitem, long threadid);
 int main(void)
 {
     int i;
-    int numbuf = 32;
+    int numbuf = 30;
     char* bufitem = NULL;
 
     init_buf(&filled_arraybuf, 30, 510, 0);
@@ -65,7 +65,7 @@ int main(void)
 
             LeaveCriticalSection(&cs_code);
             ReleaseSemaphore(handle_semfilled, 1, NULL);
-            // Sleep(10);
+            Sleep(10);
             ++i;
         }
     }

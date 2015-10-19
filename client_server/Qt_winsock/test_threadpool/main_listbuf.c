@@ -142,7 +142,7 @@ unsigned int __stdcall processBufferData(void* pPM)
         LeaveCriticalSection(&cs_code);
 
         process_msg(bufnode, GetCurrentThreadId());
-        Sleep(100);
+        Sleep(200);
 
         EnterCriticalSection(&cs_code);
 #ifdef _DEBUG
