@@ -20,7 +20,6 @@ struct server_udp
     SOCKET socket;
     SOCKADDR_IN sockaddr_in;
     char* msgheader;
-    char msgbuf[1024];
 
     void (*create_server)(struct server_udp* serv_udp, int af, u_short port, u_long addr);
 

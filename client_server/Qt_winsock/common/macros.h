@@ -9,7 +9,9 @@
 #ifndef  MACROS_H
 #define  MACROS_H
 
-// #define CHECK_PARAM
+// #define _CHECK_ARGS
+
+#define MAX_MSG_LEN 1024
 
 
 #ifndef offsetof
