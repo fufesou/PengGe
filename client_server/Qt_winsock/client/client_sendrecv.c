@@ -28,7 +28,9 @@ static int rttinit = 0;
 static struct rtt_info rttinfo;
 static struct hdr sendhdr, recvhdr;
 
+#ifndef WIN32
 static void s_sig_alarm(int signo);
+#endif
 
 #ifdef WIN32
 static struct WSASendRecvMsg msgsend, msgrecv;
@@ -145,13 +147,13 @@ ssize_t client_sendrecv(
     return msgrecv.numbytes - sizeof(struct hdr);
 }
 
+#ifndef WIN32
 void s_sig_alarm(int signo)
 {
     (void)signo;
-#ifndef WIN32
     longjmp(jmpbuf, 1);
-#endif
 }
+#endif
 
 #ifdef WIN32
 /**

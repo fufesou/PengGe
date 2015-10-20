@@ -90,10 +90,6 @@ void process_communication(struct server_udp* serv_udp)
 #ifdef _DEBUG
             printf("%s: total bytes received: %d\n", serv_udp->msgheader, unithdr.numbytes);
             printf("%s: the data is \"%s\"\n", serv_udp->msgheader, buf);
-
-            getpeername(serv_udp->socket, (SOCKADDR*)&unithdr.addr, &unithdr.addrlen);
-            printf("%s: sending IP used: %s\n", serv_udp->msgheader, inet_ntoa(unithdr.addr.sin_addr));
-            printf("%s: sending port used: %d\n", serv_udp->msgheader, htons(unithdr.addr.sin_port));
 #endif
             push2pool(buf, &unithdr, &s_recvpool);
         }
@@ -141,6 +137,10 @@ unsigned int __stdcall s_process_recv(void* unused)
             continue;
         }
 
+#ifdef WIN32
+        printf("recv- thread id: %ld, process message: %s.\n", GetCurrentThreadId(), msgdata);
+#endif
+
         process_msg(msgdata, outmsg, sizeof(outmsg));
 #ifdef WIN32
         strcat_s(outmsg, sizeof(outmsg), "server: ");
@@ -171,7 +171,9 @@ unsigned int __stdcall s_process_send(void* unused)
         }
 
 #ifdef _DEBUG
-        printf("recv- thread id: %ld, handle message: %s.\n", GetCurrentThreadId(), msgdata);
+        getpeername(s_sendpool.socket, (SOCKADDR*)&unithdr.addr, &unithdr.addrlen);
+        printf("server: sending IP used: %s\n", inet_ntoa(unithdr.addr.sin_addr));
+        printf("server: sending port used: %d\n", htons(unithdr.addr.sin_port));
 #endif
 
         server_send(
