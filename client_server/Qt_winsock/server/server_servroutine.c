@@ -142,12 +142,6 @@ unsigned int __stdcall s_process_recv(void* unused)
 #endif
 
         process_msg(msgdata, outmsg, sizeof(outmsg));
-#ifdef WIN32
-        strcat_s(outmsg, sizeof(outmsg), "server: ");
-#else
-        strcat(outmsg, "server: ");
-#endif
-
         push2pool(outmsg, &unithdr, &s_sendpool);
     }
 
@@ -156,7 +150,6 @@ unsigned int __stdcall s_process_recv(void* unused)
 
 unsigned int __stdcall s_process_send(void* unused)
 {
-    char msgdata[MAX_MSG_LEN];
     char outmsg[MAX_MSG_LEN];
     struct unit_header unithdr;
 
@@ -178,8 +171,8 @@ unsigned int __stdcall s_process_send(void* unused)
 
         server_send(
                     s_sendpool.socket,
-                    msgdata,
-                    strlen(msgdata) + 1,
+                    outmsg,
+                    strlen(outmsg) + 1,
                     &unithdr.header,
                     (SOCKADDR*)&unithdr.addr,
                     unithdr.addrlen);

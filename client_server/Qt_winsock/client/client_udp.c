@@ -15,6 +15,7 @@ extern "C" {
 #endif
 
 extern const char* g_loginmsg_header;
+extern const char* g_logoutmsg_header;
 extern const char* g_loginmsg_SUCCESS;
 extern const char* g_loginmsg_FAIL;
 extern const char g_login_delimiter;
@@ -105,9 +106,9 @@ void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* se
             }
             cli_udp->recvbuf[numbytes] = 0;
 
-            if (strncmp(cli_udp->recvbuf, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1)) {
+            if (strncmp(cli_udp->recvbuf, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1) == 0) {
                 s_login_session(cli_udp, fp, serveraddr, serveraddr_len);
-            } else if (strncmp(cli_udp->recvbuf, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1)) {
+            } else if (strncmp(cli_udp->recvbuf, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1) == 0) {
                 printf("%s: login failed.\n", cli_udp->msgheader);
             } else {
                 printf("%s: unkown message.\n", cli_udp->msgheader);
@@ -140,11 +141,15 @@ void s_login_session(struct client_udp* cli_udp, FILE* fp, const struct sockaddr
                 fflush(stderr);
             }
             cli_udp->recvbuf[numbytes] = 0;
-            fputs(cli_udp->recvbuf, stdout);
+
+            if (strncmp(cli_udp->recvbuf, g_logoutmsg_header, strlen(g_logoutmsg_header) + 1) == 0) {
+                printf("%s: exit login interface.\n", cli_udp->msgheader);
+                break;
+            } else {
+                fputs(cli_udp->recvbuf, stdout);
+            }
         }
     }
-
-    printf("%s: exit login interface.\n", cli_udp->msgheader);
 }
 
 
