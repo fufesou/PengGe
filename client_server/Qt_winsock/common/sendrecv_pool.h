@@ -26,10 +26,13 @@ struct sendrecv_pool {
     int num_thread;
     int len_item;
     int num_item;
-    HANDLE* hthreads;
-    HANDLE hsem_filled;
     struct array_buf filled_buf;
     struct array_buf empty_buf;
+
+    SOCKET socket;
+    HANDLE* hthreads;
+    HANDLE hsem_filled;
+    CRITICAL_SECTION critical_sec;
 
     ptr_process_sendrecv process_func;
 
@@ -50,7 +53,7 @@ struct sendrecv_pool {
  * @param threadnum
  * @param pfunc
  */
-void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, ptr_process_sendrecv pfunc);
+void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, SOCKET socket, ptr_process_sendrecv pfunc);
 
 
 #ifdef __cplusplus

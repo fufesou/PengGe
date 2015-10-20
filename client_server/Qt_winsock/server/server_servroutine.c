@@ -30,22 +30,37 @@ extern "C" {
 
 static struct sendrecv_pool s_sendpool, s_recvpool;
 
-/**
- * @brief s_cscode is used to ensure some variable operation to be atom op. 
- */
-static CRITICAL_SECTION s_cscode;
 
 /**
  * @brief  s_init_sendpool should parse the config first, and then set data to s_sendpool.
+ *
+ * @param socket
  */
-static void s_init_sendpool(void);
+static void s_init_sendpool(SOCKET socket);
+
 /**
  * @brief  s_init_recvpool should parse the config first, and then set data to s_recvpool.
  *
+ * @param socket
  */
-static void s_init_recvpool(void);
-static void s_push2pool(const char* data, const struct unit_header* unithdr, struct sendrecv_pool* pool);
+static void s_init_recvpool(SOCKET socket);
+
+/**
+ * @brief  s_process_recv 
+ *
+ * @param serv_udp
+ *
+ * @return   
+ */
 static unsigned int __stdcall s_process_recv(void* unused);
+
+/**
+ * @brief  s_process_send 
+ *
+ * @param serv_udp
+ *
+ * @return   
+ */
 static unsigned int __stdcall s_process_send(void* unused);
 
 #ifdef __cplusplus
@@ -57,14 +72,8 @@ void process_communication(struct server_udp* serv_udp)
     struct unit_header unithdr;
     char buf[MAX_MSG_LEN];
 
-    /**
-     * @brief  critical section must be initialized first of all. 
-     *
-     */
-    InitializeCriticalSection(&s_cscode);
-
-    s_init_sendpool();
-    s_init_recvpool();
+    s_init_sendpool(serv_udp->socket);
+    s_init_recvpool(serv_udp->socket);
 
     printf("%s: I\'m ready to receive a datagram...\n", serv_udp->msgheader);
     while (1) {
@@ -86,7 +95,7 @@ void process_communication(struct server_udp* serv_udp)
             printf("%s: sending IP used: %s\n", serv_udp->msgheader, inet_ntoa(unithdr.addr.sin_addr));
             printf("%s: sending port used: %d\n", serv_udp->msgheader, htons(unithdr.addr.sin_port));
 #endif
-            s_push2pool(buf, &unithdr, &s_recvpool);
+            push2pool(buf, &unithdr, &s_recvpool);
         }
         else if (unithdr.numbytes <= 0) {
             printf("%s: connection closed with error code: %d\n", serv_udp->msgheader, WSAGetLastError());
@@ -102,52 +111,25 @@ void process_communication(struct server_udp* serv_udp)
 
     s_sendpool.clear_pool(&s_sendpool);
     s_recvpool.clear_pool(&s_recvpool);
-
-    DeleteCriticalSection(&s_cscode);
 }
 
-void s_init_sendpool(void)
+void s_init_sendpool(SOCKET socket)
 {
-    init_sendrecv_pool(&s_sendpool, 512, 64, 4, s_process_send);
+    init_sendrecv_pool(&s_sendpool, 512, 64, 4, socket, s_process_send);
     s_sendpool.init_pool(&s_sendpool);
 }
 
-void s_init_recvpool(void)
+void s_init_recvpool(SOCKET socket)
 {
-    init_sendrecv_pool(&s_recvpool, 512, 64, 4, s_process_recv);
+    init_sendrecv_pool(&s_recvpool, 512, 64, 4, socket, s_process_recv);
     s_recvpool.init_pool(&s_recvpool);
-}
-
-void s_push2pool(const char* data, const struct unit_header* unithdr, struct sendrecv_pool* pool)
-{
-    char* poolbuf = NULL;
-
-    EnterCriticalSection(&s_cscode);
-    if ((poolbuf = pool->empty_buf.pull_item(&pool->empty_buf)) == NULL) {
-        LeaveCriticalSection(&s_cscode);
-        return;
-    }
-
-    if (merge2unit(unithdr, data, poolbuf, pool->len_item) != 0)
-    {
-        printf("copy data to pool error, omit current data.\n");
-        pool->empty_buf.push_item(&pool->empty_buf, poolbuf);
-        LeaveCriticalSection(&s_cscode);
-        return;
-    }
-
-    pool->filled_buf.push_item(&pool->filled_buf, poolbuf);
-    LeaveCriticalSection(&s_cscode);
-
-    ReleaseSemaphore(pool->hsem_filled, 1, NULL);
 }
 
 unsigned int __stdcall s_process_recv(void* unused)
 {
-    char* bufitem = NULL;
-    char* msgdata = NULL;
+    char msgdata[MAX_MSG_LEN];
     char outmsg[MAX_MSG_LEN];
-    const struct unit_header* unithdr = NULL;
+    struct unit_header unithdr;
 
     (void)unused;
     printf("child thread %ld created.\n", GetCurrentThreadId());
@@ -155,33 +137,18 @@ unsigned int __stdcall s_process_recv(void* unused)
     while (1) {
         WaitForSingleObject(s_recvpool.hsem_filled, INFINITE);
 
-        EnterCriticalSection(&s_cscode);
-        bufitem = s_recvpool.filled_buf.pull_item(&s_recvpool.filled_buf);
-        LeaveCriticalSection(&s_cscode);
-        if (bufitem == NULL) {
+        if (pull_from_pool(outmsg, sizeof(outmsg), &unithdr, &s_recvpool) != 0) {
             continue;
         }
 
-#ifdef _DEBUG
-        printf("recv- thread id: %ld, handle message: %s.\n", GetCurrentThreadId(), bufitem);
-#endif
-        extract_msg(bufitem, &unithdr, (const char**)&msgdata);
-
-        EnterCriticalSection(&s_cscode);
-        s_recvpool.empty_buf.push_item(&s_recvpool.empty_buf, bufitem);
-        LeaveCriticalSection(&s_cscode);
-
         process_msg(msgdata, outmsg, sizeof(outmsg));
-        Sleep(200);
-
-
 #ifdef WIN32
         strcat_s(outmsg, sizeof(outmsg), "server: ");
 #else
         strcat(outmsg, "server: ");
 #endif
 
-        s_push2pool(outmsg, unithdr, &s_sendpool);
+        push2pool(outmsg, &unithdr, &s_sendpool);
     }
 
     return 0;
@@ -189,7 +156,9 @@ unsigned int __stdcall s_process_recv(void* unused)
 
 unsigned int __stdcall s_process_send(void* unused)
 {
-    char* bufitem = NULL;
+    char msgdata[MAX_MSG_LEN];
+    char outmsg[MAX_MSG_LEN];
+    struct unit_header unithdr;
 
     (void)unused;
     printf("child thread %ld created.\n", GetCurrentThreadId());
@@ -197,22 +166,23 @@ unsigned int __stdcall s_process_send(void* unused)
     while (1) {
         WaitForSingleObject(s_sendpool.hsem_filled, INFINITE);
 
-        EnterCriticalSection(&s_cscode);
-        bufitem = s_sendpool.filled_buf.pull_item(&s_sendpool.filled_buf);
-        LeaveCriticalSection(&s_cscode);
-        if (bufitem == NULL) {
+        if (pull_from_pool(outmsg, sizeof(outmsg), &unithdr, &s_sendpool) != 0) {
             continue;
         }
 
 #ifdef _DEBUG
-        printf("send- thread id: %ld, handle message: %s.\n", GetCurrentThreadId(), bufitem);
+        printf("recv- thread id: %ld, handle message: %s.\n", GetCurrentThreadId(), msgdata);
 #endif
-        // server_send(serv_udp->socket, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1, hdrdata, (SOCKADDR*)to_sockaddr, sockaddr_len);
+
+        server_send(
+                    s_sendpool.socket,
+                    msgdata,
+                    strlen(msgdata) + 1,
+                    &unithdr.header,
+                    (SOCKADDR*)&unithdr.addr,
+                    unithdr.addrlen);
         Sleep(200);
 
-        EnterCriticalSection(&s_cscode);
-        s_sendpool.empty_buf.push_item(&s_sendpool.empty_buf, bufitem);
-        LeaveCriticalSection(&s_cscode);
     }
 
     return 0;

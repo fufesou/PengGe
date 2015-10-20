@@ -40,7 +40,7 @@ static void s_create_threads(HANDLE** arr_hthreads, int num_thread, ptr_process_
 #endif
 
 
-void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, ptr_process_sendrecv pfunc)
+void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, SOCKET socket, ptr_process_sendrecv pfunc)
 {
 #ifdef _CHECK_ARGS
     if (pool == NULL || pfunc == NULL) return 0;
@@ -48,6 +48,7 @@ void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, in
     pool->len_item = itemlen;
     pool->num_item = itemnum;
     pool->num_thread = threadnum;
+    pool->socket = socket;
     pool->process_func = pfunc;
 
     pool->init_pool = s_initpool;
@@ -61,8 +62,9 @@ void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, in
  *
  * @note Correct sequence for initialize is required here.
  * 1. buffers
- * 2. semaphare
- * 3. threads
+ * 2. critical section
+ * 3. semaphare
+ * 4. threads
  */
 void s_initpool(struct sendrecv_pool* pool)
 {
@@ -76,6 +78,7 @@ void s_initpool(struct sendrecv_pool* pool)
     init_emptynum = pool->filled_buf.num_item - 1 - num_items;
     init_buf(&pool->empty_buf, pool->num_item, pool->len_item, init_emptynum);
 
+    InitializeCriticalSection(&pool->critical_sec);
     s_create_semaphore(&pool->hsem_filled, 0, pool->filled_buf.num_item - 1);
     s_create_threads(&pool->hthreads, pool->num_thread, pool->process_func);
 }
@@ -93,6 +96,7 @@ void s_clearpool(struct sendrecv_pool* pool)
 
     pool->filled_buf.clear_buf(&pool->filled_buf);
     pool->empty_buf.clear_buf(&pool->empty_buf);
+    DeleteCriticalSection(&pool->critical_sec);
 }
 
 void s_create_semaphore(HANDLE* hsem, long count_init, long count_max)

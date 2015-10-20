@@ -88,9 +88,9 @@ void s_process_communication(char* inmsg, char* outmsg, int len_outmsg)
     * @todo of cause we need error handler here.
     */
 #ifdef _WIN32
-        memcpy_s(outmsg, len_outmsg, inmsg, strlen(inmsg) + 1);
+    memcpy_s(outmsg, len_outmsg, inmsg, strlen(inmsg) + 1);
 #else
-        memcpy(outmsg, inmsg, strlen(inmsg) + 1);
+    memcpy(outmsg, inmsg, strlen(inmsg) + 1);
 #endif
-
+    Sleep(200);
 }
