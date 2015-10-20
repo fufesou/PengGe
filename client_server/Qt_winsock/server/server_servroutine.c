@@ -1,6 +1,6 @@
 /**
  * @file server_servroutine.c
- * @brief 
+ * @brief This file must be reimplement when config parser was done.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-18
@@ -111,13 +111,13 @@ void process_communication(struct server_udp* serv_udp)
 
 void s_init_sendpool(SOCKET socket)
 {
-    init_sendrecv_pool(&s_sendpool, 512, 64, 4, socket, s_process_send);
+    init_sendrecv_pool(&s_sendpool, MAX_MSG_LEN + sizeof(struct unit_header), 64, 4, socket, s_process_send);
     s_sendpool.init_pool(&s_sendpool);
 }
 
 void s_init_recvpool(SOCKET socket)
 {
-    init_sendrecv_pool(&s_recvpool, 512, 64, 4, socket, s_process_recv);
+    init_sendrecv_pool(&s_recvpool, MAX_MSG_LEN + sizeof(struct unit_header), 64, 4, socket, s_process_recv);
     s_recvpool.init_pool(&s_recvpool);
 }
 
@@ -133,7 +133,7 @@ unsigned int __stdcall s_process_recv(void* unused)
     while (1) {
         WaitForSingleObject(s_recvpool.hsem_filled, INFINITE);
 
-        if (pull_from_pool(outmsg, sizeof(outmsg), &unithdr, &s_recvpool) != 0) {
+        if (pull_from_pool(msgdata, sizeof(msgdata), &unithdr, &s_recvpool) != 0) {
             continue;
         }
 

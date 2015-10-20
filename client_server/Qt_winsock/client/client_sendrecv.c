@@ -51,7 +51,7 @@ static void s_start_timeevent(int msec);
 static void s_recvmsg_fail(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
 static void s_kill_timeevent(void);
 static void s_send_msg(SOCKET fd, struct WSASendRecvMsg* msg);
-static void s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg);
+static int s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg);
 #else
 static sigjmp_buf jmpbuf;
 
@@ -217,7 +217,7 @@ void s_send_msg(SOCKET fd, struct WSASendRecvMsg* msg)
     s_start_timeevent(rtt_start(&rttinfo) * 1000);
 }
 
-void s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
+int s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
 {
     if (0 != WSARecvFrom(
                 fd,
@@ -231,9 +231,13 @@ void s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
                 NULL))
     {
         printf("s_recv_msg error.\n");
+        if (10054 == WSAGetLastError()) {
+            printf("cannot connect to peer device.\n" );
+        }
         msg->numbytes = 0;
     }
     status_accesible = 0;
+    return 0;
 }
 
 #endif

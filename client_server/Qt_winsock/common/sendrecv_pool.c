@@ -73,6 +73,8 @@ void s_initpool(struct sendrecv_pool* pool)
     int init_emptynum;
 
     init_buf(&pool->filled_buf, pool->num_item, pool->len_item, init_fillednum);
+    pool->len_item = pool->filled_buf.len_item;
+    pool->num_item = pool->filled_buf.num_item;
 
     num_items = pool->filled_buf.get_num_contained_item(&pool->filled_buf);
     init_emptynum = pool->filled_buf.num_item - 1 - num_items;

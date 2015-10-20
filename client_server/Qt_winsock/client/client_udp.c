@@ -87,10 +87,12 @@ void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* se
     s_connect_serv(cli_udp, serveraddr, serveraddr_len);
 
     while (fgets(cli_udp->sendbuf, sizeof(cli_udp->sendbuf), fp) != NULL) {
+        cli_udp->sendbuf[strlen(cli_udp->sendbuf) - 1] = '\0';
         numbytes = client_sendrecv(
                     cli_udp->socket,
                     cli_udp->sendbuf,
-                    sizeof(cli_udp->sendbuf),
+                    // sizeof(cli_udp->sendbuf),
+                    strlen(cli_udp->sendbuf) + 1,
                     cli_udp->recvbuf,
                     sizeof(cli_udp->recvbuf),
                     (struct sockaddr*)serveraddr,
@@ -121,10 +123,12 @@ void s_login_session(struct client_udp* cli_udp, FILE* fp, const struct sockaddr
     printf("%s: switch to login interface.\n", cli_udp->msgheader);
 
     while (fgets(cli_udp->sendbuf, sizeof(cli_udp->sendbuf), fp) != NULL) {
+        cli_udp->sendbuf[strlen(cli_udp->sendbuf) - 1] = '\0';
         numbytes = client_sendrecv(
                     cli_udp->socket,
                     cli_udp->sendbuf,
-                    sizeof(cli_udp->sendbuf),
+                    // sizeof(cli_udp->sendbuf),
+                    strlen(cli_udp->sendbuf) + 1,
                     cli_udp->recvbuf,
                     sizeof(cli_udp->recvbuf),
                     (struct sockaddr*)serveraddr,
