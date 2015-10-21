@@ -19,6 +19,7 @@ struct WSASendRecvMsg {
     DWORD flags;
     struct sockaddr_in msg_name;
     int msg_namelen;
+    WSAOVERLAPPED overlapped;
 };
 #endif
 

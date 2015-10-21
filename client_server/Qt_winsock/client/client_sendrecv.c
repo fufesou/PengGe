@@ -49,6 +49,16 @@ static int recv_status = 0;
 static int status_accesible = 1;
 CRITICAL_SECTION s_cscode;
 
+static int s_initWSASendRecvMsg(
+        struct WSASendRecvMsg* msg,
+        LPWSABUF pwsabuf,
+        int bufnum,
+        struct hdr* buf0,
+        char* buf1,
+        int buf1len,
+        const struct sockaddr* peeraddr,
+        int addrlen);
+
 static void s_start_timeevent(int msec);
 static void s_recvmsg_fail(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
 static void s_kill_timeevent(void);
@@ -61,7 +71,7 @@ static sigjmp_buf jmpbuf;
  * @todo implement later
  */
 static void s_send_msg(int fd, struct msghdr* msg);
-static void s_recv_msg(int fd, struct WSASendRecvMsg* msg);
+static void s_recv_msg(int fd, struct msghdr* msg);
 #endif
 
 
@@ -86,42 +96,24 @@ ssize_t client_sendrecv(
 
     ++sendhdr.seg;
 
-#ifdef WIN32
-#define iov_base buf
-#define iov_len len
-#define bufptr char*
-#else
-#define bufptr void*
-#endif
-
-#ifdef WIN32
-    memcpy_s(&msgsend.msg_name, sizeof(msgsend.msg_name), destaddr, destlen);
-#else
-    memcpy(&msgsend.msg_name, destaddr, destlen);
-#endif
-    msgsend.msg_namelen = destlen;
-    msgsend.msg_iov = iovsend;
-    msgsend.msg_iovlen = 2;
-    msgsend.flags = 0;
-    iovsend[0].iov_base = (bufptr)&sendhdr;
-    iovsend[0].iov_len = sizeof(struct hdr);
-    iovsend[1].iov_base = (bufptr)outbuf;
-    iovsend[1].iov_len = outbytes;
-
-    msgrecv.msg_namelen = sizeof(msgrecv.msg_name);
-    msgrecv.msg_iov = iovrecv;
-    msgrecv.msg_iovlen = 2;
-    msgrecv.flags = 0;
-    iovrecv[0].iov_base = (bufptr)&recvhdr;
-    iovrecv[0].iov_len = sizeof(struct hdr);
-    iovrecv[1].iov_base = (bufptr)inbuf;
-    iovrecv[1].iov_len = inbytes;
-
-#ifdef WIN32
-#undef iov_base
-#undef iov_len
-#undef bufptr
-#endif
+    s_initWSASendRecvMsg(
+                &msgsend,
+                iovsend,
+                2,
+                &sendhdr,
+                (char*)outbuf,
+                outbytes,
+                destaddr,
+                destlen);
+    s_initWSASendRecvMsg(
+                &msgrecv,
+                iovrecv,
+                2,
+                &recvhdr,
+                inbuf,
+                inbytes,
+                NULL,
+                sizeof(msgrecv.msg_name));
 
     rtt_newpack(&rttinfo);
     InitializeCriticalSection(&s_cscode);
@@ -152,7 +144,6 @@ ssize_t client_sendrecv(
     rtt_stop(&rttinfo, rtt_ts(&rttinfo) - recvhdr.ts);
     DeleteCriticalSection(&s_cscode);
 
-
     return msgrecv.numbytes - sizeof(struct hdr);
 }
 
@@ -165,6 +156,41 @@ void s_sig_alarm(int signo)
 #endif
 
 #ifdef WIN32
+int s_initWSASendRecvMsg(
+        struct WSASendRecvMsg* msg,
+        LPWSABUF pwsabuf,
+        int bufnum,
+        struct hdr* buf0,
+        char* buf1,
+        int buf1len,
+        const struct sockaddr* peeraddr,
+        int addrlen)
+{
+    if (peeraddr != NULL) {
+#ifdef WIN32
+    memcpy_s(&msg->msg_name, sizeof(msg->msg_name), peeraddr, addrlen);
+#else
+    memcpy(&msg->msg_name, destaddr, destlen);
+#endif
+    }
+    msg->msg_namelen = addrlen;
+    msg->msg_iov = pwsabuf;
+    msg->msg_iovlen = bufnum;
+    msg->flags = 0;
+    pwsabuf[0].buf = (char*)buf0;
+    pwsabuf[0].len = sizeof(struct hdr);
+    pwsabuf[1].buf = buf1;
+    pwsabuf[1].len = buf1len;
+
+    SecureZeroMemory((PVOID)&msg->overlapped, sizeof(WSAOVERLAPPED));
+    msg->overlapped.hEvent = WSACreateEvent();
+    if (msg->overlapped.hEvent == NULL) {
+        printf("WSACreateEvent failed with error: %d\n", WSAGetLastError());
+        return 1;
+    }
+    return 0;
+}
+
 /**
  * @brief s_recvmsg_fail is a callback function that will be called when assigned time elapsed.
  * This function can set the 'recv_status' value.
