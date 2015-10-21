@@ -167,9 +167,6 @@ ssize_t s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
         msg->numbytes = 0;
         return -1;
     }
-#ifdef WIN32
-    printf("msg->numbytes: %d\n", msg->numbytes);
-#endif
     return msg->numbytes;
 }
 

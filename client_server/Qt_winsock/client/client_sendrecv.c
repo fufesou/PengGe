@@ -1,7 +1,7 @@
 /**
  * @file client_sendrecv.c
  * @brief 
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
  */
@@ -14,6 +14,7 @@
 #include <signal.h>
 #endif
 
+#include <windows.h>
 #include <stdio.h>
 #include <string.h>
 #include "unprtt.h"
@@ -46,6 +47,7 @@ static MMRESULT time_event_id = 0;
 #define RECV_RESEND  3
 static int recv_status = 0;
 static int status_accesible = 1;
+CRITICAL_SECTION s_cscode;
 
 static void s_start_timeevent(int msec);
 static void s_recvmsg_fail(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
@@ -122,19 +124,24 @@ ssize_t client_sendrecv(
 #endif
 
     rtt_newpack(&rttinfo);
+    InitializeCriticalSection(&s_cscode);
 
-    recv_status = 0;
+    recv_status = RECV_RESEND;
     status_accesible = 1;
     while (recv_status!=RECV_OK && recv_status!=RECV_TIMEOUT) {
-        s_send_msg(fd, &msgsend);
+        if (recv_status == RECV_RESEND)
+            s_send_msg(fd, &msgsend);
         while (!recv_status) {
             s_recv_msg(fd, &msgrecv);
+
+            EnterCriticalSection(&s_cscode);
             if ((msgrecv.numbytes > sizeof(struct hdr)) && (recvhdr.seg == sendhdr.seg)) {
                 recv_status = RECV_OK;
                 s_kill_timeevent();
             } else {
                 status_accesible = 1;
             }
+            LeaveCriticalSection(&s_cscode);
         }
     }
 
@@ -143,6 +150,8 @@ ssize_t client_sendrecv(
     }
 
     rtt_stop(&rttinfo, rtt_ts(&rttinfo) - recvhdr.ts);
+    DeleteCriticalSection(&s_cscode);
+
 
     return msgrecv.numbytes - sizeof(struct hdr);
 }
@@ -169,8 +178,10 @@ void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1,
     (void)dw1;
     (void)dw2;
 
+    EnterCriticalSection(&s_cscode);
     if (!status_accesible) {
         s_start_timeevent(100);
+        LeaveCriticalSection(&s_cscode);
         return;
     }
 
@@ -182,6 +193,7 @@ void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1,
     else {
         recv_status = RECV_RESEND;
     }
+    LeaveCriticalSection(&s_cscode);
 }
 
 void s_start_timeevent(int msec)
@@ -219,17 +231,23 @@ void s_send_msg(SOCKET fd, struct WSASendRecvMsg* msg)
 
 int s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
 {
-    if (0 != WSARecvFrom(
-                fd,
-                msg->msg_iov,
-                msg->msg_iovlen,
-                &msg->numbytes,
-                &msg->flags,
-                (void*)&msg->msg_name,
-                &msg->msg_namelen,
-                NULL,
-                NULL))
-    {
+    /**
+     * @brief The following function is blocked, because the last two parameter is NULL.
+     *
+     * @todo make the following function none blocked later.
+     */
+    int ret_recv = WSARecvFrom(
+                            fd,
+                            msg->msg_iov,
+                            msg->msg_iovlen,
+                            &msg->numbytes,
+                            &msg->flags,
+                            (void*)&msg->msg_name,
+                            &msg->msg_namelen,
+                            NULL,
+                            NULL);
+    EnterCriticalSection(&s_cscode);
+    if (ret_recv != 0) {
         printf("s_recv_msg error.\n");
         if (10054 == WSAGetLastError()) {
             printf("cannot connect to peer device.\n" );
@@ -237,6 +255,7 @@ int s_recv_msg(SOCKET fd, struct WSASendRecvMsg* msg)
         msg->numbytes = 0;
     }
     status_accesible = 0;
+    LeaveCriticalSection(&s_cscode);
     return 0;
 }
 
