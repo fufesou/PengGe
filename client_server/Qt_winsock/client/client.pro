@@ -10,14 +10,27 @@ HEADERS += \
     udp_send_recv.h \
     ../common/udp_utility.h \
     client_sendrecv.h \
-    ../common/udp_types.h
+    ../common/error.h \
+    ../common/macros.h \
+    ../common/sock_types.h \
+    ../common/sock_wrap.h \
+    ../common/msgunit.h \
+    ../common/sendrecv_pool.h \
+    ../common/bufarray.h
 
 SOURCES += \
     client_udp.c \
     main.c \
+#    test\wsaclinet.c \
     rtt.c \
     ../common/udp_utility.c \
     client_sendrecv.c \
+    ../common/error.c \
+    ../common/global.c \
+    ../common/sock_wrap.c \
+    ../common/msgunit.c \
+    ../common/sendrecv_pool.c \
+    ../common/bufarray.c
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 

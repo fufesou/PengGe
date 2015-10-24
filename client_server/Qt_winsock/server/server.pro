@@ -20,7 +20,8 @@ HEADERS += \
     ../common/msgunit.h
 
 SOURCES += \
-    main.c \
+#    main.c \
+    test/wsaserver.c \
     server_udp.c \
     ../common/udp_utility.c \
     server_sendrecv.c \

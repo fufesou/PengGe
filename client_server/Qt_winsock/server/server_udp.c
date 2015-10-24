@@ -11,8 +11,8 @@
 #include  <stdio.h>
 #include  <stdint.h>
 #include 	"server_udp.h"
-#include    "udp_utility.h"
-#include    "udp_types.h"
+#include    "sock_wrap.h"
+#include    "sock_types.h"
 #include    "server_sendrecv.h"
 #include	"server_servroutine.h"
 

@@ -92,7 +92,6 @@ void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* se
         numbytes = client_sendrecv(
                     cli_udp->socket,
                     cli_udp->sendbuf,
-                    // sizeof(cli_udp->sendbuf),
                     strlen(cli_udp->sendbuf) + 1,
                     cli_udp->recvbuf,
                     sizeof(cli_udp->recvbuf),
@@ -101,7 +100,7 @@ void s_dg_client(struct client_udp* cli_udp, FILE* fp, const struct sockaddr* se
         if (numbytes > 0) {
             if (numbytes >= (ssize_t)(sizeof(cli_udp->recvbuf))) {
                 fflush(stdout);
-                fputs("client: recived msg cut off", stderr);
+                fprintf(stderr, "client: recived msg cut off", cli_udp->msgheader);
                 fflush(stderr);
             }
             cli_udp->recvbuf[numbytes] = 0;
@@ -128,7 +127,6 @@ void s_login_session(struct client_udp* cli_udp, FILE* fp, const struct sockaddr
         numbytes = client_sendrecv(
                     cli_udp->socket,
                     cli_udp->sendbuf,
-                    // sizeof(cli_udp->sendbuf),
                     strlen(cli_udp->sendbuf) + 1,
                     cli_udp->recvbuf,
                     sizeof(cli_udp->recvbuf),
@@ -137,7 +135,7 @@ void s_login_session(struct client_udp* cli_udp, FILE* fp, const struct sockaddr
         if (numbytes > 0) {
             if (numbytes >= (ssize_t)(sizeof(cli_udp->recvbuf))) {
                 fflush(stdout);
-                fputs("client: recived msg cut off", stderr);
+                fprintf(stderr, "%s: recived msg cut off", cli_udp->msgheader);
                 fflush(stderr);
             }
             cli_udp->recvbuf[numbytes] = 0;

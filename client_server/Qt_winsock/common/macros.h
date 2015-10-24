@@ -4,6 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
+ * modified  2015-10-24 17:49:36 (周六)
  */
 
 #ifndef  MACROS_H
@@ -40,6 +41,12 @@
 #define TO_MULTIPLE_OF(num, base) \
     (((num)+base-1) & (~(base-1)))
 
+
+#ifdef WIN32
+#define csprintf sprintf_s
+#else
+#define csprintf snprintf
+#endif
 
 #endif  // MACROS_H
 
