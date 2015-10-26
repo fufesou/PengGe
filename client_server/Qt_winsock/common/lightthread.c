@@ -61,7 +61,7 @@ void* s_thread_process(void* pargs);
 #ifdef WIN32
 int create_thread(void (*proc)(void*), void* pargs)
 {
-	return _beginthread(proc, 0, args);
+    return _beginthread(proc, 0, pargs);
 }
 
 void exit_thread(void)
@@ -83,7 +83,7 @@ mutex_t create_mutex(void)
 {
 	mutex_t handle;
 	if ((handle = CreateMutex(NULL, FALSE, NULL)) == NULL) {
-		fprintf(stderr, "create thread fail, error code: %d\n", GetLastError());
+        fprintf(stderr, "create thread fail, error code: %ld\n", GetLastError());
 	}
 	return handle;
 }

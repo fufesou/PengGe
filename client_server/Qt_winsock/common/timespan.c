@@ -15,7 +15,7 @@ void get_cur_timelong(timelong_t* tl)
 #ifdef WIN32
 	FILETIME ft;
 	GetSystemTimeAsFileTime(&ft);
-	tl->HightPart = ft.dwHightDateTime;
+    tl->HighPart = ft.dwHighDateTime;
 	tl->LowPart = ft.dwLowDateTime;
 #else
 	gettimeofday(tl, NULL);

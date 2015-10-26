@@ -12,7 +12,7 @@
 
 #ifdef WIN32
 #include  <Windows.h>
-#define timelong_t ULARGE_INTERGER
+#define timelong_t ULARGE_INTEGER
 #else
 #include  <sys/time.h>
 #include  <linux/errno.h>
