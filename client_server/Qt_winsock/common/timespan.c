@@ -4,22 +4,13 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-26
- * @modified  Mon 2015-10-26 19:37:11 (+0800)
+ * @modified  2015-10-26 23:15:37 (+0800)
  */
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include	"timespan.h"
+#include  <stdio.h>
 
-static void s_get_cur_time(timelong_t* tl);
-
-#ifdef __cplusplus
-}
-#endif
-
-
-void s_get_cur_time(timelong_t* tl)
+void get_cur_timelong(timelong_t* tl)
 {
 #ifdef WIN32
 	FILETIME ft;
@@ -31,15 +22,10 @@ void s_get_cur_time(timelong_t* tl)
 #endif
 }
 
-void reset_timelong(timelong_t* tl)
-{
-	s_get_cur_time(tl);
-}
-
-unsigned long long get_span_microsec(const timelong_t* start);
+unsigned long long get_span_microsec(const timelong_t* start)
 {
 	timelong_t end;
-	s_get_cur_time(&end);
+	get_cur_timelong(&end);
 
 #ifdef WIN32
 	return (end.QuadPart - start->QuadPart) / 10;

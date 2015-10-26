@@ -4,15 +4,16 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-26
- * @modified  Mon 2015-10-26 19:41:18 (+0800)
+ * @modified  2015-10-26 23:27:26 (+0800)
  */
 
-#include  <stdio.h>
 #include  <time.h>
+#include  <stdio.h>
+#include  <malloc.h>
 #include  <string.h>
 
 #ifdef WIN32
-#include  <windows.h>
+#include  <Windows.h>
 #include  <process.h>
 #else
 #include  <pthread.h>
@@ -58,6 +59,65 @@ void* s_thread_process(void* pargs);
  *
  */
 #ifdef WIN32
+int create_thread(void (*proc)(void*), void* pargs)
+{
+	return _beginthread(proc, 0, args);
+}
+
+void exit_thread(void)
+{
+	_endthread();
+}
+
+unsigned int get_pid(void)
+{
+	return GetCurrentThreadId();
+}
+
+void cs_sleep(unsigned int msec)
+{
+	Sleep(msec);
+}
+
+mutex_t create_mutex(void)
+{
+	mutex_t handle;
+	if ((handle = CreateMutex(NULL, FALSE, NULL)) == NULL) {
+		fprintf(stderr, "create thread fail, error code: %d\n", GetLastError());
+	}
+	return handle;
+}
+
+void destory_mutex(mutex_t handle)
+{
+	if (handle) {
+		CloseHandle(handle);
+	}
+}
+
+int lock_mutex(mutex_t handle)
+{
+	if (handle && WaitForSingleObject(handle, INFINITE) == WAIT_OBJECT_0) {
+		return 0;
+	}
+	return -1;
+}
+
+int try_lock_mutex(mutex_t handle, unsigned int msec)
+{
+	if (handle && WaitForSingleObject(handle, msec) == WAIT_OBJECT_0) {
+		return 0;
+	}
+	return -1;
+}
+
+void unlock_mutex(mutex_t handle)
+{
+	if (handle) {
+		ReleaseMutex(handle);
+	}
+}
+
 #endif
 
 
@@ -71,7 +131,7 @@ void* s_thread_process(void* pargs)
 {
 	threadwraper_linux_t* pth = (threadwraper_linux_t*)pargs;
 	pth->proc(pth->pargs);
-	delete [] pth;
+    free(pth);
 	return NULL;
 }
 
@@ -86,7 +146,7 @@ int create_thread(void (*proc)(void*), void* pargs)
 
 void exit_thread(void)
 {
-	pthread_exit();
+    pthread_exit(NULL);
 }
 
 unsigned int get_pid(void)
@@ -117,9 +177,9 @@ mutex_t create_mutex(void)
 	return handle;
 }
 
-void release_mutex(mutex_t handle)
+void destory_mutex(mutex_t handle)
 {
-	pthread_mutex_destory(&handle);
+    pthread_mutex_destroy(&handle);
 }
 
 int lock_mutex(mutex_t handle)
@@ -129,12 +189,11 @@ int lock_mutex(mutex_t handle)
 
 int try_lock_mutex(mutex_t handle, unsigned int msec)
 {
-	unsigned int usec = msec * 1000;
 	timelong_t start;
 	int rt;
 
 	if ((rt = pthread_mutex_trylock(&handle)) == EBUSY) {
-		reset_timelong(&start);
+		get_cur_timelong(&start);
 		while (rt == EBUSY) {
 			if (get_span_millisec(&start) > msec) {
 				rt = -1;
