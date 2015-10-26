@@ -36,4 +36,7 @@ Makefile*
 *.qmlproject.user.*
 
 *~
+*.swp
 *.exe
+tags
+filenametags

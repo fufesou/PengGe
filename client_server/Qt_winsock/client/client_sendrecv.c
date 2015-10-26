@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "unprtt.h"
-#include "udp_types.h"
+#include "sock_types.h"
 
 
 #ifdef __cplusplus

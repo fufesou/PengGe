@@ -1,9 +1,10 @@
 /**
- * @file msgunit.h
- * @brief  
+ * @file msgwrap.h	
+ * @brief  This file describe the message for sending and receiving.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
+ * @modified  Mon 2015-10-26 18:29:53 (+0800)
  */
 
 #ifndef  MSGUNIT_H
@@ -14,9 +15,9 @@ extern "C" {
 #endif
 
 /**
- * @brief  unit_header describe the header in pool item. unit_header is followed by the actual message data.
+ * @brief  msg_header describe the header in pool item. msg_header is followed by the actual message data.
  */
-struct unit_header {
+struct msg_header {
     SOCKADDR_IN addr;
     int addrlen;
     struct hdr header;
@@ -33,7 +34,7 @@ struct unit_header {
  *
  * @return   
  */
-int merge2unit(const struct unit_header* hdr_unit, const char* data, char* unit, int unitlen);
+int merge2unit(const struct msg_header* hdr_unit, const char* data, char* unit, int unitlen);
 
 /**
  * @brief  extract_msg 
@@ -42,7 +43,7 @@ int merge2unit(const struct unit_header* hdr_unit, const char* data, char* unit,
  * @param hdr_unit
  * @param data
  */
-void extract_msg(const char* unit, const struct unit_header** hdr_unit, const char** data);
+void extract_msg(const char* unit, const struct msg_header** hdr_unit, const char** data);
 
 /**
  * @brief  extract_copy_msg 
@@ -54,7 +55,7 @@ void extract_msg(const char* unit, const struct unit_header** hdr_unit, const ch
  *
  * @return   
  */
-int extract_copy_msg(const char* unit, struct unit_header* hdr_unit, char* data, int datalen);
+int extract_copy_msg(const char* unit, struct msg_header* hdr_unit, char* data, int datalen);
 
 /**
  * @brief  push2pool will firstly copy message data and the unit header to single char array. And 
@@ -72,7 +73,7 @@ int extract_copy_msg(const char* unit, struct unit_header* hdr_unit, char* data,
  * 0 if success. There is en empty buffer for operation.
  * 1 if fail. There is no empty buffer left.
  */
-int push2pool(const char* data, const struct unit_header* unithdr, struct sendrecv_pool* pool);
+int push2pool(const char* data, const struct msg_header* unithdr, struct sendrecv_pool* pool);
 
 /**
  * @brief  pull_from_pool works the opposite as push2pool does. The procedure can be splitted into
@@ -92,7 +93,7 @@ int push2pool(const char* data, const struct unit_header* unithdr, struct sendre
  *
  * @see push2pool
  */
-int pull_from_pool(char* data, int datalen, struct unit_header* unithdr, struct sendrecv_pool* pool);
+int pull_from_pool(char* data, int datalen, struct msg_header* unithdr, struct sendrecv_pool* pool);
 
 #ifdef __cplusplus
 }

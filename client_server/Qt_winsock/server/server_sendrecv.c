@@ -16,7 +16,7 @@
 #include <windows.h>
 #endif
 
-#include "udp_types.h"
+#include "sock_types.h"
 
 #ifdef __cplusplus
 extern "C" {

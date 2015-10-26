@@ -29,7 +29,7 @@ struct sendrecv_pool {
     struct array_buf filled_buf;
     struct array_buf empty_buf;
 
-    SOCKET socket;
+    sock_t socket;
     HANDLE* hthreads;
     HANDLE hsem_filled;
     CRITICAL_SECTION critical_sec;

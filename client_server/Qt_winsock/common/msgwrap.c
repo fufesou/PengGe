@@ -1,25 +1,30 @@
 /**
- * @file msgunit.c
+ * @file msgwrap.c
  * @brief length check is required for memcpy in this file.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
+ * @modified  Mon 2015-10-26 18:42:49 (+0800)
  */
+
+#ifdef WIN32
+#include  <winsock2.h>
+#endif
 
 #include  <stdio.h>
 #include  <assert.h>
 #include  <string.h>
-#include  <winsock2.h>
 #include  <stdint.h>
-#include	"udp_types.h"
+#include    "macros.h"
+#include	"sock_types.h"
 #include    "bufarray.h"
 #include    "sendrecv_pool.h"
-#include    "msgunit.h"
+#include    "msgwrap.h"
 
 
-int merge2unit(const struct unit_header* hdr_unit, const char* data, char* unit, int unitlen)
+int merge2unit(const struct msg_header* hdr_unit, const char* data, char* unit, int unitlen)
 {
-    int len_unitheader = sizeof(struct unit_header);
+    int len_unitheader = sizeof(struct msg_header);
 
     assert((len_unitheader + hdr_unit->numbytes) < unitlen);
 #ifdef WIN32
@@ -33,15 +38,15 @@ int merge2unit(const struct unit_header* hdr_unit, const char* data, char* unit,
     return 0;
 }
 
-void extract_msg(const char* unit, const struct unit_header** hdr_unit, const char** data)
+void extract_msg(const char* unit, const struct msg_header** hdr_unit, const char** data)
 {
-    *hdr_unit = (const struct unit_header*)unit;
-    *data = (const char*)(unit + sizeof(struct unit_header));
+    *hdr_unit = (const struct msg_header*)unit;
+    *data = (const char*)(unit + sizeof(struct msg_header));
 }
 
-int extract_copy_msg(const char* unit, struct unit_header* hdr_unit, char* data, int datalen)
+int extract_copy_msg(const char* unit, struct msg_header* hdr_unit, char* data, int datalen)
 {
-    int len_unitheader = sizeof(struct unit_header);
+    int len_unitheader = sizeof(struct msg_header);
 
 #ifdef WIN32
     memcpy_s(hdr_unit, len_unitheader, unit, len_unitheader);
@@ -54,7 +59,7 @@ int extract_copy_msg(const char* unit, struct unit_header* hdr_unit, char* data,
     return 0;
 }
 
-int push2pool(const char* data, const struct unit_header* unithdr, struct sendrecv_pool* pool)
+int push2pool(const char* data, const struct msg_header* unithdr, struct sendrecv_pool* pool)
 {
     char* poolbuf = NULL;
 
@@ -84,7 +89,7 @@ int push2pool(const char* data, const struct unit_header* unithdr, struct sendre
     return 0;
 }
 
-int pull_from_pool(char* data, int datalen, struct unit_header* unithdr, struct sendrecv_pool* pool)
+int pull_from_pool(char* data, int datalen, struct msg_header* unithdr, struct sendrecv_pool* pool)
 {
     char* bufitem = NULL;
 

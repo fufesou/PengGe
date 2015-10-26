@@ -11,13 +11,13 @@ HEADERS += \
     server_udp.h \
     ../common/udp_utility.h \
     server_sendrecv.h \
-    ../common/udp_types.h \
+    ../common/sock_types.h \
     ../common/bufarray.h \
     ../common/macros.h \
     msgdispatch.h \
     server_servroutine.h \
     ../common/sendrecv_pool.h \
-    ../common/msgunit.h
+    ../common/msgwrap.h
 
 SOURCES += \
 #    main.c \
@@ -29,7 +29,7 @@ SOURCES += \
     server_servroutine.c \
     msgdispatch.c \
     ../common/sendrecv_pool.c \
-    ../common/msgunit.c
+    ../common/msgwrap.c
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 

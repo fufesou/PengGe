@@ -14,7 +14,7 @@ HEADERS += \
     ../common/macros.h \
     ../common/sock_types.h \
     ../common/sock_wrap.h \
-    ../common/msgunit.h \
+    ../common/msgwrap.h \
     ../common/sendrecv_pool.h \
     ../common/bufarray.h
 
@@ -28,7 +28,7 @@ SOURCES += \
     ../common/error.c \
     ../common/global.c \
     ../common/sock_wrap.c \
-    ../common/msgunit.c \
+    ../common/msgwrap.c \
     ../common/sendrecv_pool.c \
     ../common/bufarray.c
 

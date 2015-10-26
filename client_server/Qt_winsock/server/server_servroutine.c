@@ -15,13 +15,13 @@
 #include  <semaphore.h>
 #include	"macros.h"
 #include    "bufarray.h"
-#include    "udp_types.h"
+#include    "sock_types.h"
 #include    "server_sendrecv.h"
 #include	"server_udp.h"
 #include    "server_servroutine.h"
 #include    "msgdispatch.h"
 #include    "sendrecv_pool.h"
-#include	"msgunit.h"
+#include	"msgwrap.h"
 
 
 #ifdef __cplusplus
