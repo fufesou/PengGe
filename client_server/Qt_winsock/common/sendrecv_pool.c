@@ -4,15 +4,20 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Tue 2015-10-27 17:56:42 (+0800)
+ * @modified  2015-10-28 00:55:47 (+0800)
  */
 
+#ifdef WIN32
+#include  <Windows.h>
+#endif
+
 #include  <stdio.h>
-#include  <windows.h>
-#include  <semaphore.h>
-#include  <process.h>
+#include  <malloc.h>
+#include  <stdint.h>
 #include  <semaphore.h>
 #include    "bufarray.h"
+#include    "sock_types.h"
+#include    "lightthread.h"
 #include    "sendrecv_pool.h"
 
 
@@ -32,8 +37,6 @@ static void s_initpool(struct sendrecv_pool* pool);
  * @param pool The send or receive pool to clear.
  */
 static void s_clearpool(struct sendrecv_pool* pool);
-static void s_create_semaphore(HANDLE* hsem, long count_init, long count_max);
-static void s_create_threads(HANDLE** arr_hthreads, int num_thread, ptr_process_sendrecv process_func);
 
 
 #ifdef __cplusplus
@@ -41,7 +44,7 @@ static void s_create_threads(HANDLE** arr_hthreads, int num_thread, ptr_process_
 #endif
 
 
-void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, SOCKET socket, ptr_process_sendrecv pfunc)
+void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc)
 {
 #ifdef _CHECK_ARGS
     if (pool == NULL || pfunc == NULL) return 0;
@@ -50,7 +53,7 @@ void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, in
     pool->num_item = itemnum;
     pool->num_thread = threadnum;
     pool->socket = socket;
-    pool->process_func = pfunc;
+    pool->proc = proc;
 
     pool->init_pool = s_initpool;
     pool->clear_pool = s_clearpool;
@@ -72,6 +75,7 @@ void s_initpool(struct sendrecv_pool* pool)
     const int init_fillednum = 0;
     int num_items;
     int init_emptynum;
+	int i;
 
     init_buf(&pool->filled_buf, pool->num_item, pool->len_item, init_fillednum);
     pool->len_item = pool->filled_buf.len_item;
@@ -81,51 +85,32 @@ void s_initpool(struct sendrecv_pool* pool)
     init_emptynum = pool->filled_buf.num_item - 1 - num_items;
     init_buf(&pool->empty_buf, pool->num_item, pool->len_item, init_emptynum);
 
-    InitializeCriticalSection(&pool->critical_sec);
-    s_create_semaphore(&pool->hsem_filled, 0, pool->filled_buf.num_item - 1);
-    s_create_threads(&pool->hthreads, pool->num_thread, pool->process_func);
+    pool->hmutex = csmutex_create();
+    cssem_create(0, pool->filled_buf.num_item - 1, &pool->hsem_filled);
+
+    pool->hthread = (csthread_t*)malloc(sizeof(csthread_t) * pool->num_thread);
+	for (i=0; i<pool->num_thread; ++i) {
+		csthread_create(pool->proc, NULL, pool->hthread + i);
+		cssleep(20);
+	}
 }
 
 void s_clearpool(struct sendrecv_pool* pool)
 {
-    int i = 0;
-
-    WaitForMultipleObjects(pool->num_thread, pool->hthreads, 1, INFINITE);
-    for (i=0; i<pool->num_thread; ++i) {
+	csthreadN_wait_terminate(pool->hthread, pool->num_thread);
+#ifdef WIN32
+    {
+        int i = 0;
+        for (i=0; i<pool->num_thread; ++i) {
         CloseHandle(pool->hthreads[i]);
+        }
     }
+#endif
 
-    CloseHandle(pool->hsem_filled);
+	cssem_destroy(&pool->hsem_filled);
 
     pool->filled_buf.clear_buf(&pool->filled_buf);
     pool->empty_buf.clear_buf(&pool->empty_buf);
-    DeleteCriticalSection(&pool->critical_sec);
-}
-
-void s_create_semaphore(HANDLE* hsem, long count_init, long count_max)
-{
-    *hsem = CreateSemaphore(NULL, count_init, count_max, NULL);
-    if ((*hsem) == NULL) {
-        printf("create semaphore error! errno: %ld\n", GetLastError());
-        exit(1);
-    }
-}
-
-void s_create_threads(HANDLE** arr_hthreads, int num_thread, ptr_process_sendrecv process_func)
-{
-    int i;
-    *arr_hthreads = (HANDLE*)malloc(sizeof(HANDLE) * num_thread);
-    for (i=0; i<num_thread; ++i) {
-        (*arr_hthreads)[i] = (HANDLE)_beginthreadex(NULL, 0, process_func, NULL, 0, NULL);
-        while ((long)(*arr_hthreads)[i] == 1L) {
-            printf("create thread error, try again now\n");
-            (*arr_hthreads)[i] = (HANDLE)_beginthreadex(NULL, 0, process_func, NULL, 0, NULL);
-        }
-        if ((*arr_hthreads)[i] == 0) {
-            printf("create thread error, errno: %d.\nexit(1)\n", errno);
-            exit(1);
-        }
-        Sleep(20);
-    }
+	csmutex_destroy(pool->hmutex);
 }
 

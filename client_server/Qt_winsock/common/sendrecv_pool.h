@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Tue 2015-10-27 18:02:04 (+0800)
+ * @modified  2015-10-28 00:23:43 (+0800)
  */
 
 #ifndef  SENDRECV_POOL_H
@@ -13,8 +13,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-typedef unsigned int __stdcall (*ptr_process_sendrecv)(void*);
 
 /**
  * @brief sendrecv_pool contains basic members for send receive buffer and thread operations.
@@ -29,12 +27,12 @@ struct sendrecv_pool {
     struct array_buf filled_buf;
     struct array_buf empty_buf;
 
-    sock_t socket;
-    HANDLE* hthreads;
-    HANDLE hsem_filled;
-    mutex_t pmutex;
+    cssock_t socket;
+    csthread_t* hthread;
+    cssem_t hsem_filled;
+    csmutex_t hmutex;
 
-    ptr_process_sendrecv process_func;
+    csthread_proc_t proc;
 
     /**
      * @brief This function should be called after init_sendrecv_pool
@@ -53,7 +51,7 @@ struct sendrecv_pool {
  * @param threadnum
  * @param pfunc
  */
-void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, SOCKET socket, ptr_process_sendrecv pfunc);
+void init_sendrecv_pool(struct sendrecv_pool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc);
 
 
 #ifdef __cplusplus

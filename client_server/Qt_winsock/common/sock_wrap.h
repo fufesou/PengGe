@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  2015-10-24 18:30:18 (周六)
+ * @modified  2015-10-27 23:48:59 (+0800)
  */
 
 #ifndef  SOCK_WRAP_H
@@ -65,14 +65,14 @@ void set_addrin(struct sockaddr_in* addr_in, const char* ip, int port);
  *
  * @return   
  */
-sock_t open_sock(int tcpudp);
+cssock_t open_sock(int tcpudp);
 
 /**
  * @brief  close_sock 
  *
  * @param handle
  */
-void close_sock(sock_t handle);
+void close_sock(cssock_t handle);
 
 /**
  * @brief  block_sock block_sock will set socket to be blocking or nonblocking according to block parameter.
@@ -84,7 +84,7 @@ void close_sock(sock_t handle);
  * 1. block set result, if handle is a valid socket.
  * 2. -1, if handle is not a valid socket.
  */
-int block_sock(sock_t handle, int block);
+int block_sock(cssock_t handle, int block);
 
 /**
  * @brief  print_sockinfo print the IP and port for current socket handle, if socket is connected.
@@ -96,7 +96,7 @@ int block_sock(sock_t handle, int block);
  * 2. 0, if socket is connected.
  * 3. 1, if socket is not connected.
  */
-int print_sockinfo(sock_t handle);
+int print_sockinfo(cssock_t handle);
 
 #ifdef __cplusplus
 }

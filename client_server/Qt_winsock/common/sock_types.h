@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-10
- * @modified  2015-10-24 16:46:06 (周六)
+ * @modified  2015-10-27 23:47:49 (+0800)
  */
 
 
@@ -28,9 +28,9 @@
  *
  */
 #ifdef WIN32
-typedef SOCKET sock_t;
+typedef SOCKET cssock_t;
 #else
-typedef int sock_t;
+typedef int cssock_t;
 #endif
 
 

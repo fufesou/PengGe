@@ -4,7 +4,7 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-26
- * @modified  Tue 2015-10-27 19:54:03 (+0800)
+ * @modified  2015-10-28 00:56:14 (+0800)
  */
 
 #include  <time.h>
@@ -34,21 +34,6 @@ extern "C"
 {
 #endif
 
-#ifdef WIN32
-#endif
-
-
-#ifndef WIN32
-typedef struct{
-	void (*proc)(void*);
-	void* pargs;
-}threadwraper_linux_t;
-
-
-void* s_thread_process(void* pargs);
-
-#endif
-
 #ifdef __cplusplus
 }
 #endif
@@ -63,17 +48,26 @@ void* s_thread_process(void* pargs);
 /**************************************************
  **            WIN32: the thread block           **
  **************************************************/
-int create_thread(void (*proc)(void*), void* pargs, csthread_t* handle)
+int csthread_create(csthread_proc_t proc, void* pargs, csthread_t* handle)
 {
-    return (int)(*handle = (void*)_beginthread(proc, 0, pargs));
+	*handle = (void*)_beginthreadex(NULL, 0, proc, pargs, 0, NULL);
+	while ((long)(*handle) == 1L) {
+		printf("create thread error, try again now\n");
+		*handle = (void*)_beginthreadex(NULL, 0, proc, pargs, 0, NULL);
+	}
+	if ((*handle) == 0) {
+		printf("create thread error, errno: %d.\nexit(1)\n", errno);
+		return -1;
+	}
+	return 0;
 }
 
-void exit_thread(void)
+void csthread_exit(void)
 {
 	_endthread();
 }
 
-void wait_thread_terminate(csthread_t handle)
+void csthread_wait_terminate(csthread_t handle)
 {
     DWORD waitStat = WaitForSingleObject(handle, INFINITE);
     if (waitStat != WAIT_OBJECT_0) {
@@ -86,7 +80,7 @@ void wait_thread_terminate(csthread_t handle)
     }
 }
 
-void wait_threadN_terminate(csthread_t* handle, int count)
+void csthreadN_wait_terminate(csthread_t* handle, int count)
 {
     DWORD waitStat = WaitForMultipleObjects(count, handle, 1, INFINITE);
     if (waitStat != WAIT_OBJECT_0) {
@@ -99,12 +93,12 @@ void wait_threadN_terminate(csthread_t* handle, int count)
     }
 }
 
-unsigned int get_pid(void)
+unsigned int csthread_getpid(void)
 {
 	return GetCurrentThreadId();
 }
 
-void cs_sleep(unsigned int msec)
+void cssleep(unsigned int msec)
 {
 	Sleep(msec);
 }
@@ -113,7 +107,7 @@ void cs_sleep(unsigned int msec)
 /**************************************************
  **             WIN32: the mutex block           **
  **************************************************/
-csmutex_t create_mutex(void)
+csmutex_t csmutex_create(void)
 {
 	csmutex_t handle;
 	if ((handle = CreateMutex(NULL, FALSE, NULL)) == NULL) {
@@ -122,14 +116,14 @@ csmutex_t create_mutex(void)
 	return handle;
 }
 
-void destory_mutex(csmutex_t handle)
+void csmutex_destroy(csmutex_t handle)
 {
 	if (handle) {
 		CloseHandle(handle);
 	}
 }
 
-int lock_mutex(csmutex_t handle)
+int csmutex_lock(csmutex_t handle)
 {
 	if (handle && WaitForSingleObject(handle, INFINITE) == WAIT_OBJECT_0) {
 		return 0;
@@ -137,7 +131,7 @@ int lock_mutex(csmutex_t handle)
 	return -1;
 }
 
-int try_lock_mutex(csmutex_t handle, unsigned int msec)
+int csmutex_try_lock(csmutex_t handle, unsigned int msec)
 {
 	if (handle && WaitForSingleObject(handle, msec) == WAIT_OBJECT_0) {
 		return 0;
@@ -145,7 +139,7 @@ int try_lock_mutex(csmutex_t handle, unsigned int msec)
 	return -1;
 }
 
-void unlock_mutex(csmutex_t handle)
+void csmutex_unlock(csmutex_t handle)
 {
 	if (handle) {
 		ReleaseMutex(handle);
@@ -215,32 +209,21 @@ int cssem_destroy(cssem_t* handle)
  */
 #ifndef WIN32
 
-void* s_thread_process(void* pargs)
-{
-	threadwraper_linux_t* pth = (threadwraper_linux_t*)pargs;
-	pth->proc(pth->pargs);
-    free(pth);
-	return NULL;
-}
-
 
 /**************************************************
  **             UNIX: the thread block           **
  **************************************************/
-int create_thread(void (*proc)(void*), void* pargs, csthread_t* handle)
+int csthread_create(csthread_proc_t proc, void* pargs, csthread_t* handle)
 {
-	threadwraper_linux_t* pwraper = (threadwraper_linux_t*)malloc(sizeof(threadwraper_linux_t));
-	pwraper->proc = proc;
-	pwraper->pargs = pargs;
-	return pthread_create(handle, NULL, s_thread_process, pwraper);
+    return pthread_create(handle, NULL, proc, pargs);
 }
 
-void exit_thread(void)
+void csthread_exit(void)
 {
     pthread_exit(NULL);
 }
 
-void wait_thread_terminate(csthread_t handle)
+void csthread_wait_terminate(csthread_t handle)
 {
 	void* thread_result;
 	if (pthread_join(handle, &thread_result) != 0) {
@@ -249,20 +232,20 @@ void wait_thread_terminate(csthread_t handle)
 	}
 }
 
-void wait_threadN_terminate(csthread_t* handle, int count)
+void csthreadN_wait_terminate(csthread_t* handle, int count)
 {
 	int i = 0;
 	for (; i<count; ++i) {
-		wait_thread_terminate(handle[i]);
+		csthread_wait_terminate(handle[i]);
 	}
 }
 
-unsigned int get_pid(void)
+unsigned int csthread_getpid(void)
 {
 	return pthread_self();
 }
 
-void cs_sleep(unsigned int msec)
+void cssleep(unsigned int msec)
 {
 	if (msec >= 1000) {
 		unsigned int s = msec / 1000;
@@ -281,24 +264,24 @@ void cs_sleep(unsigned int msec)
 /**************************************************
  **             UNIX: the mutex block            **
  **************************************************/
-csmutex_t create_mutex(void)
+csmutex_t csmutex_create(void)
 {
 	csmutex_t handle;
 	pthread_mutex_init(&handle, NULL);
 	return handle;
 }
 
-void destory_mutex(csmutex_t handle)
+void csmutex_destroy(csmutex_t handle)
 {
     pthread_mutex_destroy(&handle);
 }
 
-int lock_mutex(csmutex_t handle)
+int csmutex_lock(csmutex_t handle)
 {
 	return (pthread_mutex_lock(&handle) == 0) ? 0 : -1;
 }
 
-int try_lock_mutex(csmutex_t handle, unsigned int msec)
+int csmutex_try_lock(csmutex_t handle, unsigned int msec)
 {
 	timelong_t start;
 	int rt;
@@ -318,7 +301,7 @@ int try_lock_mutex(csmutex_t handle, unsigned int msec)
 	return rt;
 }
 
-void unlock_mutex(csmutex_t handle)
+void csmutex_unlock(csmutex_t handle)
 {
 	pthread_mutex_unlock(&handle);
 }

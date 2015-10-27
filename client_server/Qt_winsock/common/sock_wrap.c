@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  2015-10-24 18:34:02 (周六)
+ * @modified  2015-10-27 23:48:46 (+0800)
  */
 
 #include  <stdint.h>
@@ -104,7 +104,7 @@ void set_addrin(struct sockaddr_in* addr_in, const char* ip, int port)
     addr_in->sin_port = htons(port);
 }
 
-sock_t open_sock(int tcpudp)
+cssock_t open_sock(int tcpudp)
 {
     int protocol = 0;
 
@@ -117,7 +117,7 @@ sock_t open_sock(int tcpudp)
     return socket(AF_INET, tcpudp, protocol);
 }
 
-void close_sock(sock_t handle)
+void close_sock(cssock_t handle)
 {
     if (!IS_SOCK_HANDLE(handle))
     {
@@ -136,7 +136,7 @@ void close_sock(sock_t handle)
     }
 }
 
-int block_sock(sock_t handle, int block)
+int block_sock(cssock_t handle, int block)
 {
     unsigned long mode;
     if (IS_SOCK_HANDLE(handle))
@@ -153,7 +153,7 @@ int block_sock(sock_t handle, int block)
     return -1;
 }
 
-int print_sockinfo(sock_t handle)
+int print_sockinfo(cssock_t handle)
 {
     struct sockaddr_in addr_in;
 #ifdef WIN32

@@ -4,7 +4,7 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-26
- * @modified  Tue 2015-10-27 19:45:37 (+0800)
+ * @modified  2015-10-28 00:56:06 (+0800)
  */
 
 #ifndef _LIGHTTHREAD_H
@@ -19,10 +19,13 @@ extern "C"
 	typedef void* csmutex_t;
 	typedef void* cssem_t;
     typedef void* csthread_t;
+	typedef unsigned int __stdcall (*csthread_proc_t)(void*);
+
 #else
 	typedef pthread_mutex_t csmutex_t;
 	typedef sem_t cssem_t;
 	typedef pthread_t csthread_t;
+	typedef void* (*csthread_proc_t)(void*);
 #endif
 
 
@@ -30,7 +33,7 @@ extern "C"
  **             the thread block                 **
  **************************************************/
 /**
- * @brief  create_thread 
+ * @brief  csthread_create 
  *
  * @param proc
  * @param pargs
@@ -38,70 +41,70 @@ extern "C"
  *
  * @return   
  */
-int create_thread(void (*proc)(void*), void* pargs, csthread_t* handle);
+int csthread_create(csthread_proc_t proc, void* pargs, csthread_t* handle);
 
 /**
- * @brief  exit_thread 
+ * @brief  csthread_exit 
  */
-void exit_thread(void);
+void csthread_exit(void);
 /**
- * @brief  wait_thread_terminate 
+ * @brief  csthread_wait_terminate 
  *
  * @param handle
  */
-void wait_thread_terminate(csthread_t handle);
+void csthread_wait_terminate(csthread_t handle);
 
 /**
- * @brief  wait_threadN_terminate 
+ * @brief  csthreadN_wait_terminate 
  *
  * @param handle
  * @param count
  */
-void wait_threadN_terminate(csthread_t* handle, int count);
+void csthreadN_wait_terminate(csthread_t* handle, int count);
 
 /**
- * @brief  get_pid 
+ * @brief  csthread_getpid 
  *
  * @return   
  */
-unsigned int get_pid(void);
+unsigned int csthread_getpid(void);
 
 /**
- * @brief  cs_sleep 
+ * @brief  cssleep 
  *
  * @param msec
  */
-void cs_sleep(unsigned int msec);
+void cssleep(unsigned int msec);
 
 
 /**************************************************
  **             the mutex block                  **
  **************************************************/
 /**
- * @brief  create_mutex create_mutex will create the mutex and print error message if error occurs.
+ * @brief  csmutex_create csmutex_create will create the mutex and print error message if error occurs.
  *
  * @return   NULL if failed; valid mutex handle if succes.
  */
-csmutex_t create_mutex(void);
+csmutex_t csmutex_create(void);
 
 /**
- * @brief  destory_mutex 
+ * @brief  csmutex_destroy 
  *
  * @param handle
  */
-void destory_mutex(csmutex_t handle);
+void csmutex_destroy(csmutex_t handle);
 
 /**
- * @brief  lock_mutex 
+ * @brief  csmutex_lock 
  *
  * @param handle
  *
  * @return  0 if OK; -1 if failed.
  */
-int lock_mutex(csmutex_t handle);
+int csmutex_lock(csmutex_t handle);
 
 /**
- * @brief  try_lock_mutex This function returns zero if a lock on the mutex object referenced by mutex is acquired.
+ * @brief  csmutex_try_lock This function returns zero if a lock on the mutex object referenced by mutex is acquired.
  * Otherwise, an error number is returned to indicate the error.
  *
  * @param handle handle specify the mutex.
@@ -112,14 +115,14 @@ int lock_mutex(csmutex_t handle);
  * 2. -1, if timeout.
  * 3. others error code.
  */
-int try_lock_mutex(csmutex_t handle, unsigned int msec);
+int csmutex_try_lock(csmutex_t handle, unsigned int msec);
 
 /**
- * @brief  unlock_mutex This function unlock the numtex.
+ * @brief  csmutex_unlock This function unlock the numtex.
  *
  * @param handle handle specify the mutex.
  */
-void unlock_mutex(csmutex_t handle);
+void csmutex_unlock(csmutex_t handle);
 
 
 /**************************************************
