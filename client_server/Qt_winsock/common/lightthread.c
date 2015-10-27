@@ -65,7 +65,7 @@ void* s_thread_process(void* pargs);
  **************************************************/
 int create_thread(void (*proc)(void*), void* pargs, csthread_t* handle)
 {
-    return (*handle = _beginthread(proc, 0, pargs));
+    return (int)(*handle = (void*)_beginthread(proc, 0, pargs));
 }
 
 void exit_thread(void)
@@ -79,9 +79,9 @@ void wait_thread_terminate(csthread_t handle)
     if (waitStat != WAIT_OBJECT_0) {
         fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
         if (waitStat == WAIT_FAILED) {
-            fprintf(stderr, ", error code: %d\n.", GetLastError());
+            fprintf(stderr, ", error code: %ld\n.", GetLastError());
         } else {
-            fprintf("\n.");
+            fprintf(stderr, "\n.");
         }
     }
 }
@@ -92,9 +92,9 @@ void wait_threadN_terminate(csthread_t* handle, int count)
     if (waitStat != WAIT_OBJECT_0) {
         fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
         if (waitStat == WAIT_FAILED) {
-            fprintf(stderr, ", error code: %d\n.", GetLastError());
+            fprintf(stderr, ", error code: %ld\n.", GetLastError());
         } else {
-            fprintf("\n.");
+            fprintf(stderr, "\n.");
         }
     }
 }
@@ -172,9 +172,9 @@ int cssem_wait(cssem_t* handle)
 	if (waitStat != WAIT_OBJECT_0) {
 		fprintf(stderr, "wait semaphore failed, return state: %ld", waitStat);
 		if (waitStat == WAIT_FAILED) {
-			fprintf(stderr, ", error code: %d\n.", GetLastError());
+            fprintf(stderr, ", error code: %ld\n.", GetLastError());
 		} else {
-			fprintf("\n.");
+            fprintf(stderr, "\n.");
 		}
 		return -1;
 	}
@@ -184,7 +184,7 @@ int cssem_wait(cssem_t* handle)
 int cssem_post(cssem_t* handle)
 {
 	if (ReleaseSemaphore(*handle, 1, NULL) == 0) {
-		fprintf(stderr, ", post semaphoer falied, error code: %d\n.", GetLastError());
+        fprintf(stderr, ", post semaphoer falied, error code: %ld\n.", GetLastError());
 		return -1;
 	}
 	return 0;
@@ -196,9 +196,9 @@ int cssem_destroy(cssem_t* handle)
 	if (waitStat != WAIT_OBJECT_0) {
 		fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
 		if (waitStat == WAIT_FAILED) {
-			fprintf(stderr, ", error code: %d\n.", GetLastError());
+            fprintf(stderr, ", error code: %ld\n.", GetLastError());
 		} else {
-			fprintf("\n.");
+            fprintf(stderr, "\n.");
 		}
 		return 0;
 	}

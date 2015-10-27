@@ -4,11 +4,12 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-24
- * @modified  2015-10-24 17:23:23 (ÖÜÁù)
+ * @modified  2015-10-24 17:23:23 (ï¿½ï¿½ï¿½ï¿½)
  */
 
-#include    "error.h"
 #include  <stdlib.h>
+#include  <stdint.h>
+#include    "error.h"
 #include    "sock_wrap.h"
 
 #ifdef __cplusplus

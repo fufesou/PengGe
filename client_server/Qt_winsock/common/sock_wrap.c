@@ -156,13 +156,18 @@ int block_sock(sock_t handle, int block)
 int print_sockinfo(sock_t handle)
 {
     struct sockaddr_in addr_in;
-    int nlen = sizeof(struct sockaddr_in);
+#ifdef WIN32
+    int nlen;
+#else
+    socklen_t nlen;
+#endif
+    nlen = sizeof(struct sockaddr_in);
 
     if (IS_SOCK_HANDLE(handle)) {
         return -1;
     }
 
-    if (getsockname(handle, (struct sockaddr*)&addr_in, (socklen_t*)&nlen) == 0) {
+    if (getsockname(handle, (struct sockaddr*)&addr_in, &nlen) == 0) {
         printf("IP(s) used: %s\n", inet_ntoa(addr_in.sin_addr));
         printf("port used: %d\n", htons(addr_in.sin_port));
         return 0;

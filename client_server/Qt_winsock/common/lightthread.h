@@ -18,7 +18,7 @@ extern "C"
 #ifdef WIN32
 	typedef void* csmutex_t;
 	typedef void* cssem_t;
-	typedef uintptr_t csthread_t;
+    typedef void* csthread_t;
 #else
 	typedef pthread_mutex_t csmutex_t;
 	typedef sem_t cssem_t;
