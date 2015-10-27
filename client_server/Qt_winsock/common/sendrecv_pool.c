@@ -102,7 +102,7 @@ void s_clearpool(struct sendrecv_pool* pool)
     {
         int i = 0;
         for (i=0; i<pool->num_thread; ++i) {
-        CloseHandle(pool->hthreads[i]);
+            CloseHandle(pool->hthread[i]);
         }
     }
 #endif
