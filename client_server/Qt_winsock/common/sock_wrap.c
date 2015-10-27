@@ -9,6 +9,8 @@
 
 #include  <stdint.h>
 #include  <stdio.h>
+#include  <string.h>
+#include  <fcntl.h>
 #include    "sock_wrap.h"
 #include    "sock_types.h"
 #include    "macros.h"
@@ -32,13 +34,15 @@
 #endif
 
 
-void init_sock_environment()
+int init_sock_environment()
 {
+#ifdef WIN32
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2,2), &wsadata) != 0)
     {
          printf("Server: WSAStartup failed with error %d\n", WSAGetLastError());
-         exit(-1);
+         // exit(-1);
+         return -1;
     }
     else
     {
@@ -51,7 +55,8 @@ void init_sock_environment()
          printf("Server: The dll do not support the Winsock version %u.%u!\n",
                    LOBYTE(wsadata.wVersion),HIBYTE(wsadata.wVersion));
          WSACleanup();
-         exit(-1);
+         // exit(-1);
+         return -1;
     }
     else
     {
@@ -60,16 +65,21 @@ void init_sock_environment()
          printf("Server: The highest version this dll can support is %u.%u\n",
                    LOBYTE(wsadata.wHighVersion), HIBYTE(wsadata.wHighVersion));
     }
+#endif
+
+    return 0;
 }
 
 void clear_sock_environment()
 {
+#ifdef WIN32
     if(WSACleanup() != 0) {
          printf("Server: WSACleanup() failed! Error code: %d\n", WSAGetLastError());
     }
     else {
          printf("Server: WSACleanup() is OK...\n");
     }
+#endif
 }
 
 int get_last_sock_error(void)
@@ -152,7 +162,7 @@ int print_sockinfo(sock_t handle)
         return -1;
     }
 
-    if (getsockname(handle, (struct sockaddr*)&addr_in, &nlen) == 0) {
+    if (getsockname(handle, (struct sockaddr*)&addr_in, (socklen_t*)&nlen) == 0) {
         printf("IP(s) used: %s\n", inet_ntoa(addr_in.sin_addr));
         printf("port used: %d\n", htons(addr_in.sin_port));
         return 0;

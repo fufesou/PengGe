@@ -4,7 +4,7 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-26
- * @modified  Tue 2015-10-27 19:54:03 (+0800)
+ * @modified  Tue 2015-10-27 19:32:59 (+0800)
  */
 
 #include  <time.h>
@@ -15,10 +15,7 @@
 #ifdef WIN32
 #include  <Windows.h>
 #include  <process.h>
-#include  <semaphore.h>
 #else
-#include  <errno.h>
-#include  <semaphore.h>
 #include  <pthread.h>
 #include  <unistd.h>
 #include  <sys/time.h>
@@ -71,32 +68,6 @@ int create_thread(void (*proc)(void*), void* pargs, csthread_t* handle)
 void exit_thread(void)
 {
 	_endthread();
-}
-
-void wait_thread_terminate(csthread_t handle)
-{
-    DWORD waitStat = WaitForSingleObject(handle, INFINITE);
-    if (waitStat != WAIT_OBJECT_0) {
-        fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
-        if (waitStat == WAIT_FAILED) {
-            fprintf(stderr, ", error code: %d\n.", GetLastError());
-        } else {
-            fprintf("\n.");
-        }
-    }
-}
-
-void wait_threadN_terminate(csthread_t* handle, int count)
-{
-    DWORD waitStat = WaitForMultipleObjects(count, handle, 1, INFINITE);
-    if (waitStat != WAIT_OBJECT_0) {
-        fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
-        if (waitStat == WAIT_FAILED) {
-            fprintf(stderr, ", error code: %d\n.", GetLastError());
-        } else {
-            fprintf("\n.");
-        }
-    }
 }
 
 unsigned int get_pid(void)
@@ -156,54 +127,10 @@ void unlock_mutex(csmutex_t handle)
 /**************************************************
  **           WIN32: the semophare block         **
  **************************************************/
-int cssem_create(int value_init, int value_max, cssem_t* handle)
-{
-	*handle = CreateSemaphore(NULL, value_init, value_max, NULL);
-	if (*handle == NULL) {
-		fprintf(stderr, "create semaphore failed, errno: %ld.\n", GetLastError());
-		return -1;
-	}
-	return 0;
-}
-
-int cssem_wait(cssem_t* handle)
-{
-	DWORD waitStat = WaitForSingleObject(*handle, INFINITE);
-	if (waitStat != WAIT_OBJECT_0) {
-		fprintf(stderr, "wait semaphore failed, return state: %ld", waitStat);
-		if (waitStat == WAIT_FAILED) {
-			fprintf(stderr, ", error code: %d\n.", GetLastError());
-		} else {
-			fprintf("\n.");
-		}
-		return -1;
-	}
-	return 0;
-}
-
-int cssem_post(cssem_t* handle)
-{
-	if (ReleaseSemaphore(*handle, 1, NULL) == 0) {
-		fprintf(stderr, ", post semaphoer falied, error code: %d\n.", GetLastError());
-		return -1;
-	}
-	return 0;
-}
-
-int cssem_destroy(cssem_t* handle)
-{
-	DWORD waitStat = WaitForSingleObject(handle, INFINITE);
-	if (waitStat != WAIT_OBJECT_0) {
-		fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
-		if (waitStat == WAIT_FAILED) {
-			fprintf(stderr, ", error code: %d\n.", GetLastError());
-		} else {
-			fprintf("\n.");
-		}
-		return 0;
-	}
-	return -1;
-}
+int create_sem(int value_init, int value_max, cssem_t* handle);
+int wait_sem(cssem_t* handle);
+int pose_sem(cssem_t* handle);
+int destory_sem(cssem_t* handle);
 
 
 #endif
@@ -254,6 +181,32 @@ void wait_threadN_terminate(csthread_t* handle, int count)
 	int i = 0;
 	for (; i<count; ++i) {
 		wait_thread_terminate(handle[i]);
+	}
+}
+
+void wait_thread_terminate(csthread_t handle)
+{
+	DWORD waitStat = WaitForSingleObject(handle, INFINITE);
+	if (waitStat != WAIT_OBJECT_0) {
+		fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
+		if (waitStat == WAIT_FAILED) {
+			fprintf(stderr, ", error code: %d\n.", GetLastError());
+		} else {
+			fprintf("\n.");
+		}
+	}
+}
+
+void wait_threadN_terminate(csthread_t* handle, int count)
+{
+	DWORD waitStat = WaitForMultipleObjects(count, handle, 1, INFINITE);
+	if (waitStat != WAIT_OBJECT_0) {
+		fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
+		if (waitStat == WAIT_FAILED) {
+			fprintf(stderr, ", error code: %d\n.", GetLastError());
+		} else {
+			fprintf("\n.");
+		}
 	}
 }
 
@@ -327,15 +280,24 @@ void unlock_mutex(csmutex_t handle)
 /**************************************************
  **            UNIX: the semophare block         **
  **************************************************/
-int cssem_create(int value_init, int value_max, cssem_t* handle)
+int create_sem(int value_init, int value_max, cssem_t* handle)
 {
 	(void)value_max;
 	if (-1 == sem_init(handle, 0, value_init)) {
-		fprintf(stderr, "semaphore initialization falied, errno: %d\n", errno);
-		// exit(1);
-		return -1;
+		perror("semaphore initialization falied\n");
 	}
-	return 0;
+}
+
+int wait_sem(cssem_t* handle)
+{
+}
+
+int pose_sem(cssem_t* handle)
+{
+}
+
+int destory_sem(cssem_t* handle)
+{
 }
 
 

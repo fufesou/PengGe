@@ -4,11 +4,11 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
+ * @modified  Tue 2015-10-27 18:02:04 (+0800)
  */
 
 #ifndef  SENDRECV_POOL_H
 #define  SENDRECV_POOL_H
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +32,7 @@ struct sendrecv_pool {
     sock_t socket;
     HANDLE* hthreads;
     HANDLE hsem_filled;
-    CRITICAL_SECTION critical_sec;
+    mutex_t pmutex;
 
     ptr_process_sendrecv process_func;
 

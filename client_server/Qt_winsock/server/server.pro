@@ -9,7 +9,6 @@ INCLUDEPATH += ../common
 
 HEADERS += \
     server_udp.h \
-    ../common/udp_utility.h \
     server_sendrecv.h \
     ../common/sock_types.h \
     ../common/bufarray.h \
@@ -17,19 +16,27 @@ HEADERS += \
     msgdispatch.h \
     server_servroutine.h \
     ../common/sendrecv_pool.h \
-    ../common/msgwrap.h
+    ../common/msgwrap.h \
+    ../common/error.h \
+    ../common/lightthread.h \
+    ../common/sock_wrap.h \
+    ../common/timespan.h
 
 SOURCES += \
 #    main.c \
     test/wsaserver.c \
     server_udp.c \
-    ../common/udp_utility.c \
     server_sendrecv.c \
     ../common/bufarray.c \
     server_servroutine.c \
     msgdispatch.c \
     ../common/sendrecv_pool.c \
-    ../common/msgwrap.c
+    ../common/msgwrap.c \
+    ../common/error.c \
+    ../common/global.c \
+    ../common/lightthread.c \
+    ../common/sock_wrap.c \
+    ../common/timespan.c
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 

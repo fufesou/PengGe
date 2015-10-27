@@ -29,9 +29,11 @@ extern "C" {
 /**
  * @brief  init_sock_environment must be called before socket created. Similarly, clear_sock_environment must be called before exit();
  *
+ * @return
+ *
  * @see clear_sock_environment
  */
-void init_sock_environment(void);
+int init_sock_environment(void);
 
 /**
  * @brief  clear_sock_environment 
