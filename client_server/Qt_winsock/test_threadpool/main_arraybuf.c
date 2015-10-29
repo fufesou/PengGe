@@ -6,6 +6,11 @@
  * @date 2015-10-17
  */
 
+#ifndef WIN32
+#include  <pthread.h>
+#include  <semaphore.h>
+#endif
+
 #include  <assert.h>
 #include  <stdio.h>
 #include    "macros.h"

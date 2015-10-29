@@ -14,6 +14,7 @@
 #include  <stdio.h>
 #include  <malloc.h>
 #include  <stdint.h>
+#include  <string.h>
 #include  <semaphore.h>
 #include    "macros.h"
 #include    "utility_wrap.h"

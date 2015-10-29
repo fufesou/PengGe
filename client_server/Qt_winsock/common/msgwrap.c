@@ -9,6 +9,10 @@
 
 #ifdef WIN32
 #include  <winsock2.h>
+#else
+#include  <pthread.h>
+#include  <semaphore.h>
+#include  <netinet/in.h>
 #endif
 
 #include  <stdio.h>

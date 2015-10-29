@@ -40,7 +40,14 @@ SOURCES += \
     ../common/timespan.c \
     ../common/utility_wrap.c
 
-LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
+
+win32 {
+    LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
+}
+
+unix {
+    LIBS += -pthread
+}
 
 include(deployment.pri)
 qtcAddDeployment()

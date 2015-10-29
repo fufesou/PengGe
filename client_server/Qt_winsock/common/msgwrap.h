@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Mon 2015-10-26 18:29:53 (+0800)
+ * @modified  2015-10-28 23:06:53 (+0800)
  */
 
 #ifndef  MSGUNIT_H
