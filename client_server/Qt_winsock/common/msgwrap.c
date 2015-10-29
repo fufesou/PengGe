@@ -17,6 +17,7 @@
 #include  <stdint.h>
 #include    "macros.h"
 #include	"sock_types.h"
+#include    "lightthread.h"
 #include    "bufarray.h"
 #include    "sendrecv_pool.h"
 #include    "msgwrap.h"
@@ -63,9 +64,9 @@ int push2pool(const char* data, const struct msg_header* unithdr, struct sendrec
 {
     char* poolbuf = NULL;
 
-    EnterCriticalSection(&pool->critical_sec);
+    csmutex_lock(pool->hmutex);
     poolbuf = pool->empty_buf.pull_item(&pool->empty_buf);
-    LeaveCriticalSection(&pool->critical_sec);
+    csmutex_unlock(pool->hmutex);
 
     if (poolbuf == NULL) {
         return 1;
@@ -74,15 +75,15 @@ int push2pool(const char* data, const struct msg_header* unithdr, struct sendrec
     if (merge2unit(unithdr, data, poolbuf, pool->len_item) != 0)
     {
         printf("copy data to pool error, omit current data.\n");
-        EnterCriticalSection(&pool->critical_sec);
+        csmutex_lock(pool->hmutex);
         pool->empty_buf.push_item(&pool->empty_buf, poolbuf);
-        LeaveCriticalSection(&pool->critical_sec);
+        csmutex_unlock(pool->hmutex);
         return 1;
     }
 
-    EnterCriticalSection(&pool->critical_sec);
+    csmutex_lock(pool->hmutex);
     pool->filled_buf.push_item(&pool->filled_buf, poolbuf);
-    LeaveCriticalSection(&pool->critical_sec);
+    csmutex_unlock(pool->hmutex);
 
     ReleaseSemaphore(pool->hsem_filled, 1, NULL);
 
@@ -93,18 +94,18 @@ int pull_from_pool(char* data, int datalen, struct msg_header* unithdr, struct s
 {
     char* bufitem = NULL;
 
-    EnterCriticalSection(&pool->critical_sec);
+    csmutex_lock(pool->hmutex);
     bufitem = pool->filled_buf.pull_item(&pool->filled_buf);
-    LeaveCriticalSection(&pool->critical_sec);
+    csmutex_unlock(pool->hmutex);
     if (bufitem == NULL) {
         return 1;
     }
 
     extract_copy_msg(bufitem, unithdr, data, datalen);
 
-    EnterCriticalSection(&pool->critical_sec);
+    csmutex_lock(pool->hmutex);
     pool->empty_buf.push_item(&pool->empty_buf, bufitem);
-    LeaveCriticalSection(&pool->critical_sec);
+    csmutex_unlock(pool->hmutex);
 
     return 0;
 }

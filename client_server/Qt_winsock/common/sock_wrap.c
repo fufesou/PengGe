@@ -17,6 +17,7 @@
 
 #ifdef WIN32
 #include  <windows.h>
+#include  <winsock2.h>
 #define IS_SOCK_HANDLE(x) ((x)!=INVALID_SOCKET)
 #define BLOCK_RW        0
 #define NONBLICK_RW     0

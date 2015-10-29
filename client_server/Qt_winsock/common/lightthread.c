@@ -77,7 +77,9 @@ void csthread_wait_terminate(csthread_t handle)
         } else {
             fprintf(stderr, "\n.");
         }
+        return;
     }
+    CloseHandle(handle);
 }
 
 void csthreadN_wait_terminate(csthread_t* handle, int count)
@@ -89,6 +91,14 @@ void csthreadN_wait_terminate(csthread_t* handle, int count)
             fprintf(stderr, ", error code: %ld\n.", GetLastError());
         } else {
             fprintf(stderr, "\n.");
+        }
+        return;
+    }
+
+    {
+        int i = 0;
+        for (i=0; i<count; ++i) {
+            CloseHandle(handle[i]);
         }
     }
 }
@@ -194,9 +204,10 @@ int cssem_destroy(cssem_t* handle)
 		} else {
             fprintf(stderr, "\n.");
 		}
-		return 0;
+        return -1;
 	}
-	return -1;
+    CloseHandle(*handle);
+    return 0;
 }
 
 

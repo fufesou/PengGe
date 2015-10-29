@@ -8,19 +8,16 @@
 
 #include  <assert.h>
 #include  <stdio.h>
-#include  <windows.h>
-#include  <process.h>
-#include  <semaphore.h>
-#include    "list.h"
 #include    "macros.h"
 #include    "bufarray.h"
+#include    "lightthread.h"
 
 #define NUM_THREAD 4
 
-HANDLE handle_thread[NUM_THREAD];
-HANDLE handle_semfilled;
+csmutex_t hmutex;
+cssem_t hsem_filled;
+csthread_t hthreads[NUM_THREAD];
 char buf[255];
-CRITICAL_SECTION cs_code;
 
 #ifdef _DEBUG
 int pullcount = 0;
@@ -31,9 +28,11 @@ int countsem_wait = 0;
 static struct array_buf filled_arraybuf;
 static struct array_buf empty_arraybuf;
 
-static void create_semophare(long count_init, long count_max);
-static void create_threads(int num_thread);
-static unsigned int __stdcall processBufferData(void* pPM);
+#ifdef WIN32
+static unsigned int __stdcall processBufferData(void* param);
+#else
+static void* processBufferData(void* param);
+#endif
 static void process_msg(char* bufitem, long threadid);
 
 
@@ -46,36 +45,35 @@ int main(void)
     init_buf(&filled_arraybuf, 30, 510, 0);
     init_buf(&empty_arraybuf, 30, 500, -1);
 
-    InitializeCriticalSection(&cs_code);
+    hmutex = csmutex_create();
+    cssem_create(0, filled_arraybuf.num_item - 1, &hsem_filled);
 
-    create_semophare(0, filled_arraybuf.num_item - 1);
-    create_threads(NUM_THREAD);
+    for (i=0; i<NUM_THREAD; ++i) {
+        csthread_create(processBufferData, NULL, hthreads + i);
+    }
 
     while (fgets(buf, sizeof(buf), stdin) != NULL) {
         i = 0;
         while (i < numbuf) {
-            EnterCriticalSection(&cs_code);
+            csmutex_lock(hmutex);
             if ((bufitem = empty_arraybuf.pull_item(&empty_arraybuf)) == NULL) {
-                LeaveCriticalSection(&cs_code);
-                Sleep(10);
+                csmutex_unlock(hmutex);
+                cssleep(10);
                 continue;
             }
             sprintf(bufitem, "%d", i);
             filled_arraybuf.push_item(&filled_arraybuf, bufitem);
 
-            LeaveCriticalSection(&cs_code);
-            ReleaseSemaphore(handle_semfilled, 1, NULL);
-            Sleep(10);
+            csmutex_unlock(hmutex);
+            cssem_post(&hsem_filled);
+            cssleep(10);
             ++i;
         }
     }
 
-    WaitForMultipleObjects(NUM_THREAD, handle_thread, 1, INFINITE);
-    for (i=0; i<NUM_THREAD; ++i) {
-        CloseHandle(handle_thread[i]);
-    }
-    CloseHandle(handle_semfilled);
-    DeleteCriticalSection(&cs_code);
+    csthreadN_wait_terminate(hthreads, NUM_THREAD);
+    cssem_destroy(&hsem_filled);
+    csmutex_destroy(hmutex);
 
     empty_arraybuf.clear_buf(&empty_arraybuf);
     filled_arraybuf.clear_buf(&filled_arraybuf);
@@ -83,71 +81,49 @@ int main(void)
     return 0;
 }
 
-void create_semophare(long count_init, long count_max)
-{
-    handle_semfilled = CreateSemaphore(NULL, count_init, count_max, NULL);
-    if (handle_semfilled == NULL) {
-        printf("create semaphore error! errno: %ld\n", GetLastError());
-        exit(1);
-    }
-}
-
-void create_threads(int num_thread)
-{
-    int i;
-    for (i=0; i<num_thread; ++i) {
-        handle_thread[i] = (HANDLE)_beginthreadex(NULL, 0, processBufferData, NULL, 0, NULL);
-        while ((long)handle_thread[i] == 1L) {
-            printf("create thread error, try again now\n");
-            handle_thread[i] = (HANDLE)_beginthreadex(NULL, 0, processBufferData, NULL, 0, NULL);
-        }
-        if (handle_thread[i] == 0) {
-            printf("create thread error, errno: %d.\nexit(1)\n", errno);
-            exit(1);
-        }
-        Sleep(20);
-    }
-}
-
 void process_msg(char* bufitem, long threadid)
 {
     printf("thread id: %ld, handle message: %s.\n", threadid, bufitem);
 }
 
-unsigned int __stdcall processBufferData(void* pPM)
+#ifdef WIN32
+unsigned int __stdcall processBufferData(void* param)
+#else
+void* processBufferData(void* param)
+#endif
 {
     char* bufitem = NULL;
 
-    (void)pPM;
+    (void)param;
 
-    printf("child thread %ld created.\n", GetCurrentThreadId());
+    printf("child thread %d created.\n", csthread_getpid());
     while (1) {
-        WaitForSingleObject(handle_semfilled, INFINITE);
+        cssem_wait(&hsem_filled);
 
 #ifdef _DEBUG
-        EnterCriticalSection(&cs_code);
+        csmutex_lock(hmutex);
         ++countsem_wait;
-        LeaveCriticalSection(&cs_code);
+        csmutex_unlock(hmutex);
 #endif
 
-        EnterCriticalSection(&cs_code);
+        csmutex_lock(hmutex);
         bufitem = filled_arraybuf.pull_item(&filled_arraybuf);
 #ifdef _DEBUG
         ++pullcount;
 #endif
         assert(bufitem != NULL);
         if (bufitem == NULL) continue;
-        LeaveCriticalSection(&cs_code);
+        csmutex_unlock(hmutex);
 
-        process_msg(bufitem, GetCurrentThreadId());
-        Sleep(200);
+        process_msg(bufitem, csthread_getpid());
+        cssleep(200);
 
-        EnterCriticalSection(&cs_code);
+        csmutex_lock(hmutex);
 #ifdef _DEBUG
         ++pushcount;
 #endif
         empty_arraybuf.push_item(&empty_arraybuf, bufitem);
-        LeaveCriticalSection(&cs_code);
+        csmutex_unlock(hmutex);
     }
 
     return 0;

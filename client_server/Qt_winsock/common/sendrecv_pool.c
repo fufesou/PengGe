@@ -98,15 +98,6 @@ void s_initpool(struct sendrecv_pool* pool)
 void s_clearpool(struct sendrecv_pool* pool)
 {
 	csthreadN_wait_terminate(pool->hthread, pool->num_thread);
-#ifdef WIN32
-    {
-        int i = 0;
-        for (i=0; i<pool->num_thread; ++i) {
-            CloseHandle(pool->hthread[i]);
-        }
-    }
-#endif
-
 	cssem_destroy(&pool->hsem_filled);
 
     pool->filled_buf.clear_buf(&pool->filled_buf);

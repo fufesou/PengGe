@@ -18,7 +18,7 @@ extern "C" {
  * @brief  msg_header describe the header in pool item. msg_header is followed by the actual message data.
  */
 struct msg_header {
-    SOCKADDR_IN addr;
+    struct sockaddr_in addr;
     int addrlen;
     struct hdr header;
     ssize_t numbytes;
