@@ -20,7 +20,8 @@ HEADERS += \
     ../common/error.h \
     ../common/lightthread.h \
     ../common/sock_wrap.h \
-    ../common/timespan.h
+    ../common/timespan.h \
+    ../common/utility_wrap.h
 
 SOURCES += \
 #    main.c \
@@ -36,7 +37,8 @@ SOURCES += \
     ../common/global.c \
     ../common/lightthread.c \
     ../common/sock_wrap.c \
-    ../common/timespan.c
+    ../common/timespan.c \
+    ../common/utility_wrap.c
 
 LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32
 

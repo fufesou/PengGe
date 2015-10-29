@@ -10,6 +10,10 @@
 #ifndef  MACROS_H
 #define  MACROS_H
 
+#define __in
+#define __out
+#define __inout
+
 // #define _CHECK_ARGS
 
 #define MAX_MSG_LEN 1024

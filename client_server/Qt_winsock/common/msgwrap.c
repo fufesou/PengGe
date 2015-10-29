@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Mon 2015-10-26 18:42:49 (+0800)
+ * @modified  周四 2015-10-29 19:13:43 中国标准时间
  */
 
 #ifdef WIN32
@@ -16,6 +16,7 @@
 #include  <string.h>
 #include  <stdint.h>
 #include    "macros.h"
+#include    "utility_wrap.h"
 #include	"sock_types.h"
 #include    "lightthread.h"
 #include    "bufarray.h"
@@ -28,13 +29,8 @@ int merge2unit(const struct msg_header* hdr_unit, const char* data, char* unit, 
     int len_unitheader = sizeof(struct msg_header);
 
     assert((len_unitheader + hdr_unit->numbytes) < unitlen);
-#ifdef WIN32
-    memcpy_s(unit, unitlen, hdr_unit, len_unitheader);
-    memcpy_s(unit + len_unitheader, unitlen - len_unitheader, data, hdr_unit->numbytes);
-#else
-    memcpy(unit, hdr_unit, len_unitheader);
-    memcpy(unit + len_unitheader, data, hdr_unit->numbytes);
-#endif
+    cs_memcpy(unit, unitlen, hdr_unit, len_unitheader);
+    cs_memcpy(unit + len_unitheader, unitlen - len_unitheader, data, hdr_unit->numbytes);
 
     return 0;
 }
@@ -49,63 +45,49 @@ int extract_copy_msg(const char* unit, struct msg_header* hdr_unit, char* data, 
 {
     int len_unitheader = sizeof(struct msg_header);
 
-#ifdef WIN32
-    memcpy_s(hdr_unit, len_unitheader, unit, len_unitheader);
-    memcpy_s(data, datalen, unit + len_unitheader, hdr_unit->numbytes);
-#else
-    memcpy(hdr_unit, unit, len_unitheader);
-    memcpy(data, unit + len_unitheader, hdr_unit->numbytes);
-#endif
-
+    if (cs_memcpy(hdr_unit, len_unitheader, unit, len_unitheader) != 0) {
+        return 1;
+    }
+    
+    if (cs_memcpy(data, datalen, unit + len_unitheader, hdr_unit->numbytes) != 0) {
+        return 1;
+    }
+    
     return 0;
 }
 
 int push2pool(const char* data, const struct msg_header* unithdr, struct sendrecv_pool* pool)
 {
-    char* poolbuf = NULL;
+    char* bufitem = cspool_pullitem(pool, &pool->empty_buf);
 
-    csmutex_lock(pool->hmutex);
-    poolbuf = pool->empty_buf.pull_item(&pool->empty_buf);
-    csmutex_unlock(pool->hmutex);
-
-    if (poolbuf == NULL) {
-        return 1;
+    if (bufitem == NULL) {
+        return -1;
     }
 
-    if (merge2unit(unithdr, data, poolbuf, pool->len_item) != 0)
-    {
+    if (merge2unit(unithdr, data, bufitem, pool->len_item) != 0) {
         printf("copy data to pool error, omit current data.\n");
-        csmutex_lock(pool->hmutex);
-        pool->empty_buf.push_item(&pool->empty_buf, poolbuf);
-        csmutex_unlock(pool->hmutex);
+        cspool_pushitem(pool, &pool->empty_buf, bufitem);
         return 1;
     }
 
-    csmutex_lock(pool->hmutex);
-    pool->filled_buf.push_item(&pool->filled_buf, poolbuf);
-    csmutex_unlock(pool->hmutex);
-
-    ReleaseSemaphore(pool->hsem_filled, 1, NULL);
-
+    cspool_pushitem(pool, &pool->filled_buf, bufitem);
     return 0;
 }
 
 int pull_from_pool(char* data, int datalen, struct msg_header* unithdr, struct sendrecv_pool* pool)
 {
-    char* bufitem = NULL;
+    char* bufitem = cspool_pullitem(pool, &pool->filled_buf);
 
-    csmutex_lock(pool->hmutex);
-    bufitem = pool->filled_buf.pull_item(&pool->filled_buf);
-    csmutex_unlock(pool->hmutex);
     if (bufitem == NULL) {
+        return -1;
+    }
+
+    if (extract_copy_msg(bufitem, unithdr, data, datalen) != 0) {
+        fprintf(stderr, "copy data from pool error, cancel.\n");
+        cspool_pushitem(pool, &pool->filled_buf, bufitem);
         return 1;
     }
 
-    extract_copy_msg(bufitem, unithdr, data, datalen);
-
-    csmutex_lock(pool->hmutex);
-    pool->empty_buf.push_item(&pool->empty_buf, bufitem);
-    csmutex_unlock(pool->hmutex);
-
+    cspool_pushitem(pool, &pool->empty_buf, bufitem);
     return 0;
 }

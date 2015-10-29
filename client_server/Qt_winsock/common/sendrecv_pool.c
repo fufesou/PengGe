@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  2015-10-28 00:55:47 (+0800)
+ * @modified  周四 2015-10-29 19:35:51 中国标准时间
  */
 
 #ifdef WIN32
@@ -15,6 +15,8 @@
 #include  <malloc.h>
 #include  <stdint.h>
 #include  <semaphore.h>
+#include    "macros.h"
+#include    "utility_wrap.h"
 #include    "bufarray.h"
 #include    "sock_types.h"
 #include    "lightthread.h"
@@ -87,6 +89,7 @@ void s_initpool(struct sendrecv_pool* pool)
 
     pool->hmutex = csmutex_create();
     cssem_create(0, pool->filled_buf.num_item - 1, &pool->hsem_filled);
+    pool->use_sem_in_pool = 0;
 
     pool->hthread = (csthread_t*)malloc(sizeof(csthread_t) * pool->num_thread);
 	for (i=0; i<pool->num_thread; ++i) {
@@ -105,3 +108,97 @@ void s_clearpool(struct sendrecv_pool* pool)
 	csmutex_destroy(pool->hmutex);
 }
 
+char* cspool_pushitem(struct sendrecv_pool* pool, struct array_buf* buf, char* item)
+{
+    if (pool->use_sem_in_pool && buf == (&pool->filled_buf)) {
+        if (cssem_post(&pool->hsem_filled) != 0) {
+            return NULL;
+        }
+    }
+
+    csmutex_lock(pool->hmutex);
+    item = buf->push_item(buf, item);
+    csmutex_unlock(pool->hmutex);
+    return item;
+}
+
+char* cspool_pullitem(struct sendrecv_pool* pool, struct array_buf* buf)
+{
+    char* item;
+
+    if (pool->use_sem_in_pool && buf == (&pool->filled_buf)) {
+        if (cssem_wait(&pool->hsem_filled) != 0) {
+            return NULL;
+        }
+    }
+
+    csmutex_lock(pool->hmutex);
+    item = buf->pull_item(buf);
+    csmutex_unlock(pool->hmutex);
+    return item;
+}
+
+int cspool_pushdata(struct sendrecv_pool* pool, const char* data, int datalen)
+{
+    char* poolbuf = NULL;
+
+    csmutex_lock(pool->hmutex);
+    poolbuf = pool->empty_buf.pull_item(&pool->empty_buf);
+    csmutex_unlock(pool->hmutex);
+
+    if (poolbuf == NULL) {
+        return 1;
+    }
+
+    if (cs_memcpy(poolbuf, pool->len_item, data, datalen) != 0)
+    {
+        csmutex_lock(pool->hmutex);
+        pool->empty_buf.push_item(&pool->empty_buf, poolbuf);
+        csmutex_unlock(pool->hmutex);
+        return -1;
+    }
+
+    csmutex_lock(pool->hmutex);
+    pool->filled_buf.push_item(&pool->filled_buf, poolbuf);
+    csmutex_unlock(pool->hmutex);
+    if (pool->use_sem_in_pool) {
+        /*
+         * @brief error handle block should be added here.
+         */
+        cssem_post(&pool->hsem_filled);
+    }
+
+    return 0;
+}
+
+int cspool_pulldata(struct sendrecv_pool* pool, char* data, int datalen)
+{
+    char* bufitem = NULL;
+
+    if (pool->use_sem_in_pool) {
+        if (cssem_wait(&pool->hsem_filled) != 0) {
+            return 2;
+        }
+    }
+    csmutex_lock(pool->hmutex);
+    bufitem = pool->filled_buf.pull_item(&pool->filled_buf);
+    csmutex_unlock(pool->hmutex);
+
+    if (bufitem == NULL) {
+        return 1;
+    }
+
+    if (cs_memcpy(data, datalen, bufitem, strlen(bufitem) + 1) != 0)
+    {
+        csmutex_lock(pool->hmutex);
+        pool->filled_buf.push_item(&pool->filled_buf, bufitem);
+        csmutex_unlock(pool->hmutex);
+        return -1;
+    }
+
+    csmutex_lock(pool->hmutex);
+    pool->empty_buf.push_item(&pool->empty_buf, bufitem);
+    csmutex_unlock(pool->hmutex);
+
+    return 0;
+}
