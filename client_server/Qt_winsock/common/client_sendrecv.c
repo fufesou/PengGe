@@ -4,6 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
+ * @modified  Fri 2015-10-30 18:42:24 (+0800)
  */
 
 #ifdef WIN32
@@ -14,7 +15,6 @@
 #include <signal.h>
 #endif
 
-#include <windows.h>
 #include <stdio.h>
 #include <string.h>
 #include "unprtt.h"

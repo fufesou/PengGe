@@ -9,7 +9,6 @@ HEADERS += \
     unprtt.h \
     udp_send_recv.h \
     ../common/udp_utility.h \
-    client_sendrecv.h \
     ../common/error.h \
     ../common/macros.h \
     ../common/sock_types.h \
@@ -26,7 +25,6 @@ SOURCES += \
 #    test\wsaclinet.c \
     rtt.c \
     ../common/udp_utility.c \
-    client_sendrecv.c \
     ../common/error.c \
     ../common/global.c \
     ../common/sock_wrap.c \

@@ -4,31 +4,31 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-30
+ * @modified  Fri 2015-10-30 18:33:31 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
 #define  CLIENT_UDP_H
 
 #include <stdio.h>
-#include <winsock2.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-    /**
-     * @brief struct client_udp contains necessary members and functions for client operations.
-     * This struct object must be initialized (by calling init_client_udp) before any operations applied to it.
-     * @sa init_client_udp
-     */
+/**
+ * @brief struct client_udp contains necessary members and functions for client operations.
+ * This struct object must be initialized (by calling init_client_udp) before any operations applied to it.
+ * @sa init_client_udp
+ */
 struct client_udp
 {
-    SOCKET socket;
+    cssock_t hsock;
 
     /**
      * @brief sockaddr_in is the server socket address.
      */
-    SOCKADDR_IN sockaddr_in;
+    struct sockaddr_in sa_in;
 
     /**
      * @brief msgheader is the string that print before message.
