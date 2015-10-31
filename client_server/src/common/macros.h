@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
- * modified  2015-10-24 17:49:36 (周六)
+ * modified  Sat 2015-10-31 18:28:46 (+0800)
  */
 
 #ifndef  MACROS_H
@@ -17,6 +17,7 @@
 // #define _CHECK_ARGS
 
 #define MAX_MSG_LEN 1024
+#define MAX_BUF_LEN 2048
 
 
 #ifndef offsetof

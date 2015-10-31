@@ -4,11 +4,40 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-26
- * @modified  2015-10-26 23:15:37 (+0800)
+ * @modified  Sat 2015-10-31 19:13:32 (+0800)
  */
+
+#ifdef WIN32
+#include  <windows.h>
+#else
+#include  <sys/time.h>
+#endif
 
 #include	"timespan.h"
 #include  <stdio.h>
+
+void csgettimeofday(struct timeval* tv, void* tz)
+{
+#ifdef WIN32
+    time_t clock;
+    struct tm tm;
+    SYSTEMTIME wtm;
+
+    GetLocalTime(&wtm);
+    tm.tm_year    = wtm.wYear - 1900;
+    tm.tm_mon     = wtm.wMonth - 1;
+    tm.tm_mday    = wtm.wDay;
+    tm.tm_hour    = wtm.wHour;
+    tm.tm_min     = wtm.wMinute;
+    tm.tm_sec     = wtm.wSecond;
+    tm. tm_isdst  = -1;
+    clock = mktime(&tm);
+    tp->tv_sec = clock;
+    tp->tv_usec = wtm.wMilliseconds * 1000;
+#else
+	gettimeofday(tv, tz);
+#endif
+}
 
 void get_cur_timelong(timelong_t* tl)
 {

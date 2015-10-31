@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  周四 2015-10-29 19:13:43 中国标准时间
+ * @modified  Sat 2015-10-31 19:18:29 (+0800)
  */
 
 #ifdef WIN32
@@ -28,39 +28,43 @@
 #include    "msgwrap.h"
 
 
-int merge2unit(const struct msg_header* hdr_unit, const char* data, char* unit, int unitlen)
+int csmsg_merge(const struct csmsg_header* msgheader, const char* data, char* unit, int unitlen)
 {
-    int len_unitheader = sizeof(struct msg_header);
+    int len_unitheader = sizeof(struct csmsg_header);
 
-    assert((len_unitheader + hdr_unit->numbytes) < unitlen);
-    cs_memcpy(unit, unitlen, hdr_unit, len_unitheader);
-    cs_memcpy(unit + len_unitheader, unitlen - len_unitheader, data, hdr_unit->numbytes);
+    assert((len_unitheader + msgheader->numbytes) < unitlen);
+    if (cs_memcpy(unit, unitlen, msgheader, len_unitheader) != 0) {
+		return 1;
+	}
+	if (cs_memcpy(unit + len_unitheader, unitlen - len_unitheader, data, msgheader->numbytes) != 0) {
+		return 1;
+	}
 
     return 0;
 }
 
-void extract_msg(const char* unit, const struct msg_header** hdr_unit, const char** data)
+void csmsg_extract(const char* unit, const struct csmsg_header** msgheader, const char** data)
 {
-    *hdr_unit = (const struct msg_header*)unit;
-    *data = (const char*)(unit + sizeof(struct msg_header));
+    *msgheader = (const struct csmsg_header*)unit;
+    *data = (const char*)(unit + sizeof(struct csmsg_header));
 }
 
-int extract_copy_msg(const char* unit, struct msg_header* hdr_unit, char* data, int datalen)
+int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* data, int datalen)
 {
-    int len_unitheader = sizeof(struct msg_header);
+    int len_unitheader = sizeof(struct csmsg_header);
 
-    if (cs_memcpy(hdr_unit, len_unitheader, unit, len_unitheader) != 0) {
+    if (cs_memcpy(msgheader, len_unitheader, unit, len_unitheader) != 0) {
         return 1;
     }
     
-    if (cs_memcpy(data, datalen, unit + len_unitheader, hdr_unit->numbytes) != 0) {
+    if (cs_memcpy(data, datalen, unit + len_unitheader, msgheader->numbytes) != 0) {
         return 1;
     }
     
     return 0;
 }
 
-int push2pool(const char* data, const struct msg_header* unithdr, struct sendrecv_pool* pool)
+int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, struct cssendrecv_pool* pool)
 {
     char* bufitem = cspool_pullitem(pool, &pool->empty_buf);
 
@@ -68,7 +72,7 @@ int push2pool(const char* data, const struct msg_header* unithdr, struct sendrec
         return -1;
     }
 
-    if (merge2unit(unithdr, data, bufitem, pool->len_item) != 0) {
+    if (csmsg_merge(msgheader, data, bufitem, pool->len_item) != 0) {
         printf("copy data to pool error, omit current data.\n");
         cspool_pushitem(pool, &pool->empty_buf, bufitem);
         return 1;
@@ -78,7 +82,7 @@ int push2pool(const char* data, const struct msg_header* unithdr, struct sendrec
     return 0;
 }
 
-int pull_from_pool(char* data, int datalen, struct msg_header* unithdr, struct sendrecv_pool* pool)
+int csmsg_pull_from_pool(char* data, int datalen, struct csmsg_header* msgheader, struct cssendrecv_pool* pool)
 {
     char* bufitem = cspool_pullitem(pool, &pool->filled_buf);
 
@@ -86,7 +90,7 @@ int pull_from_pool(char* data, int datalen, struct msg_header* unithdr, struct s
         return -1;
     }
 
-    if (extract_copy_msg(bufitem, unithdr, data, datalen) != 0) {
+    if (csmsg_extract_copy(bufitem, msgheader, data, datalen) != 0) {
         fprintf(stderr, "copy data from pool error, cancel.\n");
         cspool_pushitem(pool, &pool->filled_buf, bufitem);
         return 1;

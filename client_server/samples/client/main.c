@@ -6,7 +6,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-01
- * @modified  Fri 2015-10-30 18:29:37 (+0800)
+ * @modified  Sat 2015-10-31 11:26:37 (+0800)
  */
 
 
@@ -15,13 +15,20 @@
 #include "client_udp.h"
 
 
+
+
 int main(int argc, char* argv[])
 {
     WSADATA wsadata;
     struct client_udp udpclient;
     struct sockaddr_in serveraddr;
 
-    check_args(argc, argv);
+    if (argc < 2) {
+        printf("usage: server <port>.");
+        exit(1);
+    }
+
+
     U_init_winsock2(&wsadata);
 
     init_client_udp(&udpclient);

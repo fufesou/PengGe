@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-10
- * @modified  Fri 2015-10-30 18:33:13 (+0800)
+ * @modified  Sat 2015-10-31 14:59:07 (+0800)
  */
 
 
@@ -29,8 +29,10 @@
  */
 #ifdef WIN32
 typedef SOCKET cssock_t;
+typedef int cssocklen_t;
 #else
 typedef int cssock_t;
+typedef socklen_t cssocklen_t;
 #endif
 
 

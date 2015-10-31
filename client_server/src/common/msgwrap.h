@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  2015-10-28 23:06:53 (+0800)
+ * @modified  Sat 2015-10-31 19:18:24 (+0800)
  */
 
 #ifndef  MSGUNIT_H
@@ -15,9 +15,9 @@ extern "C" {
 #endif
 
 /**
- * @brief  msg_header describe the header in pool item. msg_header is followed by the actual message data.
+ * @brief  csmsg_header describe the header in pool item. csmsg_header is followed by the actual message data.
  */
-struct msg_header {
+struct csmsg_header {
     struct sockaddr_in addr;
     int addrlen;
     struct hdr header;
@@ -25,75 +25,75 @@ struct msg_header {
 };
 
 /**
- * @brief  merge2unit 
+ * @brief  csmsg_merge 
  *
- * @param hdr_unit
+ * @param msgheader
  * @param data
  * @param unit
  * @param unitlen
  *
- * @return   
+ * @return   0 if succeed, 1 if fail.
  */
-int merge2unit(const struct msg_header* hdr_unit, const char* data, char* unit, int unitlen);
+int csmsg_merge(const struct csmsg_header* msghdr, const char* data, char* unit, int unitlen);
 
 /**
- * @brief  extract_msg 
+ * @brief  csmsg_extract 
  *
  * @param unit
- * @param hdr_unit
+ * @param msgheader
  * @param data
  */
-void extract_msg(const char* unit, const struct msg_header** hdr_unit, const char** data);
+void csmsg_extract(const char* unit, const struct csmsg_header** msgheader, const char** data);
 
 /**
- * @brief  extract_copy_msg 
+ * @brief  csmsg_extract_copy 
  *
  * @param unit
- * @param hdr_unit
+ * @param msgheader
  * @param data
  * @param datalen
  *
  * @return   
  */
-int extract_copy_msg(const char* unit, struct msg_header* hdr_unit, char* data, int datalen);
+int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* data, int datalen);
 
 /**
- * @brief  push2pool will firstly copy message data and the unit header to single char array. And 
- * then push the single char array to struct sendrecv_pool. The procedure can be splitted into 
+ * @brief  csmsg_push2pool will firstly copy message data and the unit header to single char array. And 
+ * then push the single char array to struct cssendrecv_pool. The procedure can be splitted into 
  * three steps:
  * 1. take out one item from empty buffer in the pool.
- * 2. copy data and unithdr to the item.
+ * 2. copy data and msgheader to the item.
  * 3. push the item into the filled buffer
  *
  * @param data the message data.
- * @param unithdr the unit header struct.
+ * @param msgheader the unit header struct.
  * @param pool the pool to operate.
  *
  * @return  
  * 0 if success. There is en empty buffer for operation.
  * 1 if fail. There is no empty buffer left.
  */
-int push2pool(const char* data, const struct msg_header* unithdr, struct sendrecv_pool* pool);
+int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, struct cssendrecv_pool* pool);
 
 /**
- * @brief  pull_from_pool works the opposite as push2pool does. The procedure can be splitted into
+ * @brief  csmsg_pull_from_pool works the opposite as csmsg_push2pool does. The procedure can be splitted into
  * three steps:
  * 1. take out one item from filled buffer in pool.
- * 2. copy data and unithdr from the item.
+ * 2. copy data and msgheader from the item.
  * 3. push the item into the empty buffer.
  *
  * @param data the message data
  * @param datalen the length of message data.
- * @param unithdr the unit header struct.
+ * @param msgheader the unit header struct.
  * @param pool the pool to operate.
  *
  * @return   
  * 0 if success. There is a filled buffer for operation.
  * 1 if fail. There is no filled buffer left.
  *
- * @see push2pool
+ * @see csmsg_push2pool
  */
-int pull_from_pool(char* data, int datalen, struct msg_header* unithdr, struct sendrecv_pool* pool);
+int csmsg_pull_from_pool(char* data, int datalen, struct csmsg_header* msgheader, struct cssendrecv_pool* pool);
 
 #ifdef __cplusplus
 }

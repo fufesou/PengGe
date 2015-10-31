@@ -1,36 +1,24 @@
-/* include rtt1 */
+/**
+ * @file rtt.c
+ * @brief This file comes from unp src.
+ * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @version 0.1
+ * @date 2015-10-31
+ */
+
+#ifdef WIN32
+#include  <windows.h>
+#else
+#include  <sys/time.h>
+#endif
+
 #include	"unprtt.h"
 #include  <time.h>
 #include  <stdio.h>
 #include  <string.h>
-
+#include    "timespan.h"
 
 int		rtt_d_flag = 0;		/* debug flag; can be set by caller */
-
-
-#ifdef WIN32
-#include  <windows.h>
-void Gettimeofday(struct timeval *tp, void *tzp)
-{
-    time_t clock;
-    struct tm tm;
-    SYSTEMTIME wtm;
-
-    GetLocalTime(&wtm);
-    tm.tm_year    = wtm.wYear - 1900;
-    tm.tm_mon     = wtm.wMonth - 1;
-    tm.tm_mday    = wtm.wDay;
-    tm.tm_hour    = wtm.wHour;
-    tm.tm_min     = wtm.wMinute;
-    tm.tm_sec     = wtm.wSecond;
-    tm. tm_isdst  = -1;
-    clock = mktime(&tm);
-    tp->tv_sec = clock;
-    tp->tv_usec = wtm.wMilliseconds * 1000;
-
-    (void)tzp;
-}
-#endif
 
 
 /*
@@ -54,7 +42,7 @@ rtt_init(struct rtt_info *ptr)
 {
 	struct timeval	tv;
 
-	Gettimeofday(&tv, NULL);
+	csgettimeofday(&tv, NULL);
 	ptr->rtt_base = tv.tv_sec;		/* # sec since 1/1/1970 at start */
 
 	ptr->rtt_rtt    = 0;
@@ -78,7 +66,7 @@ rtt_ts(struct rtt_info *ptr)
 	uint32_t		ts;
 	struct timeval	tv;
 
-	Gettimeofday(&tv, NULL);
+	csgettimeofday(&tv, NULL);
 	ts = ((tv.tv_sec - ptr->rtt_base) * 1000) + (tv.tv_usec / 1000);
 	return(ts);
 }

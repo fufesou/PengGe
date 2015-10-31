@@ -1,10 +1,10 @@
 /**
- * @file udp_utility.c
+ * @file sock_wrap.c
  * @brief 
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  2015-10-27 23:48:46 (+0800)
+ * @modified  Sat 2015-10-31 11:54:06 (+0800)
  */
 
 #include  <stdint.h>
@@ -35,7 +35,7 @@
 #endif
 
 
-int init_sock_environment()
+int cssock_envinit()
 {
 #ifdef WIN32
     WSADATA wsadata;
@@ -71,7 +71,7 @@ int init_sock_environment()
     return 0;
 }
 
-void clear_sock_environment()
+void cssock_envclear()
 {
 #ifdef WIN32
     if(WSACleanup() != 0) {
@@ -83,7 +83,7 @@ void clear_sock_environment()
 #endif
 }
 
-int get_last_sock_error(void)
+int cssock_get_last_error(void)
 {
 #ifdef WIN32
     return WSAGetLastError();
@@ -92,7 +92,7 @@ int get_last_sock_error(void)
 #endif
 }
 
-void set_addrin(struct sockaddr_in* addr_in, const char* ip, int port)
+void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port)
 {
     memset(addr_in, 0, sizeof(struct sockaddr_in));
     addr_in->sin_family = AF_INET;
@@ -105,7 +105,7 @@ void set_addrin(struct sockaddr_in* addr_in, const char* ip, int port)
     addr_in->sin_port = htons(port);
 }
 
-cssock_t open_sock(int tcpudp)
+cssock_t cssock_open(int tcpudp)
 {
     int protocol = 0;
 
@@ -118,7 +118,7 @@ cssock_t open_sock(int tcpudp)
     return socket(AF_INET, tcpudp, protocol);
 }
 
-void close_sock(cssock_t handle)
+void cssock_close(cssock_t handle)
 {
     if (!IS_SOCK_HANDLE(handle))
     {
@@ -130,14 +130,14 @@ void close_sock(cssock_t handle)
 #else
     if (close(handle) != 0) {
 #endif
-        printf("cannot close \"sending_socket\". error code: %d\n", get_last_sock_error());
+        printf("cannot close \"sending_socket\". error code: %d\n", cssock_get_last_error());
     }
     else {
         printf("closing \"sending_socket\" ...\n");
     }
 }
 
-int block_sock(cssock_t handle, int block)
+int cssock_block(cssock_t handle, int block)
 {
     unsigned long mode;
     if (IS_SOCK_HANDLE(handle))
@@ -154,7 +154,7 @@ int block_sock(cssock_t handle, int block)
     return -1;
 }
 
-int print_sockinfo(cssock_t handle)
+int cssock_print(cssock_t handle, const char* header)
 {
     struct sockaddr_in addr_in;
 #ifdef WIN32
@@ -163,14 +163,17 @@ int print_sockinfo(cssock_t handle)
     socklen_t nlen;
 #endif
     nlen = sizeof(struct sockaddr_in);
+    const char* msgheader = "";
 
     if (IS_SOCK_HANDLE(handle)) {
         return -1;
     }
 
+	msgheader = (header == NULL) ? msgheader : header;
+
     if (getsockname(handle, (struct sockaddr*)&addr_in, &nlen) == 0) {
-        printf("IP(s) used: %s\n", inet_ntoa(addr_in.sin_addr));
-        printf("port used: %d\n", htons(addr_in.sin_port));
+        fprintf(stdout, "%s IP(s) used: %s\n", msgheader, inet_ntoa(addr_in.sin_addr));
+        fprintf(stdout, "%s port used: %d\n", msgheader, htons(addr_in.sin_port));
         return 0;
     }
     return 1;

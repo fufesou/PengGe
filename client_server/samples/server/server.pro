@@ -5,40 +5,12 @@ CONFIG -= qt
 
 CONFIG(debug, release|debug):DEFINES +=  _DEBUG
 
-INCLUDEPATH += ../common
+INCLUDEPATH += ../../src/common ../../src/client
 
 HEADERS += \
-    server_udp.h \
-    server_sendrecv.h \
-    ../common/sock_types.h \
-    ../common/bufarray.h \
-    ../common/macros.h \
-    msgdispatch.h \
-    server_servroutine.h \
-    ../common/sendrecv_pool.h \
-    ../common/msgwrap.h \
-    ../common/error.h \
-    ../common/lightthread.h \
-    ../common/sock_wrap.h \
-    ../common/timespan.h \
-    ../common/utility_wrap.h
 
 SOURCES += \
 #    main.c \
-    test/wsaserver.c \
-    server_udp.c \
-    server_sendrecv.c \
-    ../common/bufarray.c \
-    server_servroutine.c \
-    msgdispatch.c \
-    ../common/sendrecv_pool.c \
-    ../common/msgwrap.c \
-    ../common/error.c \
-    ../common/global.c \
-    ../common/lightthread.c \
-    ../common/sock_wrap.c \
-    ../common/timespan.c \
-    ../common/utility_wrap.c
 
 
 win32 {

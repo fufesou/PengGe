@@ -8,17 +8,18 @@
  */
 
 #ifdef WIN32
-#include <winsock2.h>
-#include <windows.h>
+#include  <winsock2.h>
+#include  <windows.h>
 #else
-#include <setjmp.h>
-#include <signal.h>
+#include  <setjmp.h>
+#include  <signal.h>
+#include  <sys/socket.h>
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include "unprtt.h"
-#include "sock_types.h"
+#include  <stdio.h>
+#include  <string.h>
+#include    "unprtt.h"
+#include    "sock_types.h"
 
 
 #ifdef __cplusplus
