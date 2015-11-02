@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-10-03
- * @modified  Sat 2015-10-31 18:44:12 (+0800)
+ * @modified  Mon 2015-11-02 19:04:07 (+0800)
  */
 
 #ifndef  CLIENT_SENDRECV_H
@@ -19,16 +19,18 @@ extern "C" {
 /**
  * @brief  cssendrecv 
  *
- * @param hsock
+ * @param hsock hsock is the socket handle.
  * @param rttinfo
- * @param outbuf
- * @param outbytes
- * @param inbuf
- * @param inbytes
+ * @param outmsg
+ * @param outbytes outbytes is the message length of outmsg.
+ * @param inmsg
+ * @param inbytes inbytes is the buffer size of inmsg.
  * @param destaddr
  * @param destlen
  *
  * @return   
+ * 1. The length of received message.
+ * 2. -1, if timeout.
  */
 extern ssize_t cssendrecv(
 			cssock_t hsock, __inout struct rtt_info* rttinfo,

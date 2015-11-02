@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-30
- * @modified  Sat 2015-10-31 16:15:29 (+0800)
+ * @modified  Mon 2015-11-02 19:12:19 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -18,8 +18,8 @@ extern "C" {
 
 /**
  * @brief struct csclient contains necessary members and functions for client operations.
- * This struct object must be initialized (by calling init_client_udp) before any operations applied to it.
- * @sa init_client_udp
+ * This struct object must be initialized (by calling csclient_init) before any operations applied to it.
+ * @sa csclient_init
  */
 struct csclient
 {
@@ -53,9 +53,15 @@ struct csclient
  * @brief  csclient_init 
  *
  * @param cli
- * @param tcpudp
+ * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set, upd socket will
+ * be created if SOCK_DGRAM is set.
+
  *
- * @note This function must be called after init_sock_environment being called.
+ * @note 
+ * 1. This function must be called after init_sock_environment being called. 
+ * 2. Socket is set to be non-blocking socket by default. Call cssock_block explicitly if you need the socket to be blocking.
+ *
+ * @sa cssock_block cssock_open
  */
 void csclient_init(struct csclient* cli, int tcpudp);
 
@@ -74,7 +80,7 @@ void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, int
  *
  * @sa cssock_print
  */
-int csclient_print(struct csclient* cli);
+int csclient_print(const struct csclient* cli);
 
 /**
  * @brief  csclient_communicate is the interface to communicate with server.
@@ -95,7 +101,7 @@ void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr*
  *
  * @return   
  */
-int csclient_sendrecv(struct csclient* cli, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
 
 
 #ifdef __cplusplus

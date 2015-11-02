@@ -37,7 +37,8 @@ SOURCES += \
     ../../src/common/utility_wrap.c \
     ../../src/client/client.c \
     ../../src/client/unix_client_sendrecv.c \
-    ../../src/client/win_client_sendrecv.c
+    ../../src/client/win_client_sendrecv.c \
+    main.c
 
 win32 {
     LIBS += -LD:/Qt/Qt5.4.2/Tools/mingw491_32/i686-w64-mingw32/lib -lwsock32 -lWinmm -lWs2_32

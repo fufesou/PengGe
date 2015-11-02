@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-30
- * @modified  Sat 2015-10-31 15:59:00 (+0800)
+ * @modified  Mon 2015-11-02 19:00:59 (+0800)
  */
 
 #ifdef WIN32
@@ -13,13 +13,18 @@
 #else
 #include  <setjmp.h>
 #include  <signal.h>
+#include  <sys/socket.h>
+#include  <netinet/in.h>
 #endif
 
 #include  <stdio.h>
+#include  <stdlib.h>
 #include  <string.h>
+#include    "macros.h"
 #include    "unprtt.h"
 #include    "sock_types.h"
-#include    "csclient.h"
+#include    "error.h"
+#include    "client.h"
 #include    "sock_wrap.h"
 #include    "client_sendrecv.h"
 
@@ -34,22 +39,44 @@ extern const char* g_loginmsg_FAIL;
 extern const char g_login_delimiter;
 
 static char* s_cli_msgheader = "client:";
+static struct rtt_info s_rttinfo;
+static int s_rttinit = 0;
 
-static void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
-static void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len);
+static void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
+static void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
 
 #ifdef __cplusplus
 }
 #endif
 
 
+void csclient_init(struct csclient* cli, int tcpudp)
+{
+	int error;
+	int nonblocking = 1;
+
+	cli->msgheader = s_cli_msgheader;
+
+    cli->hsock = cssock_open(tcpudp);
+    if (cli->hsock == INVALID_SOCKET) {
+		error = 1;
+        csfatal_ext(&error, cserr_exit, "%s: error at socket(), error code: %d\n", cli->msgheader, cssock_get_last_error());
+    }
+    if (cssock_block(cli->hsock, nonblocking) != 0) {
+		error = 1;
+        csfatal_ext(&error, cserr_exit, "%s: set socket to non-blocking mode failed, error code: %d\n", cli->msgheader, cssock_get_last_error());
+	}
+
+    printf("%s: socket() is OK!\n", cli->msgheader);
+}
+
 int csclient_print(const struct csclient *cli)
 {
 	int testres;
 	cserr_t error;
-	if ((testres = cssock_print(cli->socket, cli->msgheader)) == -1) {
+    if ((testres = cssock_print(cli->hsock, cli->msgheader)) == -1) {
 		error = 1;
-        csfatal_ext(&error, "%s socket has not been created.\n", cli->msgheader);
+        csfatal_ext(&error, cserr_exit, "%s socket has not been created.\n", cli->msgheader);
     } else if (testres == 1) {
 		printf("%s socket has not been connected.\n", cli->msgheader);
 	}
@@ -57,25 +84,12 @@ int csclient_print(const struct csclient *cli)
 	return testres;
 }
 
-void s_set_socket(struct csclient *cli)
-{
-    if (strcmp(cli->msgheader, s_cli_msgheader) != 0) {
-        init_client_udp(cli);
-    }
-
-    cli->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (cli->socket == INVALID_SOCKET) {
-        U_errexit_value(1, "%s: error at socket(), error code: %d\n", cli->msgheader, WSAGetLastError());
-    }
-    printf("%s: socket() is OK!\n", cli->msgheader);
-}
-
 void csclient_connect(struct csclient* cli, const struct sockaddr* serveraddr, int serveraddr_len)
 {
 	cserr_t error;
-    if ((res = connect(cli->socket, serveraddr, serveraddr_len)) != 0) {
+    if (connect(cli->hsock, serveraddr, serveraddr_len) != 0) {
 		error = 1;
-        csfatal_ext(&error, "%s cannot connect server. error code: %d.\n", cli->msgheader, cssock_get_last_error());
+        csfatal_ext(&error, cserr_exit, "%s cannot connect server. error code: %d.\n", cli->msgheader, cssock_get_last_error());
     } else {
         if (csclient_print(cli) != 0) {
 			cssock_envclear();
@@ -84,16 +98,16 @@ void csclient_connect(struct csclient* cli, const struct sockaddr* serveraddr, i
     }
 }
 
-void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len)
+void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
 {
 	s_enter_init_session(cli, fp, serveraddr, serveraddr_len);
 }
 
-void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len)
+void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
 {
     ssize_t numbytes;
 
-    s_connect_serv(cli, serveraddr, serveraddr_len);
+    csclient_connect(cli, serveraddr, serveraddr_len);
 
     while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
         cli->sendbuf[strlen(cli->sendbuf) - 1] = '\0';
@@ -101,7 +115,7 @@ void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr*
 			if (numbytes > 0) {
             if (numbytes >= (ssize_t)(sizeof(cli->recvbuf))) {
                 fflush(stdout);
-                fprintf(stderr, "client: recived msg cut off", cli->msgheader);
+                fprintf(stderr, "%s: recived msg cut off", cli->msgheader);
                 fflush(stderr);
             }
             cli->recvbuf[numbytes] = 0;
@@ -117,7 +131,7 @@ void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr*
     }
 }
 
-void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len)
+void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
 {
     ssize_t numbytes;
 
@@ -144,7 +158,19 @@ void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr
     }
 }
 
-int csclient_sendrecv(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, int serveraddr_len)
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
 {
-}
+	if (s_rttinit == 0) {
+		rtt_init(&s_rttinfo);
+		s_rttinit = 1;
+#ifdef _DEBUG
+		rtt_d_flag = 1;
+#endif
+	}
 
+	return cssendrecv(
+				cli->hsock, &s_rttinfo,
+				cli->sendbuf, strlen(cli->sendbuf) + 1,
+				cli->recvbuf, sizeof(cli->recvbuf),
+				serveraddr, serveraddr_len);
+}

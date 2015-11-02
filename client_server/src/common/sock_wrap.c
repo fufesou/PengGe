@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  Sat 2015-10-31 11:54:06 (+0800)
+ * @modified  Mon 2015-11-02 18:31:54 (+0800)
  */
 
 #include  <stdint.h>
@@ -140,15 +140,24 @@ void cssock_close(cssock_t handle)
 int cssock_block(cssock_t handle, int block)
 {
     unsigned long mode;
+	int ctlret;
     if (IS_SOCK_HANDLE(handle))
     {
 #ifdef WIN32
         mode = (unsigned long)block;
-        return ioctlsocket(handle, FIONBIO, &mode);
+        if ((ctlret = ioctlsocket(handle, FIONBIO, &mode)) != NO_ERROR) {
+			printf("ioctlsocket falied with error: %d\n", ctlret);
+			return -1;
+		}
+		return 0;
 #else
         mode = fcntl(handle, F_GETFL, 0);
-        mode = block ? (mode & ~O_NONBLOCK) : (mode | O_NONBLOCK);
-        return fcntl(handle, F_SETFL, mode);
+        mode = block ? (mode | O_NONBLOCK) : (mode & ~O_NONBLOCK);
+        if ((ctlret = fcntl(handle, F_SETFL, mode)) != 0) {
+			printf("fcntl failed to set blocking mode, error: %d\n", errno);
+			return -1;
+		}
+		return 0;
 #endif
     }
     return -1;
@@ -165,7 +174,7 @@ int cssock_print(cssock_t handle, const char* header)
     nlen = sizeof(struct sockaddr_in);
     const char* msgheader = "";
 
-    if (IS_SOCK_HANDLE(handle)) {
+    if (!IS_SOCK_HANDLE(handle)) {
         return -1;
     }
 

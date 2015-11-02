@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  Sat 2015-10-31 15:04:38 (+0800)
+ * @modified  Mon 2015-11-02 19:11:42 (+0800)
  */
 
 #ifndef  SOCK_WRAP_H
@@ -61,7 +61,7 @@ void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port);
 /**
  * @brief  cssock_open cssock_open will create a socket handle according to tcpudp option.
  *
- * @param tcpudp tcp socket will be created if SOCK_STREAM  is set, upd socket will
+ * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set, upd socket will
  * be created if SOCK_DGRAM is set.
  *
  * @return   
@@ -85,7 +85,9 @@ void cssock_accept(cssock_t handle, const struct sockaddr_in* sa_in);
  * @brief  cssock_block cssock_block will set socket to be blocking or nonblocking according to block parameter.
  *
  * @param handle The socket handle.
- * @param block The blocking or nonblocking option.
+ * @param block 
+ * If block == 0, blocking is enabled. 
+ * If block != 0, non-blocking is enalbed.
  *
  * @return   
  * 1. block set result, if handle is a valid socket.

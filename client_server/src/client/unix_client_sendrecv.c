@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-31
- * @modified  Sat 2015-10-31 18:50:45 (+0800)
+ * @modified  Mon 2015-11-02 19:29:57 (+0800)
  */
 
 #ifndef WIN32
@@ -75,14 +75,21 @@ ssize_t cssendrecv(
 		alarm(rtt_start(rttinfo));
 
 		if (sigsetjmp(s_jmpbuf, 1) != 0) {
-			fprintf(stderr, "cssendrecv: no response from server, giving up");
-			errno = ETIMEDOUT;
-			return -1;
+            if (rtt_timeout(rttinfo) < 0) {
+				fprintf(stderr, "cssendrecv: no response from server, giving up.\n");
+				errno = ETIMEDOUT;
+				return -1;
+			}
+			goto sendagain;
 		}
-		goto sendagain;
 
 		do {
-            n = recvfrom(hsock, inbuf, sizeof(inbuf), 0, &fromaddr, &fromlen);
+            if ((n = recvfrom(hsock, inbuf, sizeof(inbuf), 0, &fromaddr, &fromlen)) == -1) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    printf("non-blocking option is set, recve again.\n");
+                    continue;
+                }
+            }
         } while (n < (ssize_t)sizeof(struct csmsg_header) ||
                     (((struct csmsg_header*)inbuf)->header.seg != s_sendhdr.header.seg));
 		alarm(0);
