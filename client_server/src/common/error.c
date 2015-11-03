@@ -4,12 +4,22 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-24
- * @modified  Sat 2015-10-31 12:13:31 (+0800)
+ * @modified  Tue 2015-11-03 19:30:14 (+0800)
  */
 
+#ifdef WIN32
+#include  <winsock2.h>
+#else
+#include  <netinet/in.h>
+#include  <sys/socket.h>
+#endif
+
+#include  <stdarg.h>
+#include  <stdio.h>
 #include  <stdlib.h>
 #include  <stdint.h>
 #include    "error.h"
+#include    "sock_types.h"
 #include    "sock_wrap.h"
 
 #ifdef __cplusplus

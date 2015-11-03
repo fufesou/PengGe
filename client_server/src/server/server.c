@@ -1,103 +1,66 @@
 /**
- * @file server_udp.c
+ * @file server.c
  * @brief  The functions prefexed with "s_" are static functions.
  * @author cxl
  * @version 0.1
  * @date 2015-09-28
+ * @modified  Tue 2015-11-03 19:35:09 (+0800)
  */
 
+#ifdef WIN32
+#include  <winsock2.h>
+#include  <windows.h>
+#else
+#include  <setjmp.h>
+#include  <signal.h>
+#include  <sys/socket.h>
+#include  <netinet/in.h>
+#endif
 
 #include  <stdlib.h>
 #include  <stdio.h>
 #include  <stdint.h>
-#include 	"server_udp.h"
-#include    "sock_wrap.h"
+#include    "error.h"
 #include    "sock_types.h"
-#include    "server_sendrecv.h"
-#include	"server_servroutine.h"
+#include    "sock_wrap.h"
+#include 	"server.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-static char* s_serv_msgheader = "server";
-
-static void s_create_server(struct server_udp* serv_udp, int af, u_short port, u_long addr);
-
-static void s_print_info(struct server_udp* serv_udp);
-
-static void s_communicate(struct server_udp* serv_udp);
-
-static void s_clear(struct server_udp* serv_udp);
-
+static char* s_serv_msgheader = "server:";
 
 #ifdef __cplusplus
 }
 #endif
 
 
-void check_args(int argc, char* argv[])
+void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 {
-    if (argc < 2) {
-        printf("usage: server <port>.");
-        exit(1);
-    }
-    (void)(argv);
-}
+	int error;
 
-void init_server_udp(struct server_udp *serv_udp)
-{
-    serv_udp->msgheader = s_serv_msgheader;
-    serv_udp->create_server = s_create_server;
-    serv_udp->print_info = s_print_info;
-    serv_udp->communicate = s_communicate;
-    serv_udp->clear = s_clear;
-}
+	serv->msgheader = s_serv_msgheader;
 
-void s_create_server(struct server_udp *serv_udp, int af, u_short port, u_long addr)
-{
-    if (strcmp(serv_udp->msgheader, s_serv_msgheader) != 0) {
-        init_server_udp(serv_udp);
-    }
-
-    serv_udp->socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (serv_udp->socket == INVALID_SOCKET) {
-        U_errexit_value(1, "%s: error at socket(), error code: %d\n", serv_udp->msgheader, WSAGetLastError());
-    }
-    printf("%s: socket() is OK!\n", serv_udp->msgheader);
+    serv->hsock = cssock_open(tcpudp);
+    printf("%s hsock() is OK!\n", serv->msgheader);
 
     if (port == 0) {
-        printf("invalid port!\n");
-        closesocket(serv_udp->socket);
+        cssock_close(serv->hsock);
+		error = 1;
+        csfatal_ext(&error, cserr_exit, "%s invalid port.\n", serv->msgheader);
     }
 
-    serv_udp->sockaddr_in.sin_family = af;
-    serv_udp->sockaddr_in.sin_port = htons(port);
-    serv_udp->sockaddr_in.sin_addr.s_addr = addr;
+    serv->sa_in.sin_family = AF_INET;
+    serv->sa_in.sin_port = htons(port);
+    serv->sa_in.sin_addr.s_addr = addr;
 
-    if (bind(serv_udp->socket, (SOCKADDR*)&serv_udp->sockaddr_in, sizeof(serv_udp->sockaddr_in)) == SOCKET_ERROR) {
-        closesocket(serv_udp->socket);
-        U_errexit_value(-1, "server: bind() failed! Error code: %d\n", WSAGetLastError());
-    }
-    else {
-        printf("server: bind() is OK\n");
-    }
+	cssock_bind(serv->hsock, (struct sockaddr*)&serv->sa_in, sizeof(struct sockaddr_in));
+	printf("%s bind() is OK\n", serv->msgheader);
 }
 
-void s_print_info(struct server_udp *serv_udp)
+void csserver_udp(struct csserver *serv)
 {
-    if (U_printf_sockinfo(serv_udp->socket, serv_udp->msgheader) != 0) {
-        U_errexit_value(1, "%s: some error occured before communication begin.\n", serv_udp->msgheader);
-    }
-}
-
-void s_communicate(struct server_udp *serv_udp)
-{
-    process_communication(serv_udp);
-}
-
-void s_clear(struct server_udp *serv_udp)
-{
-    U_close_socket(serv_udp->socket);
+    // process_communication(serv);
 }

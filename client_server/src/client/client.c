@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-30
- * @modified  Mon 2015-11-02 19:00:59 (+0800)
+ * @modified  Tue 2015-11-03 19:19:00 (+0800)
  */
 
 #ifdef WIN32
@@ -42,8 +42,8 @@ static char* s_cli_msgheader = "client:";
 static struct rtt_info s_rttinfo;
 static int s_rttinit = 0;
 
-static void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
-static void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
+static void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
+static void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 #ifdef __cplusplus
 }
@@ -58,10 +58,6 @@ void csclient_init(struct csclient* cli, int tcpudp)
 	cli->msgheader = s_cli_msgheader;
 
     cli->hsock = cssock_open(tcpudp);
-    if (cli->hsock == INVALID_SOCKET) {
-		error = 1;
-        csfatal_ext(&error, cserr_exit, "%s: error at socket(), error code: %d\n", cli->msgheader, cssock_get_last_error());
-    }
     if (cssock_block(cli->hsock, nonblocking) != 0) {
 		error = 1;
         csfatal_ext(&error, cserr_exit, "%s: set socket to non-blocking mode failed, error code: %d\n", cli->msgheader, cssock_get_last_error());
@@ -84,34 +80,29 @@ int csclient_print(const struct csclient *cli)
 	return testres;
 }
 
-void csclient_connect(struct csclient* cli, const struct sockaddr* serveraddr, int serveraddr_len)
+void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
-	cserr_t error;
-    if (connect(cli->hsock, serveraddr, serveraddr_len) != 0) {
-		error = 1;
-        csfatal_ext(&error, cserr_exit, "%s cannot connect server. error code: %d.\n", cli->msgheader, cssock_get_last_error());
-    } else {
-        if (csclient_print(cli) != 0) {
-			cssock_envclear();
-			exit(1);
-		}
-    }
+	cssock_connect(cli->hsock, servaddr, addrlen);
+	if (csclient_print(cli) != 0) {
+		cssock_envclear();
+		exit(1);
+	}
 }
 
-void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
+void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
-	s_enter_init_session(cli, fp, serveraddr, serveraddr_len);
+	s_enter_init_session(cli, fp, servaddr, addrlen);
 }
 
-void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
+void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     ssize_t numbytes;
 
-    csclient_connect(cli, serveraddr, serveraddr_len);
+    csclient_connect(cli, servaddr, addrlen);
 
     while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
         cli->sendbuf[strlen(cli->sendbuf) - 1] = '\0';
-        numbytes = csclient_sendrecv(cli, serveraddr, serveraddr_len);
+        numbytes = csclient_sendrecv(cli, servaddr, addrlen);
 			if (numbytes > 0) {
             if (numbytes >= (ssize_t)(sizeof(cli->recvbuf))) {
                 fflush(stdout);
@@ -121,7 +112,7 @@ void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr*
             cli->recvbuf[numbytes] = 0;
 
             if (strncmp(cli->recvbuf, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1) == 0) {
-                s_enter_login_session(cli, fp, serveraddr, serveraddr_len);
+                s_enter_login_session(cli, fp, servaddr, addrlen);
             } else if (strncmp(cli->recvbuf, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1) == 0) {
                 printf("%s: login failed.\n", cli->msgheader);
             } else {
@@ -131,7 +122,7 @@ void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr*
     }
 }
 
-void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
+void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     ssize_t numbytes;
 
@@ -139,7 +130,7 @@ void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr
 
     while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
         cli->sendbuf[strlen(cli->sendbuf) - 1] = '\0';
-        numbytes = csclient_sendrecv(cli, serveraddr, serveraddr_len);
+        numbytes = csclient_sendrecv(cli, servaddr, addrlen);
         if (numbytes > 0) {
             if (numbytes >= (ssize_t)(sizeof(cli->recvbuf))) {
                 fflush(stdout);
@@ -158,7 +149,7 @@ void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr
     }
 }
 
-ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len)
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
 	if (s_rttinit == 0) {
 		rtt_init(&s_rttinfo);
@@ -172,5 +163,5 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* serveradd
 				cli->hsock, &s_rttinfo,
 				cli->sendbuf, strlen(cli->sendbuf) + 1,
 				cli->recvbuf, sizeof(cli->recvbuf),
-				serveraddr, serveraddr_len);
+				servaddr, addrlen);
 }

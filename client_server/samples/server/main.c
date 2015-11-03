@@ -9,17 +9,17 @@
 
 #include <winsock2.h>
 #include <stdio.h>
-#include "udp_utility.h"
-#include "server_udp.h"
+#include "sock_wrap.h"
+#include "server.h"
 
+
+void s_check_args(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
-    WSADATA wsadata;
     struct server_udp udpserver;
 
-    check_args(argc, argv);
-    U_init_winsock2(&wsadata);
+    s_check_args(argc, argv);
 
     init_server_udp(&udpserver);
 
@@ -34,3 +34,13 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+
+void s_check_args(int argc, char* argv[])
+{
+    if (argc < 2) {
+        printf("usage: server <port>.");
+        exit(1);
+    }
+    (void)(argv);
+}
+

@@ -4,6 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-26
+ * @modified  Tue 2015-11-03 19:35:34 (+0800)
  */
 
 #ifndef  SERVER_HELPER_H
@@ -13,33 +14,27 @@
 extern "C" {
 #endif
 
-#include <winsock2.h>
 
-struct server_udp
+struct csserver
 {
-    SOCKET socket;
-    SOCKADDR_IN sockaddr_in;
+    cssock_t hsock;
+    struct sockaddr_in sa_in;
     char* msgheader;
-
-    void (*create_server)(struct server_udp* serv_udp, int af, u_short port, u_long addr);
-
-    void (*print_info)(struct server_udp* serv_udp);
-
-    void (*communicate)(struct server_udp* serv_udp);
-
-    void (*clear)(struct server_udp* serv_udp);
 };
 
 /**
- * @brief check_args simply check whether the program arguments are valid. If the arguments meet the
- * requirements, test_args set the port value, else call exit(1).
+ * @brief  csserver_init 
  *
- * @param argc
- * @param argv[]
+ * @param serv
+ * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set, upd socket will be created if SOCK_DGRAM is set.
+ *
+ * @note This function must be called after init_sock_environment being called. 
  */
-void check_args(int argc, char* argv[]);
+void csserver_init(struct csserver* serv, int tcpudp, u_short port, u_long addr);
 
-void init_server_udp(struct server_udp* serv_udp);
+int csserver_print(struct csserver* serv);
+
+void csserver_udp(struct csserver* serv);
 
 
 #ifdef __cplusplus

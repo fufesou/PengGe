@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-30
- * @modified  Mon 2015-11-02 19:12:19 (+0800)
+ * @modified  Tue 2015-11-03 19:15:11 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -53,9 +53,7 @@ struct csclient
  * @brief  csclient_init 
  *
  * @param cli
- * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set, upd socket will
- * be created if SOCK_DGRAM is set.
-
+ * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set, upd socket will be created if SOCK_DGRAM is set.
  *
  * @note 
  * 1. This function must be called after init_sock_environment being called. 
@@ -65,7 +63,7 @@ struct csclient
  */
 void csclient_init(struct csclient* cli, int tcpudp);
 
-void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, int servaddr_len);
+void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_print csclient_print will test and print client socket information.
@@ -87,21 +85,21 @@ int csclient_print(const struct csclient* cli);
  *
  * @param cli
  * @param fp is the FILE pointer where input data comes from.
- * @param serveraddr
- * @param serveraddr_len
+ * @param servaddr
+ * @param addrlen
  */
-void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
+void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_sendrecv 
  *
  * @param cli
- * @param serveraddr
- * @param serveraddr_len
+ * @param servaddr
+ * @param addrlen
  *
  * @return   
  */
-ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* serveraddr, cssocklen_t serveraddr_len);
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 
 #ifdef __cplusplus

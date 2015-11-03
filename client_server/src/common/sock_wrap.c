@@ -4,21 +4,12 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  Mon 2015-11-02 18:31:54 (+0800)
+ * @modified  Tue 2015-11-03 19:29:30 (+0800)
  */
-
-#include  <stdint.h>
-#include  <stdio.h>
-#include  <string.h>
-#include  <fcntl.h>
-#include    "sock_wrap.h"
-#include    "sock_types.h"
-#include    "macros.h"
 
 #ifdef WIN32
 #include  <windows.h>
 #include  <winsock2.h>
-#define IS_SOCK_HANDLE(x) ((x)!=INVALID_SOCKET)
 #define BLOCK_RW        0
 #define NONBLICK_RW     0
 #define SEND_NOSIGNAL   0
@@ -26,6 +17,9 @@
 #else
 #include  <errno.h>
 #include  <unistd.h>
+#include  <sys/types.h>
+#include  <sys/socket.h>
+#include  <netinet/in.h>
 #include  <arpa/inet.h>
 #define IS_SOCK_HANDLE(x) ((x)>0)
 #define BLOCK_RW        MSG_WAITALL
@@ -34,6 +28,14 @@
 #define ETRYAGAIN(x) ((x)==EWOULDBLOCK)
 #endif
 
+#include  <stdint.h>
+#include  <stdio.h>
+#include  <string.h>
+#include  <fcntl.h>
+#include    "macros.h"
+#include    "error.h"
+#include    "sock_types.h"
+#include    "sock_wrap.h"
 
 int cssock_envinit()
 {
@@ -107,7 +109,9 @@ void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port)
 
 cssock_t cssock_open(int tcpudp)
 {
+	int error;
     int protocol = 0;
+	cssock_t hsock;
 
     if (tcpudp == SOCK_STREAM) {
         protocol = IPPROTO_TCP;
@@ -115,7 +119,13 @@ cssock_t cssock_open(int tcpudp)
     else if (tcpudp == SOCK_DGRAM) {
         protocol = IPPROTO_UDP;
     }
-    return socket(AF_INET, tcpudp, protocol);
+	hsock = socket(AF_INET, tcpudp, protocol); 
+    if (IS_SOCK_HANDLE(hsock)) {
+		error = 1;
+        csfatal_ext(&error, cserr_exit, "error at socket(), error code: %d\n",  cssock_get_last_error());
+    }
+
+    return hsock;
 }
 
 void cssock_close(cssock_t handle)
@@ -135,6 +145,49 @@ void cssock_close(cssock_t handle)
     else {
         printf("closing \"sending_socket\" ...\n");
     }
+}
+
+void cssock_connect(cssock_t handle, const struct sockaddr* sa, cssocklen_t addrlen)
+{
+	cserr_t error;
+    if (connect(handle, sa, addrlen) != 0) {
+		cssock_close(handle);
+		error = 1;
+        csfatal_ext(&error, cserr_exit, "connect error. error code: %d.\n", cssock_get_last_error());
+    }
+}
+
+void cssock_bind(cssock_t handle, struct sockaddr* sa, cssocklen_t addrlen)
+{
+	int error;
+	if ((bind(handle, sa, addrlen)) != 0) {
+		cssock_close(handle);
+		error = 1;
+		csfatal_ext(&error, cserr_exit, "error at listen(), error code: %d\n", cssock_get_last_error());
+	}
+	
+}
+
+void cssock_listen(cssock_t handle, int maxconn)
+{
+	int error;
+	if (listen(handle, maxconn) != 0) {
+		cssock_close(handle);
+		error = 1;
+		csfatal_ext(&error, cserr_exit, "error at listen(), error code: %d\n", cssock_get_last_error());
+	}
+}
+
+cssock_t cssock_accept(cssock_t handle, const struct sockaddr* sa, cssocklen_t* addrlen)
+{
+	int error;
+	cssock_t hsock;
+	if ((hsock = accept(handle, (struct sockaddr*)sa, addrlen)) == -1) {
+		cssock_close(handle);
+		error = 1;
+		csfatal_ext(&error, cserr_exit, "error at accept(), error code: %d\n", cssock_get_last_error());
+	}
+	return hsock;
 }
 
 int cssock_block(cssock_t handle, int block)

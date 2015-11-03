@@ -1,9 +1,10 @@
 /**
- * @file server_servroutine.c
+ * @file server_udp.c
  * @brief This file must be reimplement when config parser was done.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-18
+ * @modified  Tue 2015-11-03 19:51:37 (+0800)
  */
 
 #include  <assert.h>
@@ -17,8 +18,6 @@
 #include    "bufarray.h"
 #include    "sock_types.h"
 #include    "server_sendrecv.h"
-#include	"server_udp.h"
-#include    "server_servroutine.h"
 #include    "msgdispatch.h"
 #include    "sendrecv_pool.h"
 #include	"msgwrap.h"
@@ -34,25 +33,28 @@ static struct sendrecv_pool s_sendpool, s_recvpool;
 /**
  * @brief  s_init_sendpool should parse the config first, and then set data to s_sendpool.
  *
- * @param socket
+ * @param handle
  */
-static void s_init_sendpool(SOCKET socket);
+static void s_init_sendpool(cssock_t handle);
 
 /**
  * @brief  s_init_recvpool should parse the config first, and then set data to s_recvpool.
  *
- * @param socket
+ * @param handle
  */
-static void s_init_recvpool(SOCKET socket);
+static void s_init_recvpool(cssock_t handle);
 
 /**
  * @brief  s_process_recv 
  *
- * @param serv_udp
- *
  * @return   
  */
+#ifdef WIN32
 static unsigned int __stdcall s_process_recv(void* unused);
+#else
+static void* s_process_recv(void* unused);
+#endif
+
 
 /**
  * @brief  s_process_send 
@@ -69,31 +71,31 @@ static unsigned int __stdcall s_process_send(void* unused);
 
 void process_communication(struct server_udp* serv_udp)
 {
-    struct unit_header unithdr;
+    struct csmsg_header msghdr;
     char buf[MAX_MSG_LEN];
 
-    s_init_sendpool(serv_udp->socket);
-    s_init_recvpool(serv_udp->socket);
+    s_init_sendpool(serv_udp->hsock);
+    s_init_recvpool(serv_udp->hsock);
 
     printf("%s: I\'m ready to receive a datagram...\n", serv_udp->msgheader);
     while (1) {
-        unithdr.addrlen = sizeof(unithdr.addr);
-        unithdr.numbytes = server_recv(
+        msghdr.addrlen = sizeof(msghdr.addr);
+        msghdr.numbytes = server_recv(
                     serv_udp->socket,
                     buf,
                     sizeof(buf),
-                    &unithdr.header,
-                    (struct sockaddr*)&unithdr.addr,
-                    &unithdr.addrlen);
-        if (unithdr.numbytes > 0) {
+                    &msghdr.header,
+                    (struct sockaddr*)&msghdr.addr,
+                    &msghdr.addrlen);
+        if (msghdr.numbytes > 0) {
 
 #ifdef _DEBUG
-            printf("%s: total bytes received: %d\n", serv_udp->msgheader, unithdr.numbytes);
+            printf("%s: total bytes received: %d\n", serv_udp->msgheader, msghdr.numbytes);
             printf("%s: the data is \"%s\"\n", serv_udp->msgheader, buf);
 #endif
-            push2pool(buf, &unithdr, &s_recvpool);
+            push2pool(buf, &msghdr, &s_recvpool);
         }
-        else if (unithdr.numbytes <= 0) {
+        else if (msghdr.numbytes <= 0) {
             printf("%s: connection closed with error code: %d\n", serv_udp->msgheader, WSAGetLastError());
             break;
         }
@@ -109,15 +111,14 @@ void process_communication(struct server_udp* serv_udp)
     s_recvpool.clear_pool(&s_recvpool);
 }
 
-void s_init_sendpool(SOCKET socket)
+void s_init_sendpool(cssock_t handle)
 {
-    init_sendrecv_pool(&s_sendpool, MAX_MSG_LEN + sizeof(struct unit_header), 64, 4, socket, s_process_send);
-    s_sendpool.init_pool(&s_sendpool);
+    cspool_init(&s_sendpool, MAX_MSG_LEN + sizeof(struct csmsg_header), 64, 4, socket, s_process_send);
 }
 
-void s_init_recvpool(SOCKET socket)
+void s_init_recvpool(cssock_t socket)
 {
-    init_sendrecv_pool(&s_recvpool, MAX_MSG_LEN + sizeof(struct unit_header), 64, 4, socket, s_process_recv);
+    init_sendrecv_pool(&s_recvpool, MAX_MSG_LEN + sizeof(struct csmsg_header), 64, 4, socket, s_process_recv);
     s_recvpool.init_pool(&s_recvpool);
 }
 
@@ -125,7 +126,7 @@ unsigned int __stdcall s_process_recv(void* unused)
 {
     char msgdata[MAX_MSG_LEN];
     char outmsg[MAX_MSG_LEN];
-    struct unit_header unithdr;
+    struct csmsg_header msghdr;
 
     (void)unused;
     printf("child thread %ld created.\n", GetCurrentThreadId());
@@ -133,7 +134,7 @@ unsigned int __stdcall s_process_recv(void* unused)
     while (1) {
         WaitForSingleObject(s_recvpool.hsem_filled, INFINITE);
 
-        if (pull_from_pool(msgdata, sizeof(msgdata), &unithdr, &s_recvpool) != 0) {
+        if (pull_from_pool(msgdata, sizeof(msgdata), &msghdr, &s_recvpool) != 0) {
             continue;
         }
 
@@ -142,7 +143,7 @@ unsigned int __stdcall s_process_recv(void* unused)
 #endif
 
         process_msg(msgdata, outmsg, sizeof(outmsg));
-        push2pool(outmsg, &unithdr, &s_sendpool);
+        push2pool(outmsg, &msghdr, &s_sendpool);
     }
 
     return 0;
@@ -151,7 +152,7 @@ unsigned int __stdcall s_process_recv(void* unused)
 unsigned int __stdcall s_process_send(void* unused)
 {
     char outmsg[MAX_MSG_LEN];
-    struct unit_header unithdr;
+    struct csmsg_header msghdr;
 
     (void)unused;
     printf("child thread %ld created.\n", GetCurrentThreadId());
@@ -159,23 +160,23 @@ unsigned int __stdcall s_process_send(void* unused)
     while (1) {
         WaitForSingleObject(s_sendpool.hsem_filled, INFINITE);
 
-        if (pull_from_pool(outmsg, sizeof(outmsg), &unithdr, &s_sendpool) != 0) {
+        if (pull_from_pool(outmsg, sizeof(outmsg), &msghdr, &s_sendpool) != 0) {
             continue;
         }
 
 #ifdef _DEBUG
-        getpeername(s_sendpool.socket, (SOCKADDR*)&unithdr.addr, &unithdr.addrlen);
-        printf("server: sending IP used: %s\n", inet_ntoa(unithdr.addr.sin_addr));
-        printf("server: sending port used: %d\n", htons(unithdr.addr.sin_port));
+        getpeername(s_sendpool.socket, (SOCKADDR*)&msghdr.addr, &msghdr.addrlen);
+        printf("server: sending IP used: %s\n", inet_ntoa(msghdr.addr.sin_addr));
+        printf("server: sending port used: %d\n", htons(msghdr.addr.sin_port));
 #endif
 
         server_send(
                     s_sendpool.socket,
                     outmsg,
                     strlen(outmsg) + 1,
-                    &unithdr.header,
-                    (SOCKADDR*)&unithdr.addr,
-                    unithdr.addrlen);
+                    &msghdr.header,
+                    (SOCKADDR*)&msghdr.addr,
+                    msghdr.addrlen);
         Sleep(200);
 
     }

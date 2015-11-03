@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  Mon 2015-11-02 19:11:42 (+0800)
+ * @modified  Tue 2015-11-03 19:29:34 (+0800)
  */
 
 #ifndef  SOCK_WRAP_H
@@ -14,16 +14,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#ifdef WIN32
-#include  <winsock2.h>
-#else
-#include  <netinet/in.h>
-#include  <sys/socket.h>
-#include  <sys/types.h>
-#endif
-
-#include    "sock_types.h"
 
 
 /**
@@ -75,11 +65,13 @@ cssock_t cssock_open(int tcpudp);
  */
 void cssock_close(cssock_t handle);
 
-/*
-void cssock_connect(cssock_t handle, const struct sockaddr_in* sa_in);
+void cssock_connect(cssock_t handle, const struct sockaddr* sa, cssocklen_t addrlen);
 
-void cssock_accept(cssock_t handle, const struct sockaddr_in* sa_in);
-*/
+void cssock_bind(cssock_t handle, struct sockaddr* sa, cssocklen_t addrlen);
+
+void cssock_listen(cssock_t handle, int maxconn);
+
+cssock_t cssock_accept(cssock_t handle, const struct sockaddr* sa, cssocklen_t* addrlen);
 
 /**
  * @brief  cssock_block cssock_block will set socket to be blocking or nonblocking according to block parameter.

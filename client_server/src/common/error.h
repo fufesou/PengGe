@@ -4,14 +4,11 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-24
- * @modified  Sat 2015-10-31 12:13:12 (+0800)
+ * @modified  Tue 2015-11-03 19:24:51 (+0800)
  */
 
 #ifndef _ERROR_H
 #define _ERROR_H
-
-#include  <stdarg.h>
-#include  <stdio.h>
 
 typedef size_t cserr_t;
 typedef void (*cserr_clear_func)(void);
