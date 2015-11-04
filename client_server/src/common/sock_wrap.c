@@ -8,8 +8,8 @@
  */
 
 #ifdef WIN32
-#include  <windows.h>
 #include  <winsock2.h>
+#include  <windows.h>
 #define BLOCK_RW        0
 #define NONBLICK_RW     0
 #define SEND_NOSIGNAL   0
@@ -182,7 +182,12 @@ cssock_t cssock_accept(cssock_t handle, const struct sockaddr* sa, cssocklen_t* 
 {
 	int error;
 	cssock_t hsock;
+
+#ifdef WIN32
+    if ((hsock = accept(handle, (struct sockaddr*)sa, addrlen)) == INVALID_SOCKET) {
+#else
 	if ((hsock = accept(handle, (struct sockaddr*)sa, addrlen)) == -1) {
+#endif
 		cssock_close(handle);
 		error = 1;
 		csfatal_ext(&error, cserr_exit, "error at accept(), error code: %d\n", cssock_get_last_error());

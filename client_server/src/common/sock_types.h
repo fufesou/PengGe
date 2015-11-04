@@ -37,7 +37,7 @@ typedef socklen_t cssocklen_t;
  *
  */
 struct hdr {
-    uint32_t seg;
+    uint32_t seq;
     uint32_t ts;
 };
 

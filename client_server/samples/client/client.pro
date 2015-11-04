@@ -19,8 +19,7 @@ HEADERS += \
     ../../src/common/timespan.h \
     ../../src/common/unprtt.h \
     ../../src/common/utility_wrap.h \
-    ../../src/client/client.h \
-    ../../src/client/client_sendrecv.h
+    ../../src/client/client.h
 
 SOURCES += \
     ../../src/common/bufarray.c \

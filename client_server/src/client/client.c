@@ -17,16 +17,15 @@
 #include  <netinet/in.h>
 #endif
 
+#include  <stdint.h>
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
 #include    "macros.h"
-#include    "unprtt.h"
 #include    "sock_types.h"
 #include    "error.h"
 #include    "client.h"
 #include    "sock_wrap.h"
-#include    "client_sendrecv.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,8 +38,6 @@ extern const char* g_loginmsg_FAIL;
 extern const char g_login_delimiter;
 
 static char* s_cli_msgheader = "client:";
-static struct rtt_info s_rttinfo;
-static int s_rttinit = 0;
 
 static void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
 static void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
@@ -147,21 +144,4 @@ void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr
             }
         }
     }
-}
-
-ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
-{
-	if (s_rttinit == 0) {
-		rtt_init(&s_rttinfo);
-		s_rttinit = 1;
-#ifdef _DEBUG
-		rtt_d_flag = 1;
-#endif
-	}
-
-	return cssendrecv(
-				cli->hsock, &s_rttinfo,
-				cli->sendbuf, strlen(cli->sendbuf) + 1,
-				cli->recvbuf, sizeof(cli->recvbuf),
-				servaddr, addrlen);
 }

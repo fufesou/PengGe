@@ -8,6 +8,7 @@
  */
 
 #ifdef WIN32
+#include  <time.h>
 #include  <windows.h>
 #else
 #include  <sys/time.h>
@@ -23,6 +24,8 @@ void csgettimeofday(struct timeval* tv, void* tz)
     struct tm tm;
     SYSTEMTIME wtm;
 
+    (void)tz;
+
     GetLocalTime(&wtm);
     tm.tm_year    = wtm.wYear - 1900;
     tm.tm_mon     = wtm.wMonth - 1;
@@ -32,8 +35,8 @@ void csgettimeofday(struct timeval* tv, void* tz)
     tm.tm_sec     = wtm.wSecond;
     tm. tm_isdst  = -1;
     clock = mktime(&tm);
-    tp->tv_sec = clock;
-    tp->tv_usec = wtm.wMilliseconds * 1000;
+    tv->tv_sec = clock;
+    tv->tv_usec = wtm.wMilliseconds * 1000;
 #else
 	gettimeofday(tv, tz);
 #endif

@@ -98,9 +98,24 @@ void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr*
  * @param addrlen
  *
  * @return   
+ * 1. number of bytes received.
+ * 2. -1, if timeout.
+ * 3. -2, if sendto error occurs.
+ * 4. -3, if recvfrom error occurs.
+ *
+ * @sa cssendrecv_init cssendrecv_clear
  */
 ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
+/**
+ * @brief cssendrecv_init This function shoud better be called before the first call of csclient_sendrecv.
+ */
+void cssendrecv_init(void);
+
+/**
+ * @brief cssendrecv_clear This function must be called before client end sending and receiving.
+ */
+void cssendrecv_clear(void);
 
 #ifdef __cplusplus
 }

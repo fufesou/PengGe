@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-31
- * @modified  Mon 2015-11-02 19:29:57 (+0800)
+ * @modified  2015-11-04 22:27:18 (周三)
  */
 
 #ifndef WIN32
@@ -30,15 +30,17 @@
 
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #define RTT_DEBUG
 
 static int firstcall = 1;
 static sigjmp_buf s_jmpbuf;
-static struct csmsg_header s_sendhdr, s_recvhdr;
+static struct csmsg_header s_sendhdr;
+
+static struct rtt_info s_rttinfo;
+static int s_rttinit = 0;
 
 /**
  * @brief  s_sig_alarm This function will act as the receive timer.
@@ -52,31 +54,36 @@ static void s_register_alrm(void);
 }
 #endif
 
-ssize_t cssendrecv(
-			cssock_t hsock, __inout struct rtt_info* rttinfo,
-			const void* outmsg, size_t outbytes,
-			void* inmsg, size_t inbytes,
-			const struct sockaddr* destaddr, cssocklen_t destlen)
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
-	char outbuf[MAX_BUF_LEN];
-	char inbuf[MAX_BUF_LEN];
-    struct sockaddr fromaddr;
-    cssocklen_t fromlen = sizeof(fromaddr);
-	ssize_t n;
+	char outbuf[MAX_MSG_LEN];
+    ssize_t recvbytes;
 
-	s_register_alrm();
+    if (s_rttinit == 0) {
+        rtt_init(&s_rttinfo);
+        s_rttinit = 1;
+#ifdef _DEBUG
+        rtt_d_flag = 1;
+#endif
+    }
 
-	sendagain:
-		s_sendhdr.header.ts = rtt_ts(rttinfo);
+    s_register_alrm();
+
+    ++s_sendhdr.header.seq;
+    rtt_newpack(&s_rttinfo);
+
+    sendagain:
+        s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
 		s_sendhdr.numbytes = outbytes;
 		csmsg_merge(&s_sendhdr, outmsg, outbuf, sizeof(outbuf));
         sendto(hsock, outbuf, sizeof(struct csmsg_header) + outbytes, 0, destaddr, destlen);
 
-		alarm(rtt_start(rttinfo));
+        alarm(rtt_start(&s_rttinfo));
 
 		if (sigsetjmp(s_jmpbuf, 1) != 0) {
-            if (rtt_timeout(rttinfo) < 0) {
-				fprintf(stderr, "cssendrecv: no response from server, giving up.\n");
+            if (rtt_timeout(&s_rttinfo) < 0) {
+                fprintf(stderr, "cssendrecv: no response from server, giving up.\recvbytes");
+                s_rttinit = 0;
 				errno = ETIMEDOUT;
 				return -1;
 			}
@@ -84,22 +91,20 @@ ssize_t cssendrecv(
 		}
 
 		do {
-            if ((n = recvfrom(hsock, inbuf, sizeof(inbuf), 0, &fromaddr, &fromlen)) == -1) {
+            if ((recvbytes = recvfrom(hsock, inmsg, inbytes, 0, NULL, NULL)) == -1) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    printf("non-blocking option is set, recve again.\n");
+                    printf("non-blocking option is set, recve again.\recvbytes");
                     continue;
                 }
             }
-        } while (n < (ssize_t)sizeof(struct csmsg_header) ||
-                    (((struct csmsg_header*)inbuf)->header.seg != s_sendhdr.header.seg));
+        } while (recvbytes < (ssize_t)sizeof(struct csmsg_header) ||
+                    (((struct csmsg_header*)inmsg)->header.seq != s_sendhdr.header.seq));
 		alarm(0);
 
-        csmsg_extract_copy(inbuf, &s_recvhdr, inmsg, inbytes);
-        rtt_stop(rttinfo, rtt_ts(rttinfo) - s_recvhdr.header.ts);
+        rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct csmsg_header*)inmsg)->header.ts);
 
-        return n - sizeof(struct csmsg_header);
+        return recvbytes - sizeof(struct csmsg_header);
 }
-
 
 void s_sig_alrm(int signo)
 {
@@ -112,6 +117,16 @@ void s_register_alrm()
 	if (firstcall) {
 		cssignal_ext(SIGALRM, s_sig_alrm);
 	}
+}
+
+void cssendrecv_init(void)
+{
+    s_register_alrm();
+}
+
+void cssendrecv_clear(void)
+{
+
 }
 
 #endif
