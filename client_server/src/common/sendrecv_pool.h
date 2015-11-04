@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Sat 2015-10-31 15:43:52 (+0800)
+ * @modified  Wed 2015-11-04 17:39:27 (+0800)
  */
 
 #ifndef  SENDRECV_POOL_H
@@ -125,7 +125,7 @@ int cspool_pushdata(struct cssendrecv_pool* pool, const char* data, int datalen)
  * 2 if wait semaphore failed.
  * -1 if size of data is not large enough.
  */
-int cspool_pulldata(struct cssendrecv_pool* pool, __in char* data, int datalen);
+int cspool_pulldata(struct cssendrecv_pool* pool, char* data, int datalen);
 
 #ifdef __cplusplus
 }

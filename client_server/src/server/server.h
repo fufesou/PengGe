@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-26
- * @modified  Tue 2015-11-03 19:35:34 (+0800)
+ * @modified  Wed 2015-11-04 19:06:10 (+0800)
  */
 
 #ifndef  SERVER_HELPER_H
@@ -32,9 +32,16 @@ struct csserver
  */
 void csserver_init(struct csserver* serv, int tcpudp, u_short port, u_long addr);
 
-int csserver_print(struct csserver* serv);
-
+/**
+ * @brief  csserver_udp This function process communication for udp socket.
+ *
+ * @param serv
+ */
 void csserver_udp(struct csserver* serv);
+
+ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes);
+
+void csserver_send(cssock_t handle, const void* outbuf);
 
 
 #ifdef __cplusplus

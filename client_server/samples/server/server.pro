@@ -21,7 +21,8 @@ HEADERS += \
     ../../src/common/sock_wrap.h \
     ../../src/common/timespan.h \
     ../../src/common/unprtt.h \
-    ../../src/common/utility_wrap.h
+    ../../src/common/utility_wrap.h \
+    ../../src/server/msgdispatch.h
 
 SOURCES += \
 #    main.c \
@@ -37,7 +38,9 @@ SOURCES += \
     ../../src/common/sendrecv_pool.c \
     ../../src/common/sock_wrap.c \
     ../../src/common/timespan.c \
-    ../../src/common/utility_wrap.c
+    ../../src/common/utility_wrap.c \
+    ../../src/server/server_udp.c \
+    ../../src/server/msgdispatch.c
 
 
 win32 {

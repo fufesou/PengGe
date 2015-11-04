@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Sat 2015-10-31 19:18:24 (+0800)
+ * @modified  Wed 2015-11-04 19:13:52 (+0800)
  */
 
 #ifndef  MSGUNIT_H
@@ -18,7 +18,7 @@ extern "C" {
  * @brief  csmsg_header describe the header in pool item. csmsg_header is followed by the actual message data.
  */
 struct csmsg_header {
-    struct sockaddr_in addr;
+    struct sockaddr addr;
     int addrlen;
     struct hdr header;
     ssize_t numbytes;

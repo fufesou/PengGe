@@ -4,18 +4,12 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-10-26
- * @modified  2015-10-28 00:56:14 (+0800)
+ * @modified  Wed 2015-11-04 17:29:07 (+0800)
  */
-
-#include  <time.h>
-#include  <stdio.h>
-#include  <malloc.h>
-#include  <string.h>
 
 #ifdef WIN32
 #include  <Windows.h>
 #include  <process.h>
-#include  <semaphore.h>
 #else
 #include  <errno.h>
 #include  <semaphore.h>
@@ -24,6 +18,12 @@
 #include  <sys/time.h>
 #define THREAD_IDEL_TIMESLICE_MS 20
 #endif
+
+#include  <time.h>
+#include  <stdio.h>
+#include  <malloc.h>
+#include  <string.h>
+#include  <semaphore.h>
 
 #include    "lightthread.h"
 #include    "macros.h"

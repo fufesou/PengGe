@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
- * modified  Sat 2015-10-31 18:28:46 (+0800)
+ * modified  Wed 2015-11-04 17:18:17 (+0800)
  */
 
 #ifndef  MACROS_H
@@ -18,6 +18,12 @@
 
 #define MAX_MSG_LEN 1024
 #define MAX_BUF_LEN 2048
+
+/*
+ * @todo the following macros should be set by reading the config
+ */
+#define NUM_THREAD 8
+#define SERVER_POOL_NUM_ITEM 64
 
 
 #ifndef offsetof

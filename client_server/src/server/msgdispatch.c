@@ -4,11 +4,17 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-18
+ * @modified  Wed 2015-11-04 18:53:51 (+0800)
  */
+
+#ifdef WIN32
+#include  <winsock2.h>
+#else
+#include  <sys/socket.h>
+#endif
 
 #include  <stdio.h>
 #include  <string.h>
-#include  <winsock2.h>
 #include   "msgdispatch.h"
 
 
@@ -30,7 +36,7 @@ static void s_process_communication(char* inmsg, char* outmsg, int len_outmsg);
 #endif
 
 
-void process_msg(char* inmsg, char* outmsg, int len_outmsg)
+void csserver_process_msg(char* inmsg, char* outmsg, int* outmsglen)
 {
     if (strncmp(inmsg, g_loginmsg_header, strlen(g_loginmsg_header)) == 0) {
         s_process_login(inmsg, outmsg, len_outmsg);

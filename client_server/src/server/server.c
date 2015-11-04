@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-28
- * @modified  Tue 2015-11-03 19:35:09 (+0800)
+ * @modified  Wed 2015-11-04 19:13:30 (+0800)
  */
 
 #ifdef WIN32
@@ -13,6 +13,7 @@
 #else
 #include  <setjmp.h>
 #include  <signal.h>
+#include  <sys/types.h>
 #include  <sys/socket.h>
 #include  <netinet/in.h>
 #endif
@@ -23,6 +24,7 @@
 #include    "error.h"
 #include    "sock_types.h"
 #include    "sock_wrap.h"
+#include    "msgwrap.h"
 #include 	"server.h"
 
 
@@ -60,7 +62,17 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 	printf("%s bind() is OK\n", serv->msgheader);
 }
 
-void csserver_udp(struct csserver *serv)
+ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
 {
-    // process_communication(serv);
+	ssize_t recvbytes = recvfrom(handle, inbuf, inbytes, 0, NULL, NULL);
+    return recvbytes - sizeof(struct csmsg_header);
 }
+
+void csserver_send(cssock_t handle, const void* outbuf)
+{
+	const struct csmsg_header* msghdr = NULL;
+
+	msghdr = (const struct csmsg_header*)outbuf;
+    sendto(handle, outbuf, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
+}
+
