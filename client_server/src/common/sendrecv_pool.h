@@ -45,10 +45,14 @@ struct cssendrecv_pool {
     csthread_t* hthread;
 
     /**
-     * @brief hsem_filled Be careful, cssendrecv_pool donot call cssem_wait() and cssem_post()
-     * while pushing and pulling items. user should call those fucntions or set use_sem_in_pool to 1.
+     * @brief hsem_filled Be careful, cssendrecv_pool call cssem_wait() and cssem_post() by default.
      */
     cssem_t hsem_filled;
+
+    /**
+     * @brief use_sem_in_pool User should set use_sem_in_pool to be 0 to turn off semaphore calls,
+     *  or set use_sem_in_pool to be 1 to turn on semaphore call.
+     */
     int use_sem_in_pool;
 
     /**

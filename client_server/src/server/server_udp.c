@@ -99,15 +99,11 @@ void csserver_udp(struct csserver* serv)
 void s_init_sendpool(cssock_t handle)
 {
     cspool_init(&s_sendpool, MAX_MSG_LEN + sizeof(struct csmsg_header), SERVER_POOL_NUM_ITEM, NUM_THREAD, handle, s_process_send);
-
-	s_sendpool.use_sem_in_pool = 1;
 }
 
 void s_init_recvpool(cssock_t handle)
 {
     cspool_init(&s_recvpool, MAX_MSG_LEN + sizeof(struct csmsg_header), SERVER_POOL_NUM_ITEM, NUM_THREAD, handle, s_process_recv);
-
-	s_recvpool.use_sem_in_pool = 1;
 }
 
 #ifdef WIN32
@@ -128,7 +124,7 @@ void* s_process_recv(void* unused)
     while ((outmsg = cspool_pullitem(&s_sendpool, &s_sendpool.empty_buf)) == NULL)
 	  ;
 
-    printf("recv- thread id: %d, process message: %s.\n", csthread_getpid(), msgbuf);
+    printf("recv- thread id: %d, process message: %s.\n", csthread_getpid(), msgbuf + sizeof(struct csmsg_header));
 
     outmsglen = s_sendpool.len_item;
     csserver_process_msg(msgbuf, outmsg, &outmsglen);

@@ -45,7 +45,6 @@ static void s_initpool(struct cssendrecv_pool* pool);
 
 /**
  * @brief  s_clearpool This function will do some clear works such as free memory.
-
  *
  * @param pool The send or receive pool to clear.
  */
@@ -93,7 +92,7 @@ void s_initpool(struct cssendrecv_pool* pool)
 
     pool->hmutex = csmutex_create();
     cssem_create(0, pool->filled_buf.num_item - 1, &pool->hsem_filled);
-    pool->use_sem_in_pool = 0;
+    pool->use_sem_in_pool = 1;
 
     pool->hthread = (csthread_t*)malloc(sizeof(csthread_t) * pool->num_thread);
 	for (i=0; i<pool->num_thread; ++i) {
@@ -120,6 +119,13 @@ char* cspool_pushitem(struct cssendrecv_pool* pool, struct array_buf* buf, char*
         }
     }
 
+#ifdef _DEBUG
+    {
+        static int pushcount = 0;
+        printf("pushcount: %d.\n", ++pushcount);
+    }
+#endif
+
     csmutex_lock(pool->hmutex);
     item = buf->push_item(buf, item);
     csmutex_unlock(pool->hmutex);
@@ -135,6 +141,13 @@ char* cspool_pullitem(struct cssendrecv_pool* pool, struct array_buf* buf)
             return NULL;
         }
     }
+
+#ifdef _DEBUG
+    {
+        static int pullcount = 0;
+        printf("pullcount: %d.\n", ++pullcount);
+    }
+#endif
 
     csmutex_lock(pool->hmutex);
     item = buf->pull_item(buf);

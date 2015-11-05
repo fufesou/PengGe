@@ -76,6 +76,8 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 
     ++s_sendhdr.header.seq;
     rtt_newpack(&s_rttinfo);
+    cs_memcpy(&s_sendhdr.addr, sizeof(s_sendhdr.addr), servaddr, addrlen);
+    s_sendhdr.addrlen = addrlen;
 
     s_recv_stat = RECV_RESEND;
     while (s_recv_stat != RECV_OK && s_recv_stat != RECV_TIMEOUT) {

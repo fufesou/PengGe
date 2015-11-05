@@ -43,19 +43,19 @@ int cssock_envinit()
     WSADATA wsadata;
     if (WSAStartup(MAKEWORD(2,2), &wsadata) != 0)
     {
-         printf("Server: WSAStartup failed with error %d\n", WSAGetLastError());
+         printf("WSAStartup failed with error %d\n", WSAGetLastError());
          // exit(-1);
          return -1;
     }
     else
     {
-         printf("Server: The Winsock dll found!\n");
-         printf("Server: The current status is %s.\n", wsadata.szSystemStatus);
+         printf("The Winsock dll found!\n");
+         printf("The current status is %s.\n", wsadata.szSystemStatus);
     }
 
     if (LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2 )
     {
-         printf("Server: The dll do not support the Winsock version %u.%u!\n",
+         printf("The dll do not support the Winsock version %u.%u!\n",
                    LOBYTE(wsadata.wVersion),HIBYTE(wsadata.wVersion));
          WSACleanup();
          // exit(-1);
@@ -63,9 +63,9 @@ int cssock_envinit()
     }
     else
     {
-         printf("Server: The dll supports the Winsock version %u.%u!\n", LOBYTE(wsadata.wVersion),
+         printf("The dll supports the Winsock version %u.%u!\n", LOBYTE(wsadata.wVersion),
                    HIBYTE(wsadata.wVersion));
-         printf("Server: The highest version this dll can support is %u.%u\n",
+         printf("The highest version this dll can support is %u.%u\n",
                    LOBYTE(wsadata.wHighVersion), HIBYTE(wsadata.wHighVersion));
     }
 #endif
@@ -77,10 +77,10 @@ void cssock_envclear()
 {
 #ifdef WIN32
     if(WSACleanup() != 0) {
-         printf("Server: WSACleanup() failed! Error code: %d\n", WSAGetLastError());
+         printf("WSACleanup() failed! Error code: %d\n", WSAGetLastError());
     }
     else {
-         printf("Server: WSACleanup() is OK...\n");
+         printf("WSACleanup() is OK...\n");
     }
 #endif
 }
@@ -120,7 +120,7 @@ cssock_t cssock_open(int tcpudp)
         protocol = IPPROTO_UDP;
     }
 	hsock = socket(AF_INET, tcpudp, protocol); 
-    if (IS_SOCK_HANDLE(hsock)) {
+    if (!IS_SOCK_HANDLE(hsock)) {
 		error = 1;
         csfatal_ext(&error, cserr_exit, "error at socket(), error code: %d\n",  cssock_get_last_error());
     }

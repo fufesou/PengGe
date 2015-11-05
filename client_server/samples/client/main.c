@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
     struct sockaddr_in serveraddr;
 
     if (argc < 2) {
-        printf("usage: server <port>.");
+        printf("usage: client <port>.");
         exit(1);
     }
 
