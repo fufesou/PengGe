@@ -1,10 +1,10 @@
 /**
- * @file cssendrecv_pool.h
+ * @file sendrecv_pool.h
  * @brief  
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Wed 2015-11-04 17:39:27 (+0800)
+ * @modified  周四 2015-11-05 10:14:57 中国标准时间
  */
 
 #ifndef  SENDRECV_POOL_H

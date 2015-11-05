@@ -22,8 +22,11 @@
 #include  <stdio.h>
 #include  <stdint.h>
 #include    "error.h"
+#include    "bufarray.h"
 #include    "sock_types.h"
+#include    "lightthread.h"
 #include    "sock_wrap.h"
+#include    "sendrecv_pool.h"
 #include    "msgwrap.h"
 #include 	"server.h"
 

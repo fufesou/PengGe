@@ -5,7 +5,7 @@ CONFIG -= qt
 
 CONFIG(debug, release|debug):DEFINES +=  _DEBUG
 
-INCLUDEPATH += ../../src/common ../../src/client
+INCLUDEPATH += ../../src/common ../../src/server
 
 HEADERS += \
     ../../src/server/server.h \
@@ -40,7 +40,8 @@ SOURCES += \
     ../../src/common/timespan.c \
     ../../src/common/utility_wrap.c \
     ../../src/server/server_udp.c \
-    ../../src/server/msgdispatch.c
+    ../../src/server/msgdispatch.c \
+    main.c
 
 
 win32 {

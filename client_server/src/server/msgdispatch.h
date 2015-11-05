@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-void cserver_sprocess_msg(char* inmsg, char* outmsg, int* outmsglen);
+void csserver_process_msg(char* inmsg, char* outmsg, int* outmsglen);
 
 
 #ifdef __cplusplus

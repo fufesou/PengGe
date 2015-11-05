@@ -11,7 +11,6 @@
 #include  <winsock2.h>
 #include  <windows.h>
 #include  <process.h>
-#include  <thread.h>
 #else
 #include  <sys/socket.h>
 #include  <netinet/in.h>
@@ -131,6 +130,7 @@ void* s_process_recv(void* unused)
 
     printf("recv- thread id: %d, process message: %s.\n", csthread_getpid(), msgbuf);
 
+    outmsglen = s_sendpool.len_item;
     csserver_process_msg(msgbuf, outmsg, &outmsglen);
 	
     while ((cspool_pushitem(&s_recvpool, &s_recvpool.empty_buf, msgbuf)) == NULL)

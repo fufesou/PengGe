@@ -4,33 +4,41 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-25
+ * @modified
  */
 
+#ifdef WIN32
+#include  <winsock2.h>
+#include  <windows.h>
+#else
+#include  <sys/socket.h>
+#include  <netinet/in.h>
+#include  <arpa/inet.h>
+#endif
 
-#include <winsock2.h>
-#include <stdio.h>
-#include "sock_wrap.h"
-#include "server.h"
+#include  <stdio.h>
+#include  <stdlib.h>
+#include  <stdint.h>
+#include    "sock_types.h"
+#include    "sock_wrap.h"
+#include    "server.h"
 
 
 void s_check_args(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
-    struct server_udp udpserver;
+    struct csserver udpserver;
 
     s_check_args(argc, argv);
 
-    init_server_udp(&udpserver);
+    cssock_envinit();
 
-    udpserver.create_server(&udpserver, AF_INET, atoi(argv[1]), htonl(INADDR_ANY));
-    udpserver.print_info(&udpserver);
+    csserver_init(&udpserver, SOCK_DGRAM, atoi(argv[1]), htonl(INADDR_ANY));
+    cssock_print(udpserver.hsock, udpserver.msgheader);
+    csserver_udp(&udpserver);
 
-    udpserver.communicate(&udpserver);
-
-    udpserver.clear(&udpserver);
-
-    U_cleanup_winsock2();
+    cssock_envclear();
 
     return 0;
 }

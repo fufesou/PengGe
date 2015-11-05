@@ -1,10 +1,10 @@
 /**
- * @file server_helper.h
+ * @file server.h
  * @brief This file provide some helper functions for server.
  * @author cxl
  * @version 0.1
  * @date 2015-09-26
- * @modified  Wed 2015-11-04 19:06:10 (+0800)
+ * @modified  周四 2015-11-05 10:14:33 中国标准时间
  */
 
 #ifndef  SERVER_HELPER_H

@@ -42,6 +42,8 @@ static int s_recv_stat = 0;
 static struct rtt_info s_rttinfo;
 static int s_rttinit = 0;
 
+static int s_event_timeout = 0;
+
 static csmutex_t s_mutex = 0;
 static struct csmsg_header s_sendhdr;
 static MMRESULT s_timeevent = 0;
@@ -107,20 +109,20 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
 {
     int errcode;
-    ssize_t recvbytes;
+    ssize_t recvbytes = -1;
 
     while (1) {
-        csmutex_lock(s_mutex);
-        if (s_recv_stat) {
-            return 0;
-        }
-        if ((recvbytes = recvfrom(hsock, inmsg, inbytes, 0, NULL, NULL)) == -1) {
-            csmutex_unlock(s_mutex);
-
-            if (s_recv_stat) {
-                return 0;
+        if (s_event_timeout) {
+            if (rtt_timeout(&s_rttinfo) < 0) {
+            printf("no response from server, giving up.\n");
+            s_recv_stat = RECV_TIMEOUT;
+            } else {
+                s_recv_stat = RECV_RESEND;
             }
+            return -1;
+        }
 
+        if ((recvbytes = recvfrom(hsock, inmsg, inbytes, 0, NULL, NULL)) == -1) {
             if ((errcode = cssock_get_last_error()) == WSAEWOULDBLOCK) {
                 printf("non-blocking option is set, recve again.\n");
                 continue;
@@ -131,16 +133,19 @@ int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
             }
         } else if (recvbytes > (ssize_t)sizeof(struct csmsg_header) &&
             ((struct csmsg_header*)inmsg)->header.seq == s_sendhdr.header.seq) {
+
             s_recv_stat = RECV_OK;
             s_kill_timeevent();
             return recvbytes;
         }
+
     }
 }
 
 void s_start_timeevent(int msec)
 {
     s_timeevent = timeSetEvent(msec, 500, (LPTIMECALLBACK)s_recvmsg_fail, 0, TIME_CALLBACK_FUNCTION | TIME_ONESHOT);
+    s_event_timeout = 0;
 }
 
 void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1, DWORD_PTR dw2)
@@ -151,14 +156,7 @@ void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1,
     (void)dw1;
     (void)dw2;
 
-    csmutex_lock(s_mutex);
-    if (rtt_timeout(&s_rttinfo) < 0) {
-        printf("no response from server, giving up.\n");
-        s_recv_stat = RECV_TIMEOUT;
-    } else {
-        s_recv_stat = RECV_RESEND;
-    }
-    csmutex_unlock(s_mutex);
+    s_event_timeout = 1;
 }
 
 void s_kill_timeevent()

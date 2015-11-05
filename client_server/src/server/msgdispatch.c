@@ -15,7 +15,14 @@
 
 #include  <stdio.h>
 #include  <string.h>
-#include   "msgdispatch.h"
+#include  <stdint.h>
+#include    "lightthread.h"
+#include    "sock_types.h"
+#include    "utility_wrap.h"
+#include    "bufarray.h"
+#include    "sendrecv_pool.h"
+#include    "msgwrap.h"
+#include    "msgdispatch.h"
 
 
 #ifdef __cplusplus
@@ -27,9 +34,11 @@ extern const char* g_loginmsg_SUCCESS;
 extern const char* g_loginmsg_FAIL;
 extern const char g_login_delimiter;
 
-static void s_process_login(char* inmsg, char* outmsg, int len_outmsg);
+static const struct csmsg_header* s_msghdr = NULL;
+
+static void s_process_login(char* inmsg, char* outmsg, int* outmsglen);
 static int s_login_verification(const char *username, const char *password);
-static void s_process_communication(char* inmsg, char* outmsg, int len_outmsg);
+static void s_process_communication(char* inmsg, char* outmsg, int* outmsglen);
 
 #ifdef __cplucplus
 }
@@ -38,20 +47,25 @@ static void s_process_communication(char* inmsg, char* outmsg, int len_outmsg);
 
 void csserver_process_msg(char* inmsg, char* outmsg, int* outmsglen)
 {
-    if (strncmp(inmsg, g_loginmsg_header, strlen(g_loginmsg_header)) == 0) {
-        s_process_login(inmsg, outmsg, len_outmsg);
+    char* msgbegin = inmsg + sizeof(struct csmsg_header);
+    s_msghdr = (const struct csmsg_header*)inmsg;
+
+    if (strncmp(msgbegin, g_loginmsg_header, strlen(g_loginmsg_header)) == 0) {
+        s_process_login(msgbegin, outmsg, outmsglen);
     }
     else {
-        s_process_communication(inmsg, outmsg, len_outmsg);
+        s_process_communication(msgbegin, outmsg, outmsglen);
     }
 }
 
-void s_process_login(char* inmsg, char* outmsg, int len_outmsg)
+void s_process_login(char* inmsg, char* outmsg, int* outmsglen)
 {
-    char* username = NULL;
-    char* password = NULL;
     char* delimiter = NULL;
-    int loginmsg_header_len;
+    const char* username = NULL;
+    const char* password = NULL;
+    const char* loginres = NULL;
+    int loginmsg_header_len = 0;
+    int size_msghdr = sizeof(struct csmsg_header);
 
     loginmsg_header_len = strlen(g_loginmsg_header);
     delimiter = strchr(inmsg + loginmsg_header_len, g_login_delimiter);
@@ -59,27 +73,10 @@ void s_process_login(char* inmsg, char* outmsg, int len_outmsg)
     *delimiter = '\0';
     password = delimiter + 1;
 
-    if (s_login_verification(username, password)) {
-
-        /**
-         * @todo of cause we need error handler here.
-         */
-#ifdef _WIN32
-        memcpy_s(outmsg, len_outmsg, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1);
-#else
-        memcpy(outmsg, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1);
-#endif
-    }
-    else  {
-         /**
-         * @todo of cause we need error handler here.
-         */
-#ifdef _WIN32
-        memcpy_s(outmsg, len_outmsg, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1);
-#else
-        memcpy(outmsg, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1);
-#endif
-    }
+    loginres = s_login_verification(username, password) ? g_loginmsg_SUCCESS : g_loginmsg_FAIL;
+    cs_memcpy(outmsg, *outmsglen, s_msghdr, size_msghdr);
+    cs_memcpy(outmsg + size_msghdr, *outmsglen - size_msghdr, loginres, strlen(loginres) + 1);
+    *outmsglen = size_msghdr + strlen(loginres) + 1;
 }
 
 int s_login_verification(const char* username, const char* password)
@@ -88,15 +85,11 @@ int s_login_verification(const char* username, const char* password)
             (strcmp(password, "8-15bytes") == 0));
 }
 
-void s_process_communication(char* inmsg, char* outmsg, int len_outmsg)
+void s_process_communication(char* inmsg, char* outmsg, int* outmsglen)
 {
-    /**
-    * @todo of cause we need error handler here.
-    */
-#ifdef _WIN32
-    memcpy_s(outmsg, len_outmsg, inmsg, strlen(inmsg) + 1);
-#else
-    memcpy(outmsg, inmsg, strlen(inmsg) + 1);
-#endif
+    int size_msghdr = sizeof(struct csmsg_header);
+    cs_memcpy(outmsg, *outmsglen, s_msghdr, size_msghdr);
+    cs_memcpy(outmsg + size_msghdr, *outmsglen - size_msghdr, inmsg, s_msghdr->numbytes);
+    *outmsglen = size_msghdr + s_msghdr->numbytes;
     Sleep(200);
 }
