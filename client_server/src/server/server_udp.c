@@ -131,7 +131,7 @@ void* s_process_recv(void* unused)
 	
     while ((cspool_pushitem(&s_recvpool, &s_recvpool.empty_buf, msgbuf)) == NULL)
 	  ;
-    while ((cspool_pushitem(&s_sendpool, &s_sendpool.filled_buf, outmsg)) != NULL)
+    while ((cspool_pushitem(&s_sendpool, &s_sendpool.filled_buf, outmsg)) == NULL)
 	  ;
 
     return 0;

@@ -67,15 +67,43 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 
 ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
 {
-	ssize_t recvbytes = recvfrom(handle, inbuf, inbytes, 0, NULL, NULL);
+    ssize_t recvbytes;
+    if ((recvbytes = recvfrom(handle, inbuf, inbytes, 0, NULL, NULL)) < 0) {
+        fprintf(stderr, "server: recvfrom() fail, error code: %d.\n", cssock_get_last_error());
+        return -1;
+    } else if (recvbytes == 0) {
+        fprintf(stdout, "server: peer shutdown, recvfrom() failed.\n");
+        return 0;
+    }
+
+#ifdef _DEBUG
+    {
+        static int recvcount = 0;
+        printf("server: recvcount %d.\n", recvcount++);
+    }
+#endif
+
     return recvbytes - sizeof(struct csmsg_header);
 }
 
 void csserver_send(cssock_t handle, const void* outbuf)
 {
+    ssize_t sendbytes;
 	const struct csmsg_header* msghdr = NULL;
 
 	msghdr = (const struct csmsg_header*)outbuf;
-    sendto(handle, outbuf, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
+
+#ifdef _DEBUG
+    printf("server: client ip: %s, port: %d.\n",
+           inet_ntoa(((const struct sockaddr_in*)&msghdr->addr)->sin_addr),
+           htons(((const struct sockaddr_in*)&msghdr->addr)->sin_port));
+#endif
+
+    sendbytes = sendto(handle, outbuf, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
+    if (sendbytes < 0) {
+        fprintf(stderr, "server: sendto() fail, error code: %d.\n", cssock_get_last_error());
+    } else if (sendbytes != ((ssize_t)sizeof(struct csmsg_header) + msghdr->numbytes)) {
+        printf("server: sendto() does not send right number of data.\n");
+    }
 }
 
