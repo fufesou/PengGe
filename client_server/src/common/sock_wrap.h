@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  Tue 2015-11-03 19:29:34 (+0800)
+ * @modified  Fri 2015-11-06 01:06:43 (+0800)
  */
 
 #ifndef  SOCK_WRAP_H
@@ -99,6 +99,10 @@ int cssock_block(cssock_t handle, int block);
  * 3. 1, if socket is not connected.
  */
 int cssock_print(cssock_t handle, const char* header);
+
+int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
+int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
+
 
 #ifdef __cplusplus
 }

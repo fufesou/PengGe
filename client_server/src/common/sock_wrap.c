@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-20
- * @modified  Tue 2015-11-03 19:29:30 (+0800)
+ * @modified  Fri 2015-11-06 01:09:43 (+0800)
  */
 
 #ifdef WIN32
@@ -245,3 +245,22 @@ int cssock_print(cssock_t handle, const char* header)
     }
     return 1;
 }
+
+int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen)
+{
+	int res = 0;
+	if ((res = getsockname(handle, addr, addrlen)) != 0) {
+		fprintf(stdout, "getsockname() fail, error code: %d.\n", cssock_get_last_error());
+	}
+	return res;
+}
+
+int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen)
+{
+	int res = 0;
+	if ((res = getpeername(handle, addr, addrlen)) != 0) {
+		fprintf(stdout, "getsockname() fail, error code: %d.\n", cssock_get_last_error());
+	}
+	return res;
+}
+

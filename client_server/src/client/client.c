@@ -17,6 +17,8 @@
 #include  <netinet/in.h>
 #endif
 
+struct cssendrecv_pool;
+
 #include  <stdint.h>
 #include  <stdio.h>
 #include  <stdlib.h>
@@ -26,6 +28,7 @@
 #include    "error.h"
 #include    "client.h"
 #include    "sock_wrap.h"
+#include    "msgwrap.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,6 +97,7 @@ void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr*
 void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     ssize_t numbytes;
+    char* msgdata = NULL;
 
     csclient_connect(cli, servaddr, addrlen);
 
@@ -108,12 +112,13 @@ void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr*
             }
             cli->recvbuf[numbytes] = 0;
 
-            if (strncmp(cli->recvbuf, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1) == 0) {
+            msgdata = cli->recvbuf + sizeof(struct csmsg_header);
+            if (strncmp(msgdata, g_loginmsg_SUCCESS, strlen(g_loginmsg_SUCCESS) + 1) == 0) {
                 s_enter_login_session(cli, fp, servaddr, addrlen);
-            } else if (strncmp(cli->recvbuf, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1) == 0) {
+            } else if (strncmp(msgdata, g_loginmsg_FAIL, strlen(g_loginmsg_FAIL) + 1) == 0) {
                 printf("%s: login failed.\n", cli->msgheader);
             } else {
-                printf("%s: unkown message.\n", cli->msgheader);
+                printf("%s: unkown message-%s.\n", cli->msgheader, msgdata);
             }
         }
     }

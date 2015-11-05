@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-28
- * @modified  Wed 2015-11-04 19:13:30 (+0800)
+ * @modified  Fri 2015-11-06 01:15:00 (+0800)
  */
 
 #ifdef WIN32
@@ -16,11 +16,13 @@
 #include  <sys/types.h>
 #include  <sys/socket.h>
 #include  <netinet/in.h>
+#include  <arpa/inet.h>
 #endif
 
 #include  <stdlib.h>
 #include  <stdio.h>
 #include  <stdint.h>
+#include  <semaphore.h>
 #include    "error.h"
 #include    "bufarray.h"
 #include    "sock_types.h"
@@ -86,18 +88,22 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
     return recvbytes - sizeof(struct csmsg_header);
 }
 
-void csserver_send(cssock_t handle, const void* outbuf)
+void csserver_send(cssock_t handle, void* outbuf)
 {
     ssize_t sendbytes;
-	const struct csmsg_header* msghdr = NULL;
+    cssocklen_t sendlen;
+	struct csmsg_header* msghdr = NULL;
 
-	msghdr = (const struct csmsg_header*)outbuf;
+    msghdr = (struct csmsg_header*)outbuf;
 
 #ifdef _DEBUG
     printf("server: client ip: %s, port: %d.\n",
-           inet_ntoa(((const struct sockaddr_in*)&msghdr->addr)->sin_addr),
-           htons(((const struct sockaddr_in*)&msghdr->addr)->sin_port));
+           inet_ntoa(((struct sockaddr_in*)&msghdr->addr)->sin_addr),
+           htons(((struct sockaddr_in*)&msghdr->addr)->sin_port));
 #endif
+
+    cssock_getsockname(handle, &msghdr->addr, &sendlen);
+    msghdr->addrlen = sendlen;
 
     sendbytes = sendto(handle, outbuf, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
     if (sendbytes < 0) {

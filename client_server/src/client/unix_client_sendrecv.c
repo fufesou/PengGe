@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-31
- * @modified  2015-11-04 22:27:18 (周三)
+ * @modified  Fri 2015-11-06 01:11:23 (+0800)
  */
 
 #ifndef WIN32
@@ -23,10 +23,12 @@
 #include    "unprtt.h"
 #include    "sock_types.h"
 #include    "lightthread.h"
+#include    "sock_wrap.h"
 #include    "bufarray.h"
 #include    "sendrecv_pool.h"
 #include    "msgwrap.h"
 #include    "utility_wrap.h"
+#include    "client.h"
 
 
 #ifdef __cplusplus
@@ -58,6 +60,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 {
 	char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
+    cssocklen_t sendlen;
 
     if (s_rttinit == 0) {
         rtt_init(&s_rttinfo);
@@ -71,12 +74,14 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 
     ++s_sendhdr.header.seq;
     rtt_newpack(&s_rttinfo);
+    cssock_getsockname(cli->hsock, &s_sendhdr.addr, &sendlen);
+    s_sendhdr.addrlen = sendlen;
 
     sendagain:
         s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
-		s_sendhdr.numbytes = outbytes;
-		csmsg_merge(&s_sendhdr, outmsg, outbuf, sizeof(outbuf));
-        sendto(hsock, outbuf, sizeof(struct csmsg_header) + outbytes, 0, destaddr, destlen);
+        s_sendhdr.numbytes = strlen(cli->sendbuf) + 1;
+        csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
+        sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + s_sendhdr.numbytes, 0, servaddr, addrlen);
 
         alarm(rtt_start(&s_rttinfo));
 
@@ -91,17 +96,17 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 		}
 
 		do {
-            if ((recvbytes = recvfrom(hsock, inmsg, inbytes, 0, NULL, NULL)) == -1) {
+            if ((recvbytes = recvfrom(cli->hsock, cli->recvbuf, sizeof(cli->recvbuf), 0, NULL, NULL)) == -1) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    printf("non-blocking option is set, recve again.\recvbytes");
+                    printf("non-blocking option is set, recve again.\n");
                     continue;
                 }
             }
         } while (recvbytes < (ssize_t)sizeof(struct csmsg_header) ||
-                    (((struct csmsg_header*)inmsg)->header.seq != s_sendhdr.header.seq));
+                    (((struct csmsg_header*)cli->recvbuf)->header.seq != s_sendhdr.header.seq));
 		alarm(0);
 
-        rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct csmsg_header*)inmsg)->header.ts);
+        rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct csmsg_header*)cli->recvbuf)->header.ts);
 
         return recvbytes - sizeof(struct csmsg_header);
 }

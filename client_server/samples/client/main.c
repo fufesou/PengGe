@@ -25,7 +25,6 @@
 #include    "sock_wrap.h"
 #include    "client.h"
 
-
 int main(int argc, char* argv[])
 {
     struct csclient udpclient;

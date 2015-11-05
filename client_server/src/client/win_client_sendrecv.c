@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
- * @modified  2015-11-04 22:31:14 (周三)
+ * @modified  Fri 2015-11-06 01:11:52 (+0800)
  */
 
 #ifdef WIN32
@@ -61,6 +61,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 {
 	char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
+    cssocklen_t sendlen;
 
     if (s_rttinit == 0) {
         rtt_init(&s_rttinfo);
@@ -76,8 +77,8 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 
     ++s_sendhdr.header.seq;
     rtt_newpack(&s_rttinfo);
-    cs_memcpy(&s_sendhdr.addr, sizeof(s_sendhdr.addr), servaddr, addrlen);
-    s_sendhdr.addrlen = addrlen;
+    cssock_getsockname(cli->hsock, &s_sendhdr.addr, &sendlen);
+    s_sendhdr.addrlen = sendlen;
 
     s_recv_stat = RECV_RESEND;
     while (s_recv_stat != RECV_OK && s_recv_stat != RECV_TIMEOUT) {

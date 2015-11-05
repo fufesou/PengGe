@@ -14,6 +14,7 @@
 extern "C" {
 #endif
 
+#pragma pack(4)
 /**
  * @brief  csmsg_header describe the header in pool item. csmsg_header is followed by the actual message data.
  */
@@ -21,8 +22,9 @@ struct csmsg_header {
     struct sockaddr addr;
     int addrlen;
     struct hdr header;
-    ssize_t numbytes;
+    int numbytes;
 };
+#pragma pack()
 
 /**
  * @brief  csmsg_merge 

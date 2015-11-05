@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-26
- * @modified  周四 2015-11-05 10:14:33 中国标准时间
+ * @modified  Fri 2015-11-06 01:14:04 (+0800)
  */
 
 #ifndef  SERVER_HELPER_H
@@ -41,7 +41,7 @@ void csserver_udp(struct csserver* serv);
 
 ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes);
 
-void csserver_send(cssock_t handle, const void* outbuf);
+void csserver_send(cssock_t handle, void* outbuf);
 
 
 #ifdef __cplusplus

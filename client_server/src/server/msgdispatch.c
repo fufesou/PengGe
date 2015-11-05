@@ -16,6 +16,7 @@
 #include  <stdio.h>
 #include  <string.h>
 #include  <stdint.h>
+#include  <semaphore.h>
 #include    "lightthread.h"
 #include    "sock_types.h"
 #include    "utility_wrap.h"
@@ -91,5 +92,5 @@ void s_process_communication(char* inmsg, char* outmsg, int* outmsglen)
     cs_memcpy(outmsg, *outmsglen, s_msghdr, size_msghdr);
     cs_memcpy(outmsg + size_msghdr, *outmsglen - size_msghdr, inmsg, s_msghdr->numbytes);
     *outmsglen = size_msghdr + s_msghdr->numbytes;
-    Sleep(200);
+    cssleep(200);
 }
