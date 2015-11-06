@@ -79,6 +79,7 @@ void csserver_udp(struct csserver* serv)
 			 * @brief Push to pool will succeed in normal case. There is no need to test the return value.
 			 */
 			cspool_pushitem(&s_recvpool, &s_recvpool.filled_buf, buf);
+            cssem_post(&s_recvpool.hsem_filled);
         }
         else if (numbytes <= 0) {
             printf("%s: connection closed with error code: %d\n", serv->msgheader, cssock_get_last_error());
@@ -119,20 +120,22 @@ void* s_process_recv(void* unused)
     (void)unused;
     printf("child thread %d created.\n", csthread_getpid());
 
-    while ((msgbuf = cspool_pullitem(&s_recvpool, &s_recvpool.filled_buf)) == NULL)
-	  ;
-    while ((outmsg = cspool_pullitem(&s_sendpool, &s_sendpool.empty_buf)) == NULL)
-	  ;
+    while (1)
+    {
+        cssem_wait(&s_recvpool.hsem_filled);
+        msgbuf = cspool_pullitem(&s_recvpool, &s_recvpool.filled_buf);
+        while ((outmsg = cspool_pullitem(&s_sendpool, &s_sendpool.empty_buf)) == NULL)
+          ;
 
-    printf("recv- thread id: %d, process message: %s.\n", csthread_getpid(), msgbuf + sizeof(struct csmsg_header));
+        printf("recv- thread id: %d, process message: %s.\n", csthread_getpid(), msgbuf + sizeof(struct csmsg_header));
 
-    outmsglen = s_sendpool.len_item;
-    csserver_process_msg(msgbuf, outmsg, &outmsglen);
-	
-    while ((cspool_pushitem(&s_recvpool, &s_recvpool.empty_buf, msgbuf)) == NULL)
-	  ;
-    while ((cspool_pushitem(&s_sendpool, &s_sendpool.filled_buf, outmsg)) == NULL)
-	  ;
+        outmsglen = s_sendpool.len_item;
+        csserver_process_msg(msgbuf, outmsg, &outmsglen);
+
+        cspool_pushitem(&s_recvpool, &s_recvpool.empty_buf, msgbuf);
+        cspool_pushitem(&s_sendpool, &s_sendpool.filled_buf, outmsg);
+        cssem_post(&s_sendpool.hsem_filled);
+    }
 
     return 0;
 }
@@ -148,13 +151,15 @@ void* s_process_send(void* unused)
     (void)unused;
     printf("child thread %d created.\n", csthread_getpid());
 
-    while ((outmsg = cspool_pullitem(&s_sendpool, &s_sendpool.filled_buf)) == NULL)
-	  ;
+    while (1) {
+        cssem_wait(&s_sendpool.hsem_filled);
+        outmsg = cspool_pullitem(&s_sendpool, &s_sendpool.filled_buf);
 
-    csserver_send(s_sendpool.socket, outmsg);
-	cssleep(200);
+        csserver_send(s_sendpool.socket, outmsg);
+        cssleep(200);
 
-    cspool_pushitem(&s_sendpool, &s_sendpool.empty_buf, outmsg);
+        cspool_pushitem(&s_sendpool, &s_sendpool.empty_buf, outmsg);
+    }
 
     return 0;
 }

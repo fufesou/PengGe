@@ -50,8 +50,10 @@ struct cssendrecv_pool {
     cssem_t hsem_filled;
 
     /**
-     * @brief use_sem_in_pool User should set use_sem_in_pool to be 0 to turn off semaphore calls,
-     *  or set use_sem_in_pool to be 1 to turn on semaphore call.
+     * @brief use_sem_in_pool 1 turn on semaphore wait or post, 0 turn off.
+     *
+     * @note use_sem_in_pool only works in cspool_pulldata and cspool_pushdata.
+     * user shoud call semaphore wait and post explicit while calling cspool_pullitem and cspool_pushitem.
      */
     int use_sem_in_pool;
 

@@ -42,7 +42,7 @@ void csgettimeofday(struct timeval* tv, void* tz)
 #endif
 }
 
-void get_cur_timelong(timelong_t* tl)
+void cstimelong_cur(cstimelong_t* tl)
 {
 #ifdef WIN32
 	FILETIME ft;
@@ -54,10 +54,10 @@ void get_cur_timelong(timelong_t* tl)
 #endif
 }
 
-unsigned long long get_span_microsec(const timelong_t* start)
+unsigned long long cstimelong_span_microsec(const cstimelong_t* start)
 {
-	timelong_t end;
-	get_cur_timelong(&end);
+    cstimelong_t end;
+    cstimelong_cur(&end);
 
 #ifdef WIN32
 	return (end.QuadPart - start->QuadPart) / 10;
@@ -66,13 +66,13 @@ unsigned long long get_span_microsec(const timelong_t* start)
 #endif
 }
 
-unsigned int get_span_millisec(const timelong_t* start)
+unsigned int cstimelong_span_millisec(const cstimelong_t* start)
 {
-	return (unsigned int)(get_span_microsec(start) / 1000LL);
+    return (unsigned int)(cstimelong_span_microsec(start) / 1000LL);
 }
 
-unsigned int get_span_sec(const timelong_t* start)
+unsigned int cstimelong_span_sec(const cstimelong_t* start)
 {
-	return (unsigned int)(get_span_microsec(start) / 1000000LL);
+    return (unsigned int)(cstimelong_span_microsec(start) / 1000000LL);
 }
 

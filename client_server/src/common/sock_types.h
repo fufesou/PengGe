@@ -13,8 +13,10 @@
 
 #ifdef WIN32
 #define IS_SOCK_HANDLE(x) ((x)!=INVALID_SOCKET)
+#define ETRYAGAIN(x) ((x)==WSAEWOULDBLOCK)
 #else
 #define IS_SOCK_HANDLE(x) ((x)>0)
+#define ETRYAGAIN(x) ((x)==EWOULDBLOCK)
 #endif
 
 

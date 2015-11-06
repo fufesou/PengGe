@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-31
- * @modified  Fri 2015-11-06 01:11:23 (+0800)
+ * @modified  周五 2015-11-06 12:15:06 中国标准时间
  */
 
 #ifndef WIN32
@@ -74,8 +74,6 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 
     ++s_sendhdr.header.seq;
     rtt_newpack(&s_rttinfo);
-    cssock_getsockname(cli->hsock, &s_sendhdr.addr, &sendlen);
-    s_sendhdr.addrlen = sendlen;
 
     sendagain:
         s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
@@ -107,6 +105,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 		alarm(0);
 
         rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct csmsg_header*)cli->recvbuf)->header.ts);
+        csmsg_copyaddr((struct csmsg_header*)cli->recvbuf, servaddr, addrlen);
 
         return recvbytes - sizeof(struct csmsg_header);
 }

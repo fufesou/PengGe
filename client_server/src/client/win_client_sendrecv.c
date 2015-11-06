@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
- * @modified  Fri 2015-11-06 01:11:52 (+0800)
+ * @modified  周五 2015-11-06 12:14:19 中国标准时间
  */
 
 #ifdef WIN32
@@ -17,6 +17,7 @@
 #include  <stdint.h>
 #include  <string.h>
 #include    "macros.h"
+#include    "timespan.h"
 #include    "unprtt.h"
 #include    "sock_types.h"
 #include    "lightthread.h"
@@ -34,24 +35,23 @@ extern "C" {
 
 #define RTT_DEBUG
 
-#define RECV_TIMEOUT 1
-#define RECV_OK 2
-#define RECV_RESEND 3
-static int s_recv_stat = 0;
-
 static struct rtt_info s_rttinfo;
 static int s_rttinit = 0;
 
-static int s_event_timeout = 0;
+#define RECV_TIMEOUT -1
+#define RECV_RESEND 1
+#define RECV_OK 0
+
+static int s_recv_stat = RECV_RESEND;
+static cstimelong_t s_recvbegin;
+static int s_recvtimer;
 
 static csmutex_t s_mutex = 0;
 static struct csmsg_header s_sendhdr;
-static MMRESULT s_timeevent = 0;
 
 static int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes);
-static void s_recvmsg_fail(UINT, UINT, DWORD_PTR, DWORD_PTR, DWORD_PTR);
-static void s_start_timeevent(int msec);
-static void s_kill_timeevent(void);
+static void s_reset_recvtimer(void);
+static int s_recv_elapsed(void);
 
 #ifdef __cplusplus
 }
@@ -81,19 +81,16 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
     s_sendhdr.addrlen = sendlen;
 
     s_recv_stat = RECV_RESEND;
-    while (s_recv_stat != RECV_OK && s_recv_stat != RECV_TIMEOUT) {
-        if (s_recv_stat == RECV_RESEND) {
-            s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
-            s_sendhdr.numbytes = strlen(cli->sendbuf) + 1;
-            csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
-            if (SOCKET_ERROR == sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + s_sendhdr.numbytes, 0, servaddr, addrlen)) {
-                fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->msgheader, cssock_get_last_error());
-                return -2;
-            }
-
-            s_recv_stat = 0;
-            s_start_timeevent(rtt_start(&s_rttinfo));
+    while (RECV_RESEND == s_recv_stat) {
+        s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
+        s_sendhdr.numbytes = strlen(cli->sendbuf) + 1;
+        csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
+        if (SOCKET_ERROR == sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + s_sendhdr.numbytes, 0, servaddr, addrlen)) {
+            fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->msgheader, cssock_get_last_error());
+            return -2;
         }
+
+        s_reset_recvtimer();
         if ((recvbytes = s_recvmsg(cli->hsock, cli->recvbuf, sizeof(cli->recvbuf))) == -3) {
             return -3;
         }
@@ -105,6 +102,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
     }
 
     rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct csmsg_header*)cli->recvbuf)->header.ts);
+    csmsg_copyaddr((struct csmsg_header*)cli->recvbuf, servaddr, addrlen);
 
     return recvbytes - sizeof(struct csmsg_header);
 }
@@ -115,10 +113,10 @@ int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
     ssize_t recvbytes = -1;
 
     while (1) {
-        if (s_event_timeout) {
+        if (s_recv_elapsed()) {
             if (rtt_timeout(&s_rttinfo) < 0) {
-            printf("no response from server, giving up.\n");
-            s_recv_stat = RECV_TIMEOUT;
+                printf("no response from server, giving up.\n");
+                s_recv_stat = RECV_TIMEOUT;
             } else {
                 s_recv_stat = RECV_RESEND;
             }
@@ -126,48 +124,33 @@ int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
         }
 
         if ((recvbytes = recvfrom(hsock, inmsg, inbytes, 0, NULL, NULL)) == -1) {
-            if ((errcode = cssock_get_last_error()) == WSAEWOULDBLOCK) {
-                printf("non-blocking option is set, recve again.\n");
+            errcode = cssock_get_last_error();
+            if (ETRYAGAIN(errcode)) {
                 continue;
             } else {
                 fprintf(stderr, "recvfrom() fail, error code: %d", errcode);
-                s_kill_timeevent();
                 return -3;
             }
         } else if (recvbytes > (ssize_t)sizeof(struct csmsg_header) &&
             ((struct csmsg_header*)inmsg)->header.seq == s_sendhdr.header.seq) {
 
             s_recv_stat = RECV_OK;
-            s_kill_timeevent();
             return recvbytes;
         }
 
     }
 }
 
-void s_start_timeevent(int msec)
+void s_reset_recvtimer(void)
 {
-    s_timeevent = timeSetEvent(msec, 500, (LPTIMECALLBACK)s_recvmsg_fail, 0, TIME_CALLBACK_FUNCTION | TIME_ONESHOT);
-    s_event_timeout = 0;
+    cstimelong_cur(&s_recvbegin);
+    s_recvtimer = rtt_start(&s_rttinfo);
 }
 
-void s_recvmsg_fail(UINT timer_id, UINT msg, DWORD_PTR user_data, DWORD_PTR dw1, DWORD_PTR dw2)
+int s_recv_elapsed(void)
 {
-    (void)timer_id;
-    (void)msg;
-    (void)user_data;
-    (void)dw1;
-    (void)dw2;
-
-    s_event_timeout = 1;
-}
-
-void s_kill_timeevent()
-{
-    if (s_timeevent) {
-        timeKillEvent(s_timeevent);
-        s_timeevent = 0;
-    }
+    s_recvtimer -= (int)cstimelong_span_sec(&s_recvbegin);
+    return (s_recvtimer <= 0);
 }
 
 void cssendrecv_init(void)

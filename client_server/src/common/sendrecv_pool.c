@@ -113,41 +113,16 @@ void s_clearpool(struct cssendrecv_pool* pool)
 
 char* cspool_pushitem(struct cssendrecv_pool* pool, struct array_buf* buf, char* item)
 {
-    if (pool->use_sem_in_pool && buf == (&pool->filled_buf)) {
-        if (cssem_post(&pool->hsem_filled) != 0) {
-            return NULL;
-        }
-    }
-
-#ifdef _DEBUG
-    {
-        static int pushcount = 0;
-        printf("pushcount: %d.\n", ++pushcount);
-    }
-#endif
-
     csmutex_lock(pool->hmutex);
     item = buf->push_item(buf, item);
     csmutex_unlock(pool->hmutex);
+
     return item;
 }
 
 char* cspool_pullitem(struct cssendrecv_pool* pool, struct array_buf* buf)
 {
     char* item;
-
-    if (pool->use_sem_in_pool && buf == (&pool->filled_buf)) {
-        if (cssem_wait(&pool->hsem_filled) != 0) {
-            return NULL;
-        }
-    }
-
-#ifdef _DEBUG
-    {
-        static int pullcount = 0;
-        printf("pullcount: %d.\n", ++pullcount);
-    }
-#endif
 
     csmutex_lock(pool->hmutex);
     item = buf->pull_item(buf);

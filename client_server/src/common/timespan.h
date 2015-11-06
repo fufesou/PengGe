@@ -12,11 +12,11 @@
 
 #ifdef WIN32
 #include  <Windows.h>
-#define timelong_t ULARGE_INTEGER
+#define cstimelong_t ULARGE_INTEGER
 #else
 #include  <sys/time.h>
 #include  <linux/errno.h>
-#define timelong_t struct timeval
+#define cstimelong_t struct timeval
 #endif
 
 #ifdef __cplusplus
@@ -25,10 +25,10 @@ extern "C"
 #endif
 
 void csgettimeofday(struct timeval* tv, void* tz);
-void get_cur_timelong(timelong_t* tl);
-unsigned long long get_span_microsec(const timelong_t* start);
-unsigned int get_span_millisec(const timelong_t* start);
-unsigned int get_span_sec(const timelong_t* start);
+void cstimelong_cur(cstimelong_t* tl);
+unsigned long long cstimelong_span_microsec(const cstimelong_t* start);
+unsigned int cstimelong_span_millisec(const cstimelong_t* start);
+unsigned int cstimelong_span_sec(const cstimelong_t* start);
 
 #ifdef __cplusplus
 }

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Sat 2015-10-31 19:18:29 (+0800)
+ * @modified  周五 2015-11-06 12:04:44 中国标准时间
  */
 
 #ifdef WIN32
@@ -27,6 +27,15 @@
 #include    "sendrecv_pool.h"
 #include    "msgwrap.h"
 
+
+int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int addrlen)
+{
+    if (cs_memcpy(&msghdr->addr, sizeof(msghdr->addr), addr, addrlen) != 0) {
+        return 1;
+    }
+    msghdr->addrlen = addrlen;
+    return 0;
+}
 
 int csmsg_merge(const struct csmsg_header* msgheader, const char* data, char* unit, int unitlen)
 {

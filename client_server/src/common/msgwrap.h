@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Wed 2015-11-04 19:13:52 (+0800)
+ * @modified  周五 2015-11-06 12:02:41 中国标准时间
  */
 
 #ifndef  MSGUNIT_H
@@ -25,6 +25,17 @@ struct csmsg_header {
     int numbytes;
 };
 #pragma pack()
+
+/**
+ * @brief  csmsg_copyaddr This function set the value of address information.
+ *
+ * @param msghdr
+ * @param addr
+ * @param addrlen
+ *
+ * @return   0 if succeed, 1 if fail.
+ */
+int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int addrlen);
 
 /**
  * @brief  csmsg_merge 

@@ -13,7 +13,6 @@
 #define BLOCK_RW        0
 #define NONBLICK_RW     0
 #define SEND_NOSIGNAL   0
-#define ETRYAGAIN(x) ((x)==WSAEWOULDBLOCK)
 #else
 #include  <errno.h>
 #include  <unistd.h>
@@ -21,11 +20,9 @@
 #include  <sys/socket.h>
 #include  <netinet/in.h>
 #include  <arpa/inet.h>
-#define IS_SOCK_HANDLE(x) ((x)>0)
 #define BLOCK_RW        MSG_WAITALL
 #define NONBLOCK_RW     MSG_DONTWAIT
 #define SEND_NOSIGNAL   MSG_NOSIGNAL
-#define ETRYAGAIN(x) ((x)==EWOULDBLOCK)
 #endif
 
 #include  <stdint.h>

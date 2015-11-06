@@ -4,7 +4,7 @@
  * @author cxl
  * @version 0.1
  * @date 2015-09-28
- * @modified  Fri 2015-11-06 01:15:00 (+0800)
+ * @modified  周五 2015-11-06 12:13:10 中国标准时间
  */
 
 #ifdef WIN32
@@ -69,14 +69,25 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 
 ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
 {
+    struct sockaddr cliaddr;
+    cssocklen_t addrlen = sizeof(cliaddr);
     ssize_t recvbytes;
-    if ((recvbytes = recvfrom(handle, inbuf, inbytes, 0, NULL, NULL)) < 0) {
+
+    if ((recvbytes = recvfrom(handle, inbuf, inbytes, 0, &cliaddr, &addrlen)) < 0) {
         fprintf(stderr, "server: recvfrom() fail, error code: %d.\n", cssock_get_last_error());
         return -1;
     } else if (recvbytes == 0) {
         fprintf(stdout, "server: peer shutdown, recvfrom() failed.\n");
         return 0;
     }
+    csmsg_copyaddr((struct csmsg_header*)inbuf, &cliaddr, addrlen);
+    ((struct csmsg_header*)inbuf)->addrlen = addrlen;
+
+#ifdef _DEBUG
+    printf("server: recefrom() client ip: %s, port: %d.\n",
+           inet_ntoa(((struct sockaddr_in*)&cliaddr)->sin_addr),
+           htons(((struct sockaddr_in*)&cliaddr)->sin_port));
+#endif
 
 #ifdef _DEBUG
     {
