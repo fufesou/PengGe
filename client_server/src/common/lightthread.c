@@ -294,13 +294,13 @@ int csmutex_lock(csmutex_t handle)
 
 int csmutex_try_lock(csmutex_t handle, unsigned int msec)
 {
-	timelong_t start;
+    cstimelong_t start;
 	int rt;
 
 	if ((rt = pthread_mutex_trylock(&handle)) == EBUSY) {
-		get_cur_timelong(&start);
+        cstimelong_cur(&start);
 		while (rt == EBUSY) {
-			if (get_span_millisec(&start) > msec) {
+            if (cstimelong_span_millisec(&start) > msec) {
 				rt = -1;
 			} else {
 				usleep(2000);

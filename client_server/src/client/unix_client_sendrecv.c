@@ -60,7 +60,6 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 {
 	char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
-    cssocklen_t sendlen;
 
     if (s_rttinit == 0) {
         rtt_init(&s_rttinfo);
@@ -96,7 +95,6 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 		do {
             if ((recvbytes = recvfrom(cli->hsock, cli->recvbuf, sizeof(cli->recvbuf), 0, NULL, NULL)) == -1) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                    printf("non-blocking option is set, recve again.\n");
                     continue;
                 }
             }

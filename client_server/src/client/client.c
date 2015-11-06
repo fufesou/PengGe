@@ -127,6 +127,7 @@ void s_enter_init_session(struct csclient* cli, FILE* fp, const struct sockaddr*
 void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     ssize_t numbytes;
+    char* msgdata = NULL;
 
     printf("%s: switch to login interface.\n", cli->msgheader);
 
@@ -141,11 +142,13 @@ void s_enter_login_session(struct csclient* cli, FILE* fp, const struct sockaddr
             }
             cli->recvbuf[numbytes] = 0;
 
-            if (strncmp(cli->recvbuf, g_logoutmsg_header, strlen(g_logoutmsg_header) + 1) == 0) {
+            msgdata = cli->recvbuf + sizeof(struct csmsg_header);
+            if (strncmp(msgdata, g_logoutmsg_header, strlen(g_logoutmsg_header) + 1) == 0) {
                 printf("%s: exit login interface.\n", cli->msgheader);
                 break;
             } else {
-                fputs(cli->recvbuf, stdout);
+                fputs(msgdata, stdout);
+                fflush(stdout);
             }
         }
     }
