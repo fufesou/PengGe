@@ -102,7 +102,6 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
 void csserver_send(cssock_t handle, void* outbuf)
 {
     ssize_t sendbytes;
-    cssocklen_t sendlen;
 	struct csmsg_header* msghdr = NULL;
 
     msghdr = (struct csmsg_header*)outbuf;
@@ -112,9 +111,6 @@ void csserver_send(cssock_t handle, void* outbuf)
            inet_ntoa(((struct sockaddr_in*)&msghdr->addr)->sin_addr),
            htons(((struct sockaddr_in*)&msghdr->addr)->sin_port));
 #endif
-
-    cssock_getsockname(handle, &msghdr->addr, &sendlen);
-    msghdr->addrlen = sendlen;
 
     sendbytes = sendto(handle, outbuf, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
     if (sendbytes < 0) {
