@@ -86,7 +86,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
         s_sendhdr.numbytes = strlen(cli->sendbuf) + 1;
         csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
         if (SOCKET_ERROR == sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + s_sendhdr.numbytes, 0, servaddr, addrlen)) {
-            fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->msgheader, cssock_get_last_error());
+            fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->prompt, cssock_get_last_error());
             return -2;
         }
 

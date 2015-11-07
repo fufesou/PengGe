@@ -19,6 +19,7 @@
 #endif
 
 #include  <stdio.h>
+#include  <stdint.h>
 #include  <semaphore.h>
 #include    "bufarray.h"
 #include    "sock_types.h"
