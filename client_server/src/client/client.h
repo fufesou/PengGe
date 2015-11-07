@@ -1,10 +1,10 @@
 /**
  * @file client.h
  * @brief This file provide the interfaces of udp client.
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Tue 2015-11-03 19:15:11 (+0800)
+ * @modified  Sat 2015-11-07 15:59:14 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -23,6 +23,8 @@ extern "C" {
  */
 struct csclient
 {
+	int loggedin;
+
     cssock_t hsock;
 
     /**
@@ -34,18 +36,24 @@ struct csclient
      * @brief msgheader is the string that print before message.
      * For client, the msgheader is "client", the output of client look like "clinet: xxx".
      */
-    char* msgheader;
+    char* prompt;
 
     /**
      * @brief sendbuf is the buffer to hold out message.
+	 *
+	 * @todo make sendbuf a pointer, and configure the length of sendbuf by user.
      */
-    char sendbuf[1024];
+    char sendbuf[MAX_MSG_LEN];
+	int len_senbuf;
 
     /**
      * @brief sendbuf is the buffer to hold the message from server.
      * If size of message from server is greater than 1024 bytes, the client will cut off the tail contents and puts worning.
+	 *
+	 * @todo make recvbuf a pointer, and configure the length of recvbuf by user.
      */
-    char recvbuf[1024];
+    char recvbuf[MAX_MSG_LEN];
+	int len_recvbuf;
  };
 
 
@@ -62,6 +70,13 @@ struct csclient
  * @sa cssock_block cssock_open
  */
 void csclient_init(struct csclient* cli, int tcpudp);
+
+/**
+ * @brief  csclient_clear  There may be some clear works after communication, such as free the memory.
+ *
+ * @param cli
+ */
+void csclient_clear(struct csclient* cli);
 
 void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
@@ -81,14 +96,25 @@ void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, css
 int csclient_print(const struct csclient* cli);
 
 /**
- * @brief  csclient_communicate is the interface to communicate with server.
+ * @brief  csclient_udp This function process udp communication with server. This function call csclient_udp_once in a loop.
  *
  * @param cli
  * @param fp is the FILE pointer where input data comes from.
  * @param servaddr
  * @param addrlen
+ *
+ * @sa csclient_udp_once
  */
-void csclient_communicate(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
+void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
+
+/**
+ * @brief  csclient_udp_once This function process udp send&recv one time.
+ *
+ * @param cli cli has already been filled with data(end with '\0') to send.
+ * @param servaddr
+ * @param addrlen
+ */
+void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_sendrecv 
@@ -113,7 +139,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 void cssendrecv_init(void);
 
 /**
- * @brief cssendrecv_clear This function must be called before client end sending and receiving.
+ * @brief cssendrecv_clear This function must be called after client communication done.
  */
 void cssendrecv_clear(void);
 

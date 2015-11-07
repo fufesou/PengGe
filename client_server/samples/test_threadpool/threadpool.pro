@@ -20,7 +20,7 @@ SOURCES += \
     ../../src/common/list.c \
     ../../src/common/msgwrap.c \
     ../../src/common/rtt.c \
-    ../../src/common/sendrecv_pool.c \
+    ../../src/common/msgpool.c \
     ../../src/common/sock_wrap.c \
     ../../src/common/timespan.c \
     ../../src/common/utility_wrap.c
@@ -33,7 +33,7 @@ HEADERS += \
     ../../src/common/list.h \
     ../../src/common/macros.h \
     ../../src/common/msgwrap.h \
-    ../../src/common/sendrecv_pool.h \
+    ../../src/common/msgpool.h \
     ../../src/common/sock_types.h \
     ../../src/common/sock_wrap.h \
     ../../src/common/timespan.h \

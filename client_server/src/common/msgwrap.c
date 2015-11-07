@@ -24,7 +24,7 @@
 #include	"sock_types.h"
 #include    "lightthread.h"
 #include    "bufarray.h"
-#include    "sendrecv_pool.h"
+#include    "msgpool.h"
 #include    "msgwrap.h"
 
 
@@ -73,7 +73,7 @@ int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* d
     return 0;
 }
 
-int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, struct cssendrecv_pool* pool)
+int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, struct csmsgpool* pool)
 {
     char* bufitem = cspool_pullitem(pool, &pool->empty_buf);
 
@@ -91,7 +91,7 @@ int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, stru
     return 0;
 }
 
-int csmsg_pull_from_pool(char* data, int datalen, struct csmsg_header* msgheader, struct cssendrecv_pool* pool)
+int csmsg_pull_from_pool(char* data, int datalen, struct csmsg_header* msgheader, struct csmsgpool* pool)
 {
     char* bufitem = cspool_pullitem(pool, &pool->filled_buf);
 

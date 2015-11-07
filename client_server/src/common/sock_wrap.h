@@ -1,7 +1,7 @@
 /**
  * @file sock_wrap.h
  * @brief 
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
  * @modified  Fri 2015-11-06 01:06:43 (+0800)

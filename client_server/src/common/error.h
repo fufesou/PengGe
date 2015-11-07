@@ -1,7 +1,7 @@
 /**
  * @file error.h
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-24
  * @modified  Tue 2015-11-03 19:24:51 (+0800)

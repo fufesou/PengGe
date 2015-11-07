@@ -1,7 +1,7 @@
 /**
  * @file utility_wrap.c
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-29
  * @modified  Sat 2015-10-31 17:32:24 (+0800)

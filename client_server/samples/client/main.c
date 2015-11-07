@@ -21,6 +21,7 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <stdint.h>
+#include    "macros.h"
 #include    "sock_types.h"
 #include    "sock_wrap.h"
 #include    "client.h"
@@ -42,7 +43,7 @@ int main(int argc, char* argv[])
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons((unsigned short)atoi(argv[1]));
     serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-    csclient_communicate(&udpclient, stdin, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+    csclient_udp(&udpclient, stdin, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 
 	cssock_envclear();
 

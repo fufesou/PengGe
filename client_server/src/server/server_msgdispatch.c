@@ -1,10 +1,10 @@
 /**
- * @file msgdispatch.c
+ * @file server_msgdispatch.c
  * @brief 
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-18
- * @modified  Wed 2015-11-04 18:53:51 (+0800)
+ * @modified  Sat 2015-11-07 13:22:11 (+0800)
  */
 
 #ifdef WIN32
@@ -21,9 +21,8 @@
 #include    "sock_types.h"
 #include    "utility_wrap.h"
 #include    "bufarray.h"
-#include    "sendrecv_pool.h"
+#include    "msgpool.h"
 #include    "msgwrap.h"
-#include    "msgdispatch.h"
 
 
 #ifdef __cplusplus
@@ -46,8 +45,10 @@ static void s_process_communication(char* inmsg, char* outmsg, int* outmsglen);
 #endif
 
 
-void csserver_process_msg(char* inmsg, char* outmsg, int* outmsglen)
+void csserver_process_msg(char* inmsg, char* outmsg, int* outmsglen, void* unused)
 {
+	(void)unused;
+
     char* msgbegin = inmsg + sizeof(struct csmsg_header);
     s_msghdr = (const struct csmsg_header*)inmsg;
 

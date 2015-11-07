@@ -1,7 +1,7 @@
 /**
  * @file client_2.c
  * @brief simple client test
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-21
  */

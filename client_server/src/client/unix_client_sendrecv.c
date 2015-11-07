@@ -25,7 +25,7 @@
 #include    "lightthread.h"
 #include    "sock_wrap.h"
 #include    "bufarray.h"
-#include    "sendrecv_pool.h"
+#include    "msgpool.h"
 #include    "msgwrap.h"
 #include    "utility_wrap.h"
 #include    "client.h"

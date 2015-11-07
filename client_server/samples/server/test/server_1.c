@@ -1,7 +1,7 @@
 /**
  * @file server_1.c
  * @brief 
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
  */

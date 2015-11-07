@@ -1,14 +1,14 @@
 /**
- * @file sendrecv_pool.h
+ * @file msgpool.h
  * @brief  
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  周四 2015-11-05 10:14:57 中国标准时间
+ * @modified  Sat 2015-11-07 14:52:40 (+0800)
  */
 
-#ifndef  SENDRECV_POOL_H
-#define  SENDRECV_POOL_H
+#ifndef  MSGPOOL_H
+#define  MSGPOOL_H
 
 #include    "macros.h"
 
@@ -17,12 +17,12 @@ extern "C" {
 #endif
 
 /**
- * @brief cssendrecv_pool contains basic members for send receive buffer and thread operations.
- * The members of struct cssendrecv_pool should be set with configuration.
+ * @brief csmsgpool contains basic members for send receive buffer and thread operations.
+ * The members of struct csmsgpool should be set with configuration.
  *
  * @todo write a cofigure parser to set the members
  */
-struct cssendrecv_pool {
+struct csmsgpool {
     int num_thread;
     int len_item;
     int num_item;
@@ -45,7 +45,27 @@ struct cssendrecv_pool {
     csthread_t* hthread;
 
     /**
-     * @brief hsem_filled Be careful, cssendrecv_pool call cssem_wait() and cssem_post() by default.
+     * @brief threadexit threadexit is used to make thread exit normally.
+     * If threadexit is 1, thread will exit;
+     * if threadexit is 0, thread keep on running.
+     *
+     * @note thread entry must test this value to determine whether exit or not, as the following code shows.
+     *
+     * @code
+     * func()
+     * {
+     *     while (1) {
+     *         if (threadexit) {
+     *             break;
+     *         }
+     *     }
+     * }
+     * @endcode
+     */
+    int threadexit;
+
+    /**
+     * @brief hsem_filled Be careful, csmsgpool call cssem_wait() and cssem_post() by default.
      */
     cssem_t hsem_filled;
 
@@ -56,29 +76,25 @@ struct cssendrecv_pool {
      * user shoud call semaphore wait and post explicit while calling cspool_pullitem and cspool_pushitem.
      */
     int use_sem_in_pool;
-
-    /**
-     * @brief proc
-     */
-    csthread_proc_t proc;
 };
 
 /**
  * @brief cspool_init This function must be called before any of pool operation begins.
- * @param pool the operating bool
+ * @param pool the operating pool
  * @param itemlen length for each buffer item.
  * @param itemnum number of buffer items.
  * @param threadnum number of threads that the buffer contains.
  * @param pfunc the initial operation that each thread will operate once created.
+ * @param pargs this args of pfunc.
  */
-void cspool_init(struct cssendrecv_pool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc);
+void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc, void* pargs);
 
 /**
  * @brief  cspool_clear This function will do some clear works such as free memory.
  *
  * @param pool
  */
-void cspool_clear(struct cssendrecv_pool* pool);
+void cspool_clear(struct csmsgpool* pool);
 
 /**
  * @brief  cspool_pushitem 
@@ -89,7 +105,7 @@ void cspool_clear(struct cssendrecv_pool* pool);
  *
  * @return   NULL if failed, else success.
  */
-char* cspool_pushitem(struct cssendrecv_pool* pool, struct array_buf* buf, char* item);
+char* cspool_pushitem(struct csmsgpool* pool, struct array_buf* buf, char* item);
 
 /**
  * @brief  cspool_pullitem 
@@ -99,7 +115,7 @@ char* cspool_pushitem(struct cssendrecv_pool* pool, struct array_buf* buf, char*
  *
  * @return   NULL if failed, else success.
  */
-char* cspool_pullitem(struct cssendrecv_pool* pool, struct array_buf* buf);
+char* cspool_pullitem(struct csmsgpool* pool, struct array_buf* buf);
 
 /**
  * @brief  cspool_pushdata This function push one buffer item data to pool. This procedure can be splitted into two steps:
@@ -116,7 +132,7 @@ char* cspool_pullitem(struct cssendrecv_pool* pool, struct array_buf* buf);
  * 1 if fail. There is no empty buffer.
  * -1 if fail. copy data error.
  */
-int cspool_pushdata(struct cssendrecv_pool* pool, const char* data, int datalen);
+int cspool_pushdata(struct csmsgpool* pool, const char* data, int datalen);
 
 /**
  * @brief  cspool_pulldata This function pull one buffer item data from filled buffer and move the item into the empty buffer.
@@ -131,11 +147,11 @@ int cspool_pushdata(struct cssendrecv_pool* pool, const char* data, int datalen)
  * 2 if wait semaphore failed.
  * -1 if size of data is not large enough.
  */
-int cspool_pulldata(struct cssendrecv_pool* pool, char* data, int datalen);
+int cspool_pulldata(struct csmsgpool* pool, char* data, int datalen);
 
 #ifdef __cplusplus
 }
 #endif
 
 
-#endif  // SENDRECV_POOL_H
+#endif  // MSGPOOL_H

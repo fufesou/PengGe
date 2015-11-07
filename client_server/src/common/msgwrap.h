@@ -72,7 +72,7 @@ int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* d
 
 /**
  * @brief  csmsg_push2pool will firstly copy message data and the unit header to single char array. And 
- * then push the single char array to struct cssendrecv_pool. The procedure can be splitted into 
+ * then push the single char array to struct csmsgpool. The procedure can be splitted into 
  * three steps:
  * 1. take out one item from empty buffer in the pool.
  * 2. copy data and msgheader to the item.
@@ -86,7 +86,7 @@ int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* d
  * 0 if success. There is en empty buffer for operation.
  * 1 if fail. There is no empty buffer left.
  */
-int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, struct cssendrecv_pool* pool);
+int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, struct csmsgpool* pool);
 
 /**
  * @brief  csmsg_pull_from_pool works the opposite as csmsg_push2pool does. The procedure can be splitted into
@@ -106,7 +106,7 @@ int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, stru
  *
  * @see csmsg_push2pool
  */
-int csmsg_pull_from_pool(char* data, int datalen, struct csmsg_header* msgheader, struct cssendrecv_pool* pool);
+int csmsg_pull_from_pool(char* data, int datalen, struct csmsg_header* msgheader, struct csmsgpool* pool);
 
 #ifdef __cplusplus
 }

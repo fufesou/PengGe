@@ -1,7 +1,7 @@
 /**
  * @file server.h
  * @brief This file provide some helper functions for server.
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-26
  * @modified  Fri 2015-11-06 01:14:04 (+0800)
@@ -19,7 +19,7 @@ struct csserver
 {
     cssock_t hsock;
     struct sockaddr_in sa_in;
-    char* msgheader;
+    char* prompt;
 };
 
 /**

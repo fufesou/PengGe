@@ -1,7 +1,7 @@
 /**
  * @file lightthread.h
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-26
  * @modified  2015-10-28 00:56:06 (+0800)

@@ -1,10 +1,10 @@
 /**
  * @file server.c
  * @brief  The functions prefexed with "s_" are static functions.
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-28
- * @modified  周五 2015-11-06 12:13:10 中国标准时间
+ * @modified  Sat 2015-11-07 11:50:02 (+0800)
  */
 
 #ifdef WIN32
@@ -28,7 +28,7 @@
 #include    "sock_types.h"
 #include    "lightthread.h"
 #include    "sock_wrap.h"
-#include    "sendrecv_pool.h"
+#include    "msgpool.h"
 #include    "msgwrap.h"
 #include 	"server.h"
 
@@ -37,7 +37,7 @@
 extern "C" {
 #endif
 
-static char* s_serv_msgheader = "server:";
+static char* s_serv_prompt = "server:";
 
 #ifdef __cplusplus
 }
@@ -48,15 +48,15 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 {
 	int error;
 
-	serv->msgheader = s_serv_msgheader;
+    serv->prompt = s_serv_prompt;
 
     serv->hsock = cssock_open(tcpudp);
-    printf("%s hsock() is OK!\n", serv->msgheader);
+    printf("%s hsock() is OK!\n", serv->prompt);
 
     if (port == 0) {
         cssock_close(serv->hsock);
 		error = 1;
-        csfatal_ext(&error, cserr_exit, "%s invalid port.\n", serv->msgheader);
+        csfatal_ext(&error, cserr_exit, "%s invalid port.\n", serv->prompt);
     }
 
     serv->sa_in.sin_family = AF_INET;
@@ -64,7 +64,7 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
     serv->sa_in.sin_addr.s_addr = addr;
 
 	cssock_bind(serv->hsock, (struct sockaddr*)&serv->sa_in, sizeof(struct sockaddr_in));
-	printf("%s bind() is OK\n", serv->msgheader);
+	printf("%s bind() is OK\n", serv->prompt);
 }
 
 ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
@@ -99,12 +99,12 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
     return recvbytes - sizeof(struct csmsg_header);
 }
 
-void csserver_send(cssock_t handle, void* outbuf)
+void csserver_send(cssock_t handle, void* outmsg)
 {
     ssize_t sendbytes;
 	struct csmsg_header* msghdr = NULL;
 
-    msghdr = (struct csmsg_header*)outbuf;
+    msghdr = (struct csmsg_header*)outmsg;
 
 #ifdef _DEBUG
     printf("server: client ip: %s, port: %d.\n",
@@ -112,7 +112,7 @@ void csserver_send(cssock_t handle, void* outbuf)
            htons(((struct sockaddr_in*)&msghdr->addr)->sin_port));
 #endif
 
-    sendbytes = sendto(handle, outbuf, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
+    sendbytes = sendto(handle, outmsg, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
     if (sendbytes < 0) {
         fprintf(stderr, "server: sendto() fail, error code: %d.\n", cssock_get_last_error());
     } else if (sendbytes != ((ssize_t)sizeof(struct csmsg_header) + msghdr->numbytes)) {

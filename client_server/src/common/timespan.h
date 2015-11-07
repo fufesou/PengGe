@@ -1,7 +1,7 @@
 /**
  * @file timespan.h
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-26
  * @modified  Sat 2015-10-31 19:10:43 (+0800)

@@ -1,10 +1,10 @@
 /**
- * @file cssendrecv_pool.c
+ * @file msgpool.c
  * @brief  
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Sat 2015-10-31 15:43:58 (+0800)
+ * @modified  Sat 2015-11-07 14:53:04 (+0800)
  */
 
 #ifdef WIN32
@@ -23,7 +23,7 @@
 #include    "bufarray.h"
 #include    "sock_types.h"
 #include    "lightthread.h"
-#include    "sendrecv_pool.h"
+#include    "msgpool.h"
 
 
 #ifdef __cplusplus
@@ -34,6 +34,8 @@ extern "C" {
  * @brief  s_initpool This function will initialize buffers, create semaphore and threads.
  *
  * @param pool The send or receive pool to be initialized.
+ * @proc  the function entry of thread.
+ * @pargs the parameter of proc.
  *
  * @note Correct sequence for initialize is required here.
  * 1. buffers
@@ -41,14 +43,14 @@ extern "C" {
  * 3. semaphare
  * 4. threads
  */
-static void s_initpool(struct cssendrecv_pool* pool);
+static void s_initpool(struct csmsgpool* pool, csthread_proc_t proc, void* pargs);
 
 /**
  * @brief  s_clearpool This function will do some clear works such as free memory.
  *
  * @param pool The send or receive pool to clear.
  */
-static void s_clearpool(struct cssendrecv_pool* pool);
+static void s_clearpool(struct csmsgpool* pool);
 
 
 #ifdef __cplusplus
@@ -56,7 +58,7 @@ static void s_clearpool(struct cssendrecv_pool* pool);
 #endif
 
 
-void cspool_init(struct cssendrecv_pool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc)
+void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc, void* pargs)
 {
 #ifdef _CHECK_ARGS
     if (pool == NULL || pfunc == NULL) return 0;
@@ -65,17 +67,17 @@ void cspool_init(struct cssendrecv_pool* pool, int itemlen, int itemnum, int thr
     pool->num_item = itemnum;
     pool->num_thread = threadnum;
     pool->socket = socket;
-    pool->proc = proc;
+    pool->threadexit = 0;
 
-	s_initpool(pool);
+	s_initpool(pool, proc, pargs);
 }
 
-void cspool_clear(struct cssendrecv_pool* pool)
+void cspool_clear(struct csmsgpool* pool)
 {
 	s_clearpool(pool);
 }
 
-void s_initpool(struct cssendrecv_pool* pool)
+void s_initpool(struct csmsgpool* pool, csthread_proc_t proc, void* pargs)
 {
     const int init_fillednum = 0;
     int num_items;
@@ -96,13 +98,23 @@ void s_initpool(struct cssendrecv_pool* pool)
 
     pool->hthread = (csthread_t*)malloc(sizeof(csthread_t) * pool->num_thread);
 	for (i=0; i<pool->num_thread; ++i) {
-		csthread_create(pool->proc, NULL, pool->hthread + i);
+		csthread_create(proc, pargs, pool->hthread + i);
 		cssleep(20);
 	}
 }
 
-void s_clearpool(struct cssendrecv_pool* pool)
+void s_clearpool(struct csmsgpool* pool)
 {
+    int i = 0;
+
+    /**
+      * @brief make sure all threads will not block for semaphore.
+      */
+    pool->threadexit = 1;
+    for (; i<pool->num_thread; ++i) {
+        cssem_post(&pool->hsem_filled);
+    }
+
 	csthreadN_wait_terminate(pool->hthread, pool->num_thread);
 	cssem_destroy(&pool->hsem_filled);
 
@@ -111,7 +123,7 @@ void s_clearpool(struct cssendrecv_pool* pool)
 	csmutex_destroy(pool->hmutex);
 }
 
-char* cspool_pushitem(struct cssendrecv_pool* pool, struct array_buf* buf, char* item)
+char* cspool_pushitem(struct csmsgpool* pool, struct array_buf* buf, char* item)
 {
     csmutex_lock(pool->hmutex);
     item = buf->push_item(buf, item);
@@ -120,7 +132,7 @@ char* cspool_pushitem(struct cssendrecv_pool* pool, struct array_buf* buf, char*
     return item;
 }
 
-char* cspool_pullitem(struct cssendrecv_pool* pool, struct array_buf* buf)
+char* cspool_pullitem(struct csmsgpool* pool, struct array_buf* buf)
 {
     char* item;
 
@@ -130,7 +142,7 @@ char* cspool_pullitem(struct cssendrecv_pool* pool, struct array_buf* buf)
     return item;
 }
 
-int cspool_pushdata(struct cssendrecv_pool* pool, const char* data, int datalen)
+int cspool_pushdata(struct csmsgpool* pool, const char* data, int datalen)
 {
     char* poolbuf = NULL;
 
@@ -163,7 +175,7 @@ int cspool_pushdata(struct cssendrecv_pool* pool, const char* data, int datalen)
     return 0;
 }
 
-int cspool_pulldata(struct cssendrecv_pool* pool, char* data, int datalen)
+int cspool_pulldata(struct csmsgpool* pool, char* data, int datalen)
 {
     char* bufitem = NULL;
 

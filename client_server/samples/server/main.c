@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @brief
- * @author cxl
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-25
  * @modified
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
     cssock_envinit();
 
     csserver_init(&udpserver, SOCK_DGRAM, atoi(argv[1]), htonl(INADDR_ANY));
-    cssock_print(udpserver.hsock, udpserver.msgheader);
+    cssock_print(udpserver.hsock, udpserver.prompt);
     csserver_udp(&udpserver);
 
     cssock_envclear();

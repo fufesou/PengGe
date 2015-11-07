@@ -1,7 +1,7 @@
 /**
  * @file list.h
  * @brief  
- * @author cxl, <shuanlongchen@yeah.net>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
  */

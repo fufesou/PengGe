@@ -1,7 +1,7 @@
 /**
  * @file rtt.c
  * @brief This file comes from unp src.
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-31
  */
