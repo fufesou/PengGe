@@ -1,0 +1,85 @@
+\hypertarget{unprtt_8h}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/unprtt.h File Reference}
+\label{unprtt_8h}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/unprtt.\+h@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/unprtt.\+h}}
+
+
+This file comes from \textquotesingle{}U\+N\+I\+X Network Programming\textquotesingle{} source code.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+Include dependency graph for unprtt.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{unprtt_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{unprtt_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structrtt__info}{rtt\+\_\+info}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{unprtt_8h_a003daf6b4ebfd9ade32edfeb677d3f74}{}\#define {\bfseries R\+T\+T\+\_\+\+R\+X\+T\+M\+I\+N}~2	/$\ast$ min retransmit timeout value, in seconds $\ast$/\label{unprtt_8h_a003daf6b4ebfd9ade32edfeb677d3f74}
+
+\item 
+\hypertarget{unprtt_8h_afd5140f29c60ceb157befe7691a097ed}{}\#define {\bfseries R\+T\+T\+\_\+\+R\+X\+T\+M\+A\+X}~60	/$\ast$ max retransmit timeout value, in seconds $\ast$/\label{unprtt_8h_afd5140f29c60ceb157befe7691a097ed}
+
+\item 
+\hypertarget{unprtt_8h_a672e9e317a9d4cb8c9f62b121757e81d}{}\#define {\bfseries R\+T\+T\+\_\+\+M\+A\+X\+N\+R\+E\+X\+M\+T}~3	/$\ast$ max \# times to retransmit $\ast$/\label{unprtt_8h_a672e9e317a9d4cb8c9f62b121757e81d}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{unprtt_8h_a3741468280b31358eb140ec9ad8b7748}{}void {\bfseries rtt\+\_\+debug} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$)\label{unprtt_8h_a3741468280b31358eb140ec9ad8b7748}
+
+\item 
+\hypertarget{unprtt_8h_a0287d720e1beefe26654495345dcfea0}{}void {\bfseries rtt\+\_\+init} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$)\label{unprtt_8h_a0287d720e1beefe26654495345dcfea0}
+
+\item 
+\hypertarget{unprtt_8h_ae4a0c480601fb4e591b734050d18739b}{}void {\bfseries rtt\+\_\+newpack} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$)\label{unprtt_8h_ae4a0c480601fb4e591b734050d18739b}
+
+\item 
+\hypertarget{unprtt_8h_ad78cae7d6369311b9164501a3f8b948a}{}int {\bfseries rtt\+\_\+start} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$)\label{unprtt_8h_ad78cae7d6369311b9164501a3f8b948a}
+
+\item 
+\hypertarget{unprtt_8h_a45423ff010c73c75ecc3d4bf55558682}{}void {\bfseries rtt\+\_\+stop} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$, uint32\+\_\+t)\label{unprtt_8h_a45423ff010c73c75ecc3d4bf55558682}
+
+\item 
+\hypertarget{unprtt_8h_a4e3fbd4c76174a02fc6992f333a90054}{}int {\bfseries rtt\+\_\+timeout} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$)\label{unprtt_8h_a4e3fbd4c76174a02fc6992f333a90054}
+
+\item 
+\hypertarget{unprtt_8h_ae60a79e3fdd3a8c76e2f336d9984498f}{}uint32\+\_\+t {\bfseries rtt\+\_\+ts} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$)\label{unprtt_8h_ae60a79e3fdd3a8c76e2f336d9984498f}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{unprtt_8h_a7c7ad1b4e2182b95b294b91a3b5e2ca2}{}int {\bfseries rtt\+\_\+d\+\_\+flag}\label{unprtt_8h_a7c7ad1b4e2182b95b294b91a3b5e2ca2}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file comes from \textquotesingle{}U\+N\+I\+X Network Programming\textquotesingle{} source code. 
+
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/09 
+\end{DoxyDate}

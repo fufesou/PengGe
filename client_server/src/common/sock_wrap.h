@@ -1,6 +1,6 @@
 /**
  * @file sock_wrap.h
- * @brief 
+ * @brief This file defines some basic wrapper functions of socket.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
@@ -100,7 +100,22 @@ int cssock_block(cssock_t handle, int block);
  */
 int cssock_print(cssock_t handle, const char* header);
 
+/**
+ * @brief cssock_getsockname
+ * @param handle
+ * @param addr
+ * @param addrlen
+ * @return
+ */
 int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
+
+/**
+ * @brief cssock_getpeername
+ * @param handle
+ * @param addr
+ * @param addrlen
+ * @return
+ */
 int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
 
 

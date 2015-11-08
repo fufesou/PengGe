@@ -1,0 +1,70 @@
+\hypertarget{structcsclient}{}\section{csclient Struct Reference}
+\label{structcsclient}\index{csclient@{csclient}}
+
+
+struct csclient contains necessary members and functions for client operations. This struct object must be initialized (by calling csclient\+\_\+init) before any operations applied to it.  
+
+
+
+
+{\ttfamily \#include $<$client.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structcsclient_aa2665ff9ff09e43acae721376c92b9f4}{}int {\bfseries loggedin}\label{structcsclient_aa2665ff9ff09e43acae721376c92b9f4}
+
+\item 
+\hypertarget{structcsclient_ad730beb18ecbbb000950d8e1f7085d85}{}\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} {\bfseries hsock}\label{structcsclient_ad730beb18ecbbb000950d8e1f7085d85}
+
+\item 
+\hypertarget{structcsclient_a5e7b35f2d6dd38bd473ba94e35cbd9eb}{}struct sockaddr\+\_\+in \hyperlink{structcsclient_a5e7b35f2d6dd38bd473ba94e35cbd9eb}{sa\+\_\+in}\label{structcsclient_a5e7b35f2d6dd38bd473ba94e35cbd9eb}
+
+\begin{DoxyCompactList}\small\item\em sockaddr\+\_\+in is the server socket address. \end{DoxyCompactList}\item 
+\hypertarget{structcsclient_a40909df8825a1a5171688d280d98ebdb}{}char $\ast$ \hyperlink{structcsclient_a40909df8825a1a5171688d280d98ebdb}{prompt}\label{structcsclient_a40909df8825a1a5171688d280d98ebdb}
+
+\begin{DoxyCompactList}\small\item\em msgheader is the string that print before message. For client, the msgheader is \char`\"{}client\char`\"{}, the output of client look like \char`\"{}clinet\+: xxx\char`\"{}. \end{DoxyCompactList}\item 
+char \hyperlink{structcsclient_a325006ca2b5e74fe78e00847974234e5}{sendbuf} \mbox{[}M\+A\+X\+\_\+\+M\+S\+G\+\_\+\+L\+E\+N\mbox{]}
+\begin{DoxyCompactList}\small\item\em sendbuf is the buffer to hold out message. \end{DoxyCompactList}\item 
+\hypertarget{structcsclient_a2fd85113ce1bcbea4820f4b43ccdc761}{}int {\bfseries len\+\_\+senbuf}\label{structcsclient_a2fd85113ce1bcbea4820f4b43ccdc761}
+
+\item 
+char \hyperlink{structcsclient_a1ae9e95e2f7cb12d129776b0269ddae0}{recvbuf} \mbox{[}M\+A\+X\+\_\+\+M\+S\+G\+\_\+\+L\+E\+N\mbox{]}
+\begin{DoxyCompactList}\small\item\em sendbuf is the buffer to hold the message from server. If size of message from server is greater than 1024 bytes, the client will cut off the tail contents and puts worning. \end{DoxyCompactList}\item 
+\hypertarget{structcsclient_aad557f6df33e8820d04560ac9cbdfa5f}{}int {\bfseries len\+\_\+recvbuf}\label{structcsclient_aad557f6df33e8820d04560ac9cbdfa5f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+struct csclient contains necessary members and functions for client operations. This struct object must be initialized (by calling csclient\+\_\+init) before any operations applied to it. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{client_8h_a5aa275fcd29cc40dc4e8b04aca4836a8}{csclient\+\_\+init} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structcsclient_a1ae9e95e2f7cb12d129776b0269ddae0}{}\index{csclient@{csclient}!recvbuf@{recvbuf}}
+\index{recvbuf@{recvbuf}!csclient@{csclient}}
+\subsubsection[{recvbuf}]{\setlength{\rightskip}{0pt plus 5cm}char csclient\+::recvbuf\mbox{[}M\+A\+X\+\_\+\+M\+S\+G\+\_\+\+L\+E\+N\mbox{]}}\label{structcsclient_a1ae9e95e2f7cb12d129776b0269ddae0}
+
+
+sendbuf is the buffer to hold the message from server. If size of message from server is greater than 1024 bytes, the client will cut off the tail contents and puts worning. 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000002}{Todo}]make recvbuf a pointer, and configure the length of recvbuf by user. \end{DoxyRefDesc}
+\hypertarget{structcsclient_a325006ca2b5e74fe78e00847974234e5}{}\index{csclient@{csclient}!sendbuf@{sendbuf}}
+\index{sendbuf@{sendbuf}!csclient@{csclient}}
+\subsubsection[{sendbuf}]{\setlength{\rightskip}{0pt plus 5cm}char csclient\+::sendbuf\mbox{[}M\+A\+X\+\_\+\+M\+S\+G\+\_\+\+L\+E\+N\mbox{]}}\label{structcsclient_a325006ca2b5e74fe78e00847974234e5}
+
+
+sendbuf is the buffer to hold out message. 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000001}{Todo}]make sendbuf a pointer, and configure the length of sendbuf by user. \end{DoxyRefDesc}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/\hyperlink{client_8h}{client.\+h}\end{DoxyCompactItemize}

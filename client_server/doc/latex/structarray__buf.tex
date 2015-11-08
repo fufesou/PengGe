@@ -1,0 +1,98 @@
+\hypertarget{structarray__buf}{}\section{array\+\_\+buf Struct Reference}
+\label{structarray__buf}\index{array\+\_\+buf@{array\+\_\+buf}}
+
+
+\hyperlink{structarray__buf}{array\+\_\+buf} is used to hold data. This struct works like circle queue(tail-\/in head-\/out).  
+
+
+
+
+{\ttfamily \#include $<$bufarray.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structarray__buf_a6b3093b6347140edaaa51b676d59c205}{}int \hyperlink{structarray__buf_a6b3093b6347140edaaa51b676d59c205}{head}\label{structarray__buf_a6b3093b6347140edaaa51b676d59c205}
+
+\begin{DoxyCompactList}\small\item\em head index the first item that hold data. \end{DoxyCompactList}\item 
+\hypertarget{structarray__buf_a155c07b4ff22174031f6a05fac14f78f}{}int \hyperlink{structarray__buf_a155c07b4ff22174031f6a05fac14f78f}{tail}\label{structarray__buf_a155c07b4ff22174031f6a05fac14f78f}
+
+\begin{DoxyCompactList}\small\item\em tail index the item after the last item with data. \end{DoxyCompactList}\item 
+\hypertarget{structarray__buf_abb07ebe1e97287e5a217677e90a6e97d}{}int \hyperlink{structarray__buf_abb07ebe1e97287e5a217677e90a6e97d}{len\+\_\+item}\label{structarray__buf_abb07ebe1e97287e5a217677e90a6e97d}
+
+\begin{DoxyCompactList}\small\item\em len\+\_\+item is the length of each buffer item. This value is multiple of 512 right this moment. \end{DoxyCompactList}\item 
+\hypertarget{structarray__buf_abd212c4f472234ddb6f1cf14023a3204}{}int \hyperlink{structarray__buf_abd212c4f472234ddb6f1cf14023a3204}{num\+\_\+item}\label{structarray__buf_abd212c4f472234ddb6f1cf14023a3204}
+
+\begin{DoxyCompactList}\small\item\em num\+\_\+item is the number of items that the buffer hold. Data number is multiple of 4 right this moment. The actual num\+\_\+item value is the number of data item plus one(tail item with no data). \end{DoxyCompactList}\item 
+\hypertarget{structarray__buf_adb2440bd07023c1957827083d1735432}{}char $\ast$$\ast$ \hyperlink{structarray__buf_adb2440bd07023c1957827083d1735432}{data}\label{structarray__buf_adb2440bd07023c1957827083d1735432}
+
+\begin{DoxyCompactList}\small\item\em data is 2\+D array. data holds the indices of items. $\ast$data holds the buffered data. \end{DoxyCompactList}\item 
+char $\ast$($\ast$ \hyperlink{structarray__buf_a0b51cb106346823cf7fb861d1d2b5359}{pull\+\_\+item} )(struct \hyperlink{structarray__buf}{array\+\_\+buf} $\ast$buf)
+\begin{DoxyCompactList}\small\item\em pull\+\_\+item fetch the earliest item in \hyperlink{structarray__buf}{array\+\_\+buf} object. \end{DoxyCompactList}\item 
+char $\ast$($\ast$ \hyperlink{structarray__buf_ab90bdd641479ac916d653df2c3688ebf}{push\+\_\+item} )(struct \hyperlink{structarray__buf}{array\+\_\+buf} $\ast$buf, char $\ast$item)
+\begin{DoxyCompactList}\small\item\em push\+\_\+item will push item in \hyperlink{structarray__buf}{array\+\_\+buf} object. \end{DoxyCompactList}\item 
+void($\ast$ \hyperlink{structarray__buf_af0c784332c37e64228d9ee80cc0bdaed}{clear\+\_\+buf} )(struct \hyperlink{structarray__buf}{array\+\_\+buf} $\ast$buf)
+\begin{DoxyCompactList}\small\item\em clear\+\_\+buf does some clear work for the \hyperlink{structarray__buf}{array\+\_\+buf} object. \end{DoxyCompactList}\item 
+\hypertarget{structarray__buf_ac82dad3541bb02ffffea44b7809ce6b9}{}int($\ast$ {\bfseries get\+\_\+num\+\_\+contained\+\_\+item} )(const struct \hyperlink{structarray__buf}{array\+\_\+buf} $\ast$buf)\label{structarray__buf_ac82dad3541bb02ffffea44b7809ce6b9}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{structarray__buf}{array\+\_\+buf} is used to hold data. This struct works like circle queue(tail-\/in head-\/out). 
+
+\begin{DoxyNote}{Note}
+For function members in the struct, the pointer of current owner struct (commonly the first parameter) can be omited, if i use \textquotesingle{}container of\textquotesingle{} macro the in implementation. This will make the function called more intuitive. However i have not seen this usage, thus i am not sure whether this usage is harmful to efficiency. 
+\end{DoxyNote}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structarray__buf_af0c784332c37e64228d9ee80cc0bdaed}{}\index{array\+\_\+buf@{array\+\_\+buf}!clear\+\_\+buf@{clear\+\_\+buf}}
+\index{clear\+\_\+buf@{clear\+\_\+buf}!array\+\_\+buf@{array\+\_\+buf}}
+\subsubsection[{clear\+\_\+buf}]{\setlength{\rightskip}{0pt plus 5cm}void($\ast$ array\+\_\+buf\+::clear\+\_\+buf) (struct {\bf array\+\_\+buf} $\ast$buf)}\label{structarray__buf_af0c784332c37e64228d9ee80cc0bdaed}
+
+
+clear\+\_\+buf does some clear work for the \hyperlink{structarray__buf}{array\+\_\+buf} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & is the struct \hyperlink{structarray__buf}{array\+\_\+buf} object that will be clear. \\
+\hline
+\end{DoxyParams}
+\hypertarget{structarray__buf_a0b51cb106346823cf7fb861d1d2b5359}{}\index{array\+\_\+buf@{array\+\_\+buf}!pull\+\_\+item@{pull\+\_\+item}}
+\index{pull\+\_\+item@{pull\+\_\+item}!array\+\_\+buf@{array\+\_\+buf}}
+\subsubsection[{pull\+\_\+item}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$($\ast$ array\+\_\+buf\+::pull\+\_\+item) (struct {\bf array\+\_\+buf} $\ast$buf)}\label{structarray__buf_a0b51cb106346823cf7fb861d1d2b5359}
+
+
+pull\+\_\+item fetch the earliest item in \hyperlink{structarray__buf}{array\+\_\+buf} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & is the \hyperlink{structarray__buf}{array\+\_\+buf} object that hold data.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+data to handle. 
+\end{DoxyReturn}
+\hypertarget{structarray__buf_ab90bdd641479ac916d653df2c3688ebf}{}\index{array\+\_\+buf@{array\+\_\+buf}!push\+\_\+item@{push\+\_\+item}}
+\index{push\+\_\+item@{push\+\_\+item}!array\+\_\+buf@{array\+\_\+buf}}
+\subsubsection[{push\+\_\+item}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$($\ast$ array\+\_\+buf\+::push\+\_\+item) (struct {\bf array\+\_\+buf} $\ast$buf, char $\ast$item)}\label{structarray__buf_ab90bdd641479ac916d653df2c3688ebf}
+
+
+push\+\_\+item will push item in \hyperlink{structarray__buf}{array\+\_\+buf} object. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & is the \hyperlink{structarray__buf}{array\+\_\+buf} object that will accept item data. \\
+\hline
+{\em item} & is the data to form new item of buf.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+two difference values. N\+U\+L\+L if push\+\_\+item failed. item if push\+\_\+item succeed. 
+\end{DoxyReturn}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/\hyperlink{bufarray_8h}{bufarray.\+h}\end{DoxyCompactItemize}

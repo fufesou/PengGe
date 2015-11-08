@@ -1,0 +1,128 @@
+\hypertarget{msgpool__dispatch_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/msgpool\+\_\+dispatch.c File Reference}
+\label{msgpool__dispatch_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/msgpool\+\_\+dispatch.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/msgpool\+\_\+dispatch.\+c}}
+{\ttfamily \#include $<$sys/socket.\+h$>$}\\*
+{\ttfamily \#include $<$netinet/in.\+h$>$}\\*
+{\ttfamily \#include $<$pthread.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$semaphore.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}bufarray.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lightthread.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgpool.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgwrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgpool\+\_\+dispatch.\+h\char`\"{}}\\*
+Include dependency graph for msgpool\+\_\+dispatch.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{msgpool__dispatch_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{msgpool__dispatch_8c_a3c48a7dd1f03fccdeae84c9b41a84592}{csmsgpool\+\_\+dispatch\+\_\+init} (struct \hyperlink{structcsmsgpool__dispatch}{csmsgpool\+\_\+dispatch} $\ast$pool\+\_\+dispath)
+\begin{DoxyCompactList}\small\item\em csmsgpool\+\_\+dispatch\+\_\+init This function should be called first of all. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{msgpool__dispatch_8c_a45b7e54d8d8abaa2042d2835dea4c39a}{csmsgpool\+\_\+process} (void $\ast$pool\+\_\+dispath)
+\begin{DoxyCompactList}\small\item\em csmsgpool\+\_\+process This is the thread function of send pool. \end{DoxyCompactList}\item 
+void $\ast$ \hyperlink{msgpool__dispatch_8c_af38f74003b2a41b9b56599b5a87a5cbd}{csmsgpool\+\_\+process\+\_\+af} (void $\ast$pool\+\_\+dispath)
+\begin{DoxyCompactList}\small\item\em csmsgpool\+\_\+process\+\_\+af This is the thread function of recv pool. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/11-\/07 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+Sat 2015-\/11-\/07 15\+:30\+:56 (+0800) 
+\end{DoxyParagraph}
+
+
+\subsection{Function Documentation}
+\hypertarget{msgpool__dispatch_8c_a3c48a7dd1f03fccdeae84c9b41a84592}{}\index{msgpool\+\_\+dispatch.\+c@{msgpool\+\_\+dispatch.\+c}!csmsgpool\+\_\+dispatch\+\_\+init@{csmsgpool\+\_\+dispatch\+\_\+init}}
+\index{csmsgpool\+\_\+dispatch\+\_\+init@{csmsgpool\+\_\+dispatch\+\_\+init}!msgpool\+\_\+dispatch.\+c@{msgpool\+\_\+dispatch.\+c}}
+\subsubsection[{csmsgpool\+\_\+dispatch\+\_\+init(struct csmsgpool\+\_\+dispatch $\ast$pool\+\_\+dispath)}]{\setlength{\rightskip}{0pt plus 5cm}void csmsgpool\+\_\+dispatch\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csmsgpool\+\_\+dispatch} $\ast$}]{pool\+\_\+dispath}
+\end{DoxyParamCaption}
+)}\label{msgpool__dispatch_8c_a3c48a7dd1f03fccdeae84c9b41a84592}
+
+
+csmsgpool\+\_\+dispatch\+\_\+init This function should be called first of all. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool\+\_\+dispath} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{msgpool__dispatch_8c_a45b7e54d8d8abaa2042d2835dea4c39a}{}\index{msgpool\+\_\+dispatch.\+c@{msgpool\+\_\+dispatch.\+c}!csmsgpool\+\_\+process@{csmsgpool\+\_\+process}}
+\index{csmsgpool\+\_\+process@{csmsgpool\+\_\+process}!msgpool\+\_\+dispatch.\+c@{msgpool\+\_\+dispatch.\+c}}
+\subsubsection[{csmsgpool\+\_\+process(void $\ast$pool\+\_\+dispath)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ csmsgpool\+\_\+process (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{pool\+\_\+dispath}
+\end{DoxyParamCaption}
+)}\label{msgpool__dispatch_8c_a45b7e54d8d8abaa2042d2835dea4c39a}
+
+
+csmsgpool\+\_\+process This is the thread function of send pool. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool\+\_\+dispath} & This pointer should be casted from (struct cspool\+\_\+process$\ast$);\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{msgpool__dispatch_8c_a45b7e54d8d8abaa2042d2835dea4c39a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{msgpool__dispatch_8c_af38f74003b2a41b9b56599b5a87a5cbd}{}\index{msgpool\+\_\+dispatch.\+c@{msgpool\+\_\+dispatch.\+c}!csmsgpool\+\_\+process\+\_\+af@{csmsgpool\+\_\+process\+\_\+af}}
+\index{csmsgpool\+\_\+process\+\_\+af@{csmsgpool\+\_\+process\+\_\+af}!msgpool\+\_\+dispatch.\+c@{msgpool\+\_\+dispatch.\+c}}
+\subsubsection[{csmsgpool\+\_\+process\+\_\+af(void $\ast$pool\+\_\+dispath)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ csmsgpool\+\_\+process\+\_\+af (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{pool\+\_\+dispath}
+\end{DoxyParamCaption}
+)}\label{msgpool__dispatch_8c_af38f74003b2a41b9b56599b5a87a5cbd}
+
+
+csmsgpool\+\_\+process\+\_\+af This is the thread function of recv pool. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool\+\_\+dispath} & This pointer should be casted from (struct cspool\+\_\+process$\ast$);\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{msgpool__dispatch_8c_af38f74003b2a41b9b56599b5a87a5cbd_cgraph}
+\end{center}
+\end{figure}
+
+

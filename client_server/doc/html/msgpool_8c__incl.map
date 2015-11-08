@@ -1,0 +1,8 @@
+<map id="D:/project/PengGe/client_server/src/common/msgpool.c" name="D:/project/PengGe/client_server/src/common/msgpool.c">
+<area shape="rect" id="node8" href="$macros_8h.html" title="This file define some basic macro operations and functions. And .. some macros stand for config data(..." alt="" coords="608,95,684,121"/>
+<area shape="rect" id="node9" href="$utility__wrap_8h.html" title="This function defines some utility wrap functions, such as memcpy. " alt="" coords="709,95,807,121"/>
+<area shape="rect" id="node10" href="$bufarray_8h.html" title="The basic buffer operations that implemented with circular queue. " alt="" coords="832,95,911,121"/>
+<area shape="rect" id="node11" href="$sock__types_8h.html" title="This file defines some basic socket types and macros for this application. " alt="" coords="935,95,1035,121"/>
+<area shape="rect" id="node12" href="$lightthread_8h.html" title="This file defines some basic wrapper functions of thread, mutex and semaphore. " alt="" coords="1059,95,1153,121"/>
+<area shape="rect" id="node13" href="$msgpool_8h.html" title="This file defines message buffer pool operations. With thread, mutex, semaphore used, This struct csmsgpool can be used for constructing multithread environment. " alt="" coords="1177,95,1259,121"/>
+</map>

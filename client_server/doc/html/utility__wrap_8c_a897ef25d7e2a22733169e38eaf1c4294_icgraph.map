@@ -1,0 +1,12 @@
+<map id="cs_memcpy" name="cs_memcpy">
+<area shape="rect" id="node2" href="$msgpool_8h.html#a577ed27293ca2b80f656a3722857cddb" title="cspool_pushdata This function push one buffer item data to pool. This procedure can be splitted into ..." alt="" coords="158,5,278,32"/>
+<area shape="rect" id="node3" href="$msgpool_8h.html#a3edf21b1efef5632e038e45e07d12216" title="cspool_pulldata This function pull one buffer item data from filled buffer and move the item into the..." alt="" coords="162,56,274,83"/>
+<area shape="rect" id="node4" href="$msgwrap_8h.html#a992091194e59740446257e10c0d7864d" title="csmsg_copyaddr This function set the value of address information. " alt="" coords="157,107,279,133"/>
+<area shape="rect" id="node8" href="$msgwrap_8h.html#a7a90c5800135ab934256e8d2135b3cb1" title="csmsg_merge " alt="" coords="166,157,270,184"/>
+<area shape="rect" id="node10" href="$msgwrap_8h.html#adbe79a0a1bb14bb4cf053f7bbadb78a7" title="csmsg_extract_copy " alt="" coords="147,208,289,235"/>
+<area shape="rect" id="node5" href="$unix__client__sendrecv_8c.html#aeecc65b7dbf1e0ac8f806ba8f518dab9" title="csclient_sendrecv " alt="" coords="350,107,475,133"/>
+<area shape="rect" id="node6" href="$client__udp_8c.html#a571252c127c68c849fdf766d6cef63e2" title="csclient_udp_once This function process udp send&amp;recv one time. " alt="" coords="536,107,667,133"/>
+<area shape="rect" id="node7" href="$client__udp_8c.html#a8be5e8ba05fdac392536b4bb22d8914b" title="csclient_udp This function process udp communication with server. This function call csclient_udp_onc..." alt="" coords="715,107,809,133"/>
+<area shape="rect" id="node9" href="$msgwrap_8h.html#ad813358703a8d2859cc883e8ee15c286" title="csmsg_push2pool will firstly copy message data and the unit header to single char array..." alt="" coords="349,157,476,184"/>
+<area shape="rect" id="node11" href="$msgwrap_8h.html#a116afb019547278f14bc11309ba7c387" title="csmsg_pull_from_pool works the opposite as csmsg_push2pool does. The procedure can be splitted into t..." alt="" coords="337,208,488,235"/>
+</map>

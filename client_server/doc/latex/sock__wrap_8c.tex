@@ -1,0 +1,392 @@
+\hypertarget{sock__wrap_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/sock\+\_\+wrap.c File Reference}
+\label{sock__wrap_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/sock\+\_\+wrap.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/sock\+\_\+wrap.\+c}}
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$sys/types.\+h$>$}\\*
+{\ttfamily \#include $<$sys/socket.\+h$>$}\\*
+{\ttfamily \#include $<$netinet/in.\+h$>$}\\*
+{\ttfamily \#include $<$arpa/inet.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}macros.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+wrap.\+h\char`\"{}}\\*
+Include dependency graph for sock\+\_\+wrap.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sock__wrap_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{sock__wrap_8c_a1261a88b8a0b8123842a31f7a02b2486}{}\#define {\bfseries B\+L\+O\+C\+K\+\_\+\+R\+W}~M\+S\+G\+\_\+\+W\+A\+I\+T\+A\+L\+L\label{sock__wrap_8c_a1261a88b8a0b8123842a31f7a02b2486}
+
+\item 
+\hypertarget{sock__wrap_8c_a79088d0acc477173596796523013fc68}{}\#define {\bfseries N\+O\+N\+B\+L\+O\+C\+K\+\_\+\+R\+W}~M\+S\+G\+\_\+\+D\+O\+N\+T\+W\+A\+I\+T\label{sock__wrap_8c_a79088d0acc477173596796523013fc68}
+
+\item 
+\hypertarget{sock__wrap_8c_a89eaed6dccd7be9397d148c614959d6a}{}\#define {\bfseries S\+E\+N\+D\+\_\+\+N\+O\+S\+I\+G\+N\+A\+L}~M\+S\+G\+\_\+\+N\+O\+S\+I\+G\+N\+A\+L\label{sock__wrap_8c_a89eaed6dccd7be9397d148c614959d6a}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{sock__wrap_8c_adfc7e39d317417ed2dcb1dee74a21a65}{cssock\+\_\+envinit} ()
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+envinit must be called before socket created. Similarly, cssock\+\_\+envclear must be called before exit(); \end{DoxyCompactList}\item 
+\hypertarget{sock__wrap_8c_ac839f08c2ad8afafceb7a931529a1a7f}{}void \hyperlink{sock__wrap_8c_ac839f08c2ad8afafceb7a931529a1a7f}{cssock\+\_\+envclear} ()\label{sock__wrap_8c_ac839f08c2ad8afafceb7a931529a1a7f}
+
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+envclear \end{DoxyCompactList}\item 
+int \hyperlink{sock__wrap_8c_a41b2b1f3f488bea3c83fc844813d305b}{cssock\+\_\+get\+\_\+last\+\_\+error} (void)
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+get\+\_\+last\+\_\+error will return last error number. \end{DoxyCompactList}\item 
+void \hyperlink{sock__wrap_8c_abec552db463f74d1f54cefd3e43acfaa}{csaddrin\+\_\+set} (struct sockaddr\+\_\+in $\ast$addr\+\_\+in, const char $\ast$ip, int port)
+\begin{DoxyCompactList}\small\item\em csaddrin\+\_\+set \end{DoxyCompactList}\item 
+\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} \hyperlink{sock__wrap_8c_a842dda0d61b2e39aab64b40764adddd1}{cssock\+\_\+open} (int tcpudp)
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+open cssock\+\_\+open will create a socket handle according to tcpudp option. \end{DoxyCompactList}\item 
+void \hyperlink{sock__wrap_8c_acd994aca6a58e8d8e201d2d8a3f6268e}{cssock\+\_\+close} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle)
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+close \end{DoxyCompactList}\item 
+\hypertarget{sock__wrap_8c_ad02b103d8bc0fc3c85e9f29c0adc7315}{}void {\bfseries cssock\+\_\+connect} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, const struct sockaddr $\ast$sa, cssocklen\+\_\+t addrlen)\label{sock__wrap_8c_ad02b103d8bc0fc3c85e9f29c0adc7315}
+
+\item 
+\hypertarget{sock__wrap_8c_ad35bbb6f1899748561fbbd26903b388d}{}void {\bfseries cssock\+\_\+bind} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, struct sockaddr $\ast$sa, cssocklen\+\_\+t addrlen)\label{sock__wrap_8c_ad35bbb6f1899748561fbbd26903b388d}
+
+\item 
+\hypertarget{sock__wrap_8c_af9f60f5855eb95a0d39a925f37925389}{}void {\bfseries cssock\+\_\+listen} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, int maxconn)\label{sock__wrap_8c_af9f60f5855eb95a0d39a925f37925389}
+
+\item 
+\hypertarget{sock__wrap_8c_a2feb7e688dbdfc2cd11914bf88635b86}{}\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} {\bfseries cssock\+\_\+accept} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, const struct sockaddr $\ast$sa, cssocklen\+\_\+t $\ast$addrlen)\label{sock__wrap_8c_a2feb7e688dbdfc2cd11914bf88635b86}
+
+\item 
+int \hyperlink{sock__wrap_8c_a60b0fd1896802faae9fd9dd341fadc54}{cssock\+\_\+block} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, int block)
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+block cssock\+\_\+block will set socket to be blocking or nonblocking according to block parameter. \end{DoxyCompactList}\item 
+int \hyperlink{sock__wrap_8c_a047455240499ada0472e5722cd50640b}{cssock\+\_\+print} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, const char $\ast$header)
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+print print the I\+P and port for current socket handle, if socket is connected. \end{DoxyCompactList}\item 
+int \hyperlink{sock__wrap_8c_a098e3c55e9e87fb357ca535aa1511ff2}{cssock\+\_\+getsockname} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, struct sockaddr $\ast$addr, cssocklen\+\_\+t $\ast$addrlen)
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+getsockname \end{DoxyCompactList}\item 
+int \hyperlink{sock__wrap_8c_a31487252f4a7328c3a19272520b131a7}{cssock\+\_\+getpeername} (\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} handle, struct sockaddr $\ast$addr, cssocklen\+\_\+t $\ast$addrlen)
+\begin{DoxyCompactList}\small\item\em cssock\+\_\+getpeername \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/09-\/20 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+Fri 2015-\/11-\/06 01\+:09\+:43 (+0800) 
+\end{DoxyParagraph}
+
+
+\subsection{Function Documentation}
+\hypertarget{sock__wrap_8c_abec552db463f74d1f54cefd3e43acfaa}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!csaddrin\+\_\+set@{csaddrin\+\_\+set}}
+\index{csaddrin\+\_\+set@{csaddrin\+\_\+set}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{csaddrin\+\_\+set(struct sockaddr\+\_\+in $\ast$addr\+\_\+in, const char $\ast$ip, int port)}]{\setlength{\rightskip}{0pt plus 5cm}void csaddrin\+\_\+set (
+\begin{DoxyParamCaption}
+\item[{struct sockaddr\+\_\+in $\ast$}]{addr\+\_\+in, }
+\item[{const char $\ast$}]{ip, }
+\item[{int}]{port}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_abec552db463f74d1f54cefd3e43acfaa}
+
+
+csaddrin\+\_\+set 
+
+
+\begin{DoxyParams}{Parameters}
+{\em addr\+\_\+in} & \\
+\hline
+{\em ip} & \\
+\hline
+{\em port} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{sock__wrap_8c_a60b0fd1896802faae9fd9dd341fadc54}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+block@{cssock\+\_\+block}}
+\index{cssock\+\_\+block@{cssock\+\_\+block}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+block(cssock\+\_\+t handle, int block)}]{\setlength{\rightskip}{0pt plus 5cm}int cssock\+\_\+block (
+\begin{DoxyParamCaption}
+\item[{{\bf cssock\+\_\+t}}]{handle, }
+\item[{int}]{block}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_a60b0fd1896802faae9fd9dd341fadc54}
+
+
+cssock\+\_\+block cssock\+\_\+block will set socket to be blocking or nonblocking according to block parameter. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & The socket handle. \\
+\hline
+{\em block} & If block == 0, blocking is enabled. If block != 0, non-\/blocking is enalbed.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\begin{DoxyEnumerate}
+\item block set result, if handle is a valid socket.
+\item -\/1, if handle is not a valid socket. 
+\end{DoxyEnumerate}
+\end{DoxyReturn}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{sock__wrap_8c_a60b0fd1896802faae9fd9dd341fadc54_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{sock__wrap_8c_acd994aca6a58e8d8e201d2d8a3f6268e}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+close@{cssock\+\_\+close}}
+\index{cssock\+\_\+close@{cssock\+\_\+close}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+close(cssock\+\_\+t handle)}]{\setlength{\rightskip}{0pt plus 5cm}void cssock\+\_\+close (
+\begin{DoxyParamCaption}
+\item[{{\bf cssock\+\_\+t}}]{handle}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_acd994aca6a58e8d8e201d2d8a3f6268e}
+
+
+cssock\+\_\+close 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+\end{DoxyParams}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=306pt]{sock__wrap_8c_acd994aca6a58e8d8e201d2d8a3f6268e_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sock__wrap_8c_acd994aca6a58e8d8e201d2d8a3f6268e_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{sock__wrap_8c_adfc7e39d317417ed2dcb1dee74a21a65}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+envinit@{cssock\+\_\+envinit}}
+\index{cssock\+\_\+envinit@{cssock\+\_\+envinit}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+envinit()}]{\setlength{\rightskip}{0pt plus 5cm}int cssock\+\_\+envinit (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_adfc7e39d317417ed2dcb1dee74a21a65}
+
+
+cssock\+\_\+envinit must be called before socket created. Similarly, cssock\+\_\+envclear must be called before exit(); 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{sock__wrap_8h_a0d026695d06e8b65b88600b53ce74147}{cssock\+\_\+envclear} 
+\end{DoxySeeAlso}
+\hypertarget{sock__wrap_8c_a41b2b1f3f488bea3c83fc844813d305b}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+get\+\_\+last\+\_\+error@{cssock\+\_\+get\+\_\+last\+\_\+error}}
+\index{cssock\+\_\+get\+\_\+last\+\_\+error@{cssock\+\_\+get\+\_\+last\+\_\+error}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+get\+\_\+last\+\_\+error(void)}]{\setlength{\rightskip}{0pt plus 5cm}int cssock\+\_\+get\+\_\+last\+\_\+error (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_a41b2b1f3f488bea3c83fc844813d305b}
+
+
+cssock\+\_\+get\+\_\+last\+\_\+error will return last error number. 
+
+\begin{DoxyNote}{Note}
+This function may not be thread-\/safe.
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+The last error number. 
+\end{DoxyReturn}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{sock__wrap_8c_a41b2b1f3f488bea3c83fc844813d305b_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{sock__wrap_8c_a31487252f4a7328c3a19272520b131a7}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+getpeername@{cssock\+\_\+getpeername}}
+\index{cssock\+\_\+getpeername@{cssock\+\_\+getpeername}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+getpeername(cssock\+\_\+t handle, struct sockaddr $\ast$addr, cssocklen\+\_\+t $\ast$addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}int cssock\+\_\+getpeername (
+\begin{DoxyParamCaption}
+\item[{{\bf cssock\+\_\+t}}]{handle, }
+\item[{struct sockaddr $\ast$}]{addr, }
+\item[{cssocklen\+\_\+t $\ast$}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_a31487252f4a7328c3a19272520b131a7}
+
+
+cssock\+\_\+getpeername 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+{\em addr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=339pt]{sock__wrap_8c_a31487252f4a7328c3a19272520b131a7_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{sock__wrap_8c_a098e3c55e9e87fb357ca535aa1511ff2}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+getsockname@{cssock\+\_\+getsockname}}
+\index{cssock\+\_\+getsockname@{cssock\+\_\+getsockname}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+getsockname(cssock\+\_\+t handle, struct sockaddr $\ast$addr, cssocklen\+\_\+t $\ast$addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}int cssock\+\_\+getsockname (
+\begin{DoxyParamCaption}
+\item[{{\bf cssock\+\_\+t}}]{handle, }
+\item[{struct sockaddr $\ast$}]{addr, }
+\item[{cssocklen\+\_\+t $\ast$}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_a098e3c55e9e87fb357ca535aa1511ff2}
+
+
+cssock\+\_\+getsockname 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+{\em addr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=341pt]{sock__wrap_8c_a098e3c55e9e87fb357ca535aa1511ff2_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{sock__wrap_8c_a842dda0d61b2e39aab64b40764adddd1}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+open@{cssock\+\_\+open}}
+\index{cssock\+\_\+open@{cssock\+\_\+open}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+open(int tcpudp)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cssock\+\_\+t} cssock\+\_\+open (
+\begin{DoxyParamCaption}
+\item[{int}]{tcpudp}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_a842dda0d61b2e39aab64b40764adddd1}
+
+
+cssock\+\_\+open cssock\+\_\+open will create a socket handle according to tcpudp option. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em tcpudp} & Tcp socket will be created if S\+O\+C\+K\+\_\+\+S\+T\+R\+E\+A\+M is set, upd socket will be created if S\+O\+C\+K\+\_\+\+D\+G\+R\+A\+M is set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=303pt]{sock__wrap_8c_a842dda0d61b2e39aab64b40764adddd1_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=261pt]{sock__wrap_8c_a842dda0d61b2e39aab64b40764adddd1_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{sock__wrap_8c_a047455240499ada0472e5722cd50640b}{}\index{sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}!cssock\+\_\+print@{cssock\+\_\+print}}
+\index{cssock\+\_\+print@{cssock\+\_\+print}!sock\+\_\+wrap.\+c@{sock\+\_\+wrap.\+c}}
+\subsubsection[{cssock\+\_\+print(cssock\+\_\+t handle, const char $\ast$header)}]{\setlength{\rightskip}{0pt plus 5cm}int cssock\+\_\+print (
+\begin{DoxyParamCaption}
+\item[{{\bf cssock\+\_\+t}}]{handle, }
+\item[{const char $\ast$}]{header}
+\end{DoxyParamCaption}
+)}\label{sock__wrap_8c_a047455240499ada0472e5722cd50640b}
+
+
+cssock\+\_\+print print the I\+P and port for current socket handle, if socket is connected. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & specified socket to be test and print. \\
+\hline
+{\em header} & specify the header message of print infomation.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\begin{DoxyEnumerate}
+\item -\/1, if socket is not a valid socket.
+\item 0, if socket is connected.
+\item 1, if socket is not connected. 
+\end{DoxyEnumerate}
+\end{DoxyReturn}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{sock__wrap_8c_a047455240499ada0472e5722cd50640b_icgraph}
+\end{center}
+\end{figure}
+
+

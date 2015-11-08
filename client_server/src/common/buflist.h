@@ -1,6 +1,6 @@
 /**
  * @file buflist.h
- * @brief  
+ * @brief  The basic buffer operations that implemented with list.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16

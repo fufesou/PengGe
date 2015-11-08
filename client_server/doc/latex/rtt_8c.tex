@@ -1,0 +1,71 @@
+\hypertarget{rtt_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/rtt.c File Reference}
+\label{rtt_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/rtt.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/rtt.\+c}}
+
+
+This file comes from unp src.  
+
+
+{\ttfamily \#include $<$sys/time.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}unprtt.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}timespan.\+h\char`\"{}}\\*
+Include dependency graph for rtt.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{rtt_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{rtt_8c_a43b791eadc5c2785a2b1720f2341d610}{}\#define {\bfseries R\+T\+T\+\_\+\+R\+T\+O\+C\+A\+L\+C}(ptr)~((ptr)-\/$>$rtt\+\_\+srtt + (4.\+0 $\ast$ (ptr)-\/$>$rtt\+\_\+rttvar))\label{rtt_8c_a43b791eadc5c2785a2b1720f2341d610}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{rtt_8c_a2191d5f4bcec2003de22187aa092d07f}{}void {\bfseries rtt\+\_\+init} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$ptr)\label{rtt_8c_a2191d5f4bcec2003de22187aa092d07f}
+
+\item 
+\hypertarget{rtt_8c_a06ba64b24e284ba89126de03296a5608}{}uint32\+\_\+t {\bfseries rtt\+\_\+ts} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$ptr)\label{rtt_8c_a06ba64b24e284ba89126de03296a5608}
+
+\item 
+\hypertarget{rtt_8c_a739fe24423a3f00edd607ba1a21f32e8}{}void {\bfseries rtt\+\_\+newpack} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$ptr)\label{rtt_8c_a739fe24423a3f00edd607ba1a21f32e8}
+
+\item 
+\hypertarget{rtt_8c_a3c663c3c07fcd21198df190be9d18a1f}{}int {\bfseries rtt\+\_\+start} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$ptr)\label{rtt_8c_a3c663c3c07fcd21198df190be9d18a1f}
+
+\item 
+\hypertarget{rtt_8c_a41e2f997620e18c0960bfd57b87a7485}{}void {\bfseries rtt\+\_\+stop} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$ptr, uint32\+\_\+t ms)\label{rtt_8c_a41e2f997620e18c0960bfd57b87a7485}
+
+\item 
+\hypertarget{rtt_8c_aaa6baa96a92cbd2accd80489588b10e2}{}int {\bfseries rtt\+\_\+timeout} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$ptr)\label{rtt_8c_aaa6baa96a92cbd2accd80489588b10e2}
+
+\item 
+\hypertarget{rtt_8c_aa4209566dbdff07b0f7ebcd164da092c}{}void {\bfseries rtt\+\_\+debug} (struct \hyperlink{structrtt__info}{rtt\+\_\+info} $\ast$ptr)\label{rtt_8c_aa4209566dbdff07b0f7ebcd164da092c}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{rtt_8c_a7c7ad1b4e2182b95b294b91a3b5e2ca2}{}int {\bfseries rtt\+\_\+d\+\_\+flag} = 0\label{rtt_8c_a7c7ad1b4e2182b95b294b91a3b5e2ca2}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file comes from unp src. 
+
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/31 
+\end{DoxyDate}

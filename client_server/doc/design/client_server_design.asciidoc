@@ -1,4 +1,4 @@
-= 程序设计方案 =
+= 程序设计方案
 陈小龙 <34814491@qq.com>
 v1.0, 2015-9-19
 :library: Asciidoctor
@@ -19,50 +19,27 @@ v1.0, 2015-9-19
 [abstract]
 服务器客户端通信程序初步用于在windows上运行，以后移植到IOS和Android上，大部分代码用C完成。
 
-link:https://github.com/fufesou/PengGe[项目git地址]中的client_server/Qt_winsock(link:https://github.com/fufesou/PengGe/tree/master/client_server/Qt_winsock[点我])为服务器客户端的工程。
+link:https://github.com/fufesou/PengGe[项目git地址]中的client_server(link:https://github.com/fufesou/PengGe/tree/master/client_server[点我])为服务器客户端的工程。
 
 
 :numbered:
-== 总述 ==
---
-. 采用C语言写客户端和服务器程序。
-. 用Qt做界面，界面包括：
-. log。
---
+== 总述
 
-.注意
---
-. 目前编译的是windows64位的程序，程序需要winsock2版本的支持。
-. 现在只是用的IPv4，后面改成IPv6。
-. 代码中没写注释，这两天把注释补全。
-. 代码调试差不多的话，就开始做界面吗？
---
+=== 服务器
 
-.问题
---
-. 发送数据时，'\n'也会跟着发送过去，需要处理掉吗？
---
-
-=== 服务器 ===
-
-我写的程序只监听一个端口，程序服务器要监听4个端口，就开4个程序。
+程序只监听一个端口，程序服务器要监听4个端口，需开4个程序。
 
 
-=== 客户端 ===
+=== 客户端
 
-客户端分为两个界面(界面还没开始做)，初始界面与登录界面，通过用户名和密码验证后，客户端由初始界面转入登录界面(目前的实现为打印enter login interface的信息)。
-
-登录方式为输入"login: 64bit 8-15bytes"，登录后客户端控制台会打印返回信息(现在的返回信息为输入信息)。
+登录方式为输入"login: 64bit 8-15bytes"。
 
 客户端使用rtt算法确保消息送达服务器与消息的顺序。
 
-=== 界面 ===
+== 详细设计
 
-=== log ===
+=== 服务器客户端程序
 
-== 详细设计 ==
-
-=== 服务器客户端 ===
 服务器客户端主要分成三个模块。
 --
 . 通用模块，包括一些错误处理函数，socket包裹函数，一些常用宏定义等。
@@ -70,8 +47,83 @@ link:https://github.com/fufesou/PengGe[项目git地址]中的client_server/Qt_wi
 . 客户端，定义客户端对象数据结构及操作。
 --
 
-==== 通用模块 ====
+==== 消息结构
 
-==== 服务器 ====
+通信消息数据结构如<<data_overview, 通信消息数据>>所示。
+[[data_overview]]
+.通信消息数据
+image::data_overview.svg[图片无法显示，请参考./images/data_overview.svg, align="center"]
 
-==== 客户端 ====
+message header数据结构定义在msgwrap.h中，基结构如<<csmsg_header,csmsg_header>>所示。
+
+--
+. 前两个成员用于记录对端的socket地址。
+. header用于判断确认消息号和记录消息发送时间。
+. numbytes于用记录消息数据(除开头部)的长度。
+--
+
+[source,c]
+.csmsg_header
+----
+struct csmsg_header
+{
+    struct sockaddr addr;
+    int addrlen;
+    struct hdr header;
+    int numbytes;
+};
+
+struct hdr
+{
+    uint32_t seq;
+    uint32_t ts;
+};
+----
+
+==== 数据传输过程
+
+消息的传输过程如<<data_trans, 完整的消息传输过程>>所示。
+[[data_trans]]
+.一次完整的消息传输过程
+image::data_trans.svg[图片无法显示，请参考./images/data_trans.svg, align="center"]
+
+==== 通用模块
+
+客户端服务器程序用C语言编写，在Ubuntu和Windows上运行正确。程序实现中使用了socket，thread，mutex等wrap函数。
+下面列出各文件与功能的对应。
+
+--
+. macros.h 常用的宏及配置数据(目前没有写配置文件读写)。
+. global.c 常用的配置数据。
+. error.h error.c 错误处理函数。
+. timespan.h timespan.c 定义了time的获取以及计算time span的操作。
+. utility_wrap.h utility_wrap.c 定义了一个memcpy和memcpy_s的wrap函数。(memcpy_s在c11标准中也有)
+. unprtt.h rtt.c rtt超时判断函数。此文件直接从<<unix network programming>>3rd的源码中拷贝过来的。
+. lightthread.h lightthread.c 对thread, mutex, semaphore的wrap函数。
+. sock_types.h sock_wrap.h sock_wrap.c 定义了socket的基本wrap函数。
+. list.h list.c list的实现，从linux源码中扒出来的文件。
+. bufarray.h bufarray.c buflist.h buflist.c 缓冲区的基本操作，分别用循环队列和链表实现。
+. msgpool.h msgpool.c 消息缓冲区struct csmsgpool实现。一个消息缓冲区中包含一个emtpy buffer和一个filled buffer，emtpy buffer存放可用的单元，filled buffer存放处理数据单元。另外struct csmsgpool还定义了thread，mutex和semaphore，多线程操作和同步。
+. msgpool_dispatch.h msgpool_dispatch.c 定义了基本的处理数据注册操作。这个部分的函数最终被用于server_udp.c和client_udp.c。 [red]#这个部分有点乱#。
+. msg_wrap.h msg_wrap.c 定义了传输消息头以及消息头和消息数据合并的基本操作。
+--
+
+==== 服务器
+
+服务器socket为阻塞socket。
+
+--
+. server.h server.c 常用的服务器socket初始化操作和收发数据操作。
+. server_udp.c 定义了udp通信的while(1)部分，并注册process message和send message操作到struct csmsgpool_dispatch中。
+. server_dispatch.h server_dispatch.c 定义了process message操作。
+--
+
+==== 客户端
+
+客户端socket为非阻塞socket。客户端文件结构与服务器相仿。
+
+--
+. client.h client.c 常用的客户端socket初始化操作和收发数据操作。
+. client_udp.c 定义了udp通信的while(1)部分，并注册process message和send message操作到struct csmsgpool_dispatch中。
+. client_dispatch.h client_dispatch.c 定义了process message操作。
+--

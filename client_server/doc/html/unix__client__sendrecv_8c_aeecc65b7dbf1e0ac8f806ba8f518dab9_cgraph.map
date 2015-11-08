@@ -1,0 +1,5 @@
+<map id="csclient_sendrecv" name="csclient_sendrecv">
+<area shape="rect" id="node2" href="$msgwrap_8c.html#a4af2e50286de90e21dec452fa67d9268" title="csmsg_merge " alt="" coords="187,5,291,32"/>
+<area shape="rect" id="node4" href="$msgwrap_8c.html#a992091194e59740446257e10c0d7864d" title="csmsg_copyaddr This function set the value of address information. " alt="" coords="179,56,300,83"/>
+<area shape="rect" id="node3" href="$utility__wrap_8c.html#a897ef25d7e2a22733169e38eaf1c4294" title="cs_memecpy cs_memcpy is a simple wrapper of memcpy_s(windows) or memcpy(unix). " alt="" coords="348,31,441,57"/>
+</map>

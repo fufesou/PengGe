@@ -1,0 +1,345 @@
+\hypertarget{lightthread_8h}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/lightthread.h File Reference}
+\label{lightthread_8h}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/lightthread.\+h@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/lightthread.\+h}}
+
+
+This file defines some basic wrapper functions of thread, mutex and semaphore.  
+
+
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lightthread_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{lightthread_8h_aa3b671eedc1c42b33634b91da858fb71}{}\#define {\bfseries cssem\+\_\+wait}~sem\+\_\+wait\label{lightthread_8h_aa3b671eedc1c42b33634b91da858fb71}
+
+\item 
+\hypertarget{lightthread_8h_a2dea9ea8cb965c134a53c5260817afc1}{}\#define {\bfseries cssem\+\_\+post}~sem\+\_\+post\label{lightthread_8h_a2dea9ea8cb965c134a53c5260817afc1}
+
+\item 
+\hypertarget{lightthread_8h_aa7d66b30f3d06b2f211bd016dcaf23f4}{}\#define {\bfseries cssem\+\_\+destroy}~sem\+\_\+destroy\label{lightthread_8h_aa7d66b30f3d06b2f211bd016dcaf23f4}
+
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{lightthread_8h_abb7c984a936823027eddd6bdf6584e9b}{}typedef pthread\+\_\+mutex\+\_\+t {\bfseries csmutex\+\_\+t}\label{lightthread_8h_abb7c984a936823027eddd6bdf6584e9b}
+
+\item 
+\hypertarget{lightthread_8h_a57986cb36f70ef3cb073481f6dfbf367}{}typedef sem\+\_\+t {\bfseries cssem\+\_\+t}\label{lightthread_8h_a57986cb36f70ef3cb073481f6dfbf367}
+
+\item 
+\hypertarget{lightthread_8h_a40498c08ce5d1d40ae8095e4d373c080}{}typedef pthread\+\_\+t {\bfseries csthread\+\_\+t}\label{lightthread_8h_a40498c08ce5d1d40ae8095e4d373c080}
+
+\item 
+\hypertarget{lightthread_8h_a11acaad034da6c34f500602ff914ffff}{}typedef void $\ast$($\ast$ {\bfseries csthread\+\_\+proc\+\_\+t}) (void $\ast$)\label{lightthread_8h_a11acaad034da6c34f500602ff914ffff}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{lightthread_8h_a56ae5a13616435e42ec013020a35cf59}{csthread\+\_\+create} (csthread\+\_\+proc\+\_\+t proc, void $\ast$pargs, csthread\+\_\+t $\ast$handle)
+\begin{DoxyCompactList}\small\item\em csthread\+\_\+create \end{DoxyCompactList}\item 
+\hypertarget{lightthread_8h_a3f281b2855e0eb63360f12a1e745e088}{}void \hyperlink{lightthread_8h_a3f281b2855e0eb63360f12a1e745e088}{csthread\+\_\+exit} (void)\label{lightthread_8h_a3f281b2855e0eb63360f12a1e745e088}
+
+\begin{DoxyCompactList}\small\item\em csthread\+\_\+exit \end{DoxyCompactList}\item 
+void \hyperlink{lightthread_8h_a3be8a03a3c7ab0758d4dfe1c1a4939dd}{csthread\+\_\+wait\+\_\+terminate} (csthread\+\_\+t handle)
+\begin{DoxyCompactList}\small\item\em csthread\+\_\+wait\+\_\+terminate \end{DoxyCompactList}\item 
+void \hyperlink{lightthread_8h_a40598371a661aa6085b63b001f161a71}{csthread\+N\+\_\+wait\+\_\+terminate} (csthread\+\_\+t $\ast$handle, int count)
+\begin{DoxyCompactList}\small\item\em csthread\+N\+\_\+wait\+\_\+terminate \end{DoxyCompactList}\item 
+unsigned int \hyperlink{lightthread_8h_a16e901a07d7391faed2f6e41af336708}{csthread\+\_\+getpid} (void)
+\begin{DoxyCompactList}\small\item\em csthread\+\_\+getpid \end{DoxyCompactList}\item 
+void \hyperlink{lightthread_8h_a903de2b932fc9de89fd5952d217ddd15}{cssleep} (unsigned int msec)
+\begin{DoxyCompactList}\small\item\em cssleep \end{DoxyCompactList}\item 
+csmutex\+\_\+t \hyperlink{lightthread_8h_a5c3a7fb06b62b05a6dfa3359eb939655}{csmutex\+\_\+create} (void)
+\begin{DoxyCompactList}\small\item\em csmutex\+\_\+create csmutex\+\_\+create will create the mutex and print error message if error occurs. \end{DoxyCompactList}\item 
+void \hyperlink{lightthread_8h_aab46494a34bf1e3dbd157b8dd6ea04cb}{csmutex\+\_\+destroy} (csmutex\+\_\+t handle)
+\begin{DoxyCompactList}\small\item\em csmutex\+\_\+destroy \end{DoxyCompactList}\item 
+int \hyperlink{lightthread_8h_a78561b071805b213f88d0757b381aa92}{csmutex\+\_\+lock} (csmutex\+\_\+t handle)
+\begin{DoxyCompactList}\small\item\em csmutex\+\_\+lock \end{DoxyCompactList}\item 
+int \hyperlink{lightthread_8h_ad3a757691d8d36a947984c914a2fe5b3}{csmutex\+\_\+try\+\_\+lock} (csmutex\+\_\+t handle, unsigned int msec)
+\begin{DoxyCompactList}\small\item\em csmutex\+\_\+try\+\_\+lock This function returns zero if a lock on the mutex object referenced by mutex is acquired. Otherwise, an error number is returned to indicate the error. \end{DoxyCompactList}\item 
+void \hyperlink{lightthread_8h_abe0d10d1918d0b3fc8a9966e9710b632}{csmutex\+\_\+unlock} (csmutex\+\_\+t handle)
+\begin{DoxyCompactList}\small\item\em csmutex\+\_\+unlock This function unlock the numtex. \end{DoxyCompactList}\item 
+\hypertarget{lightthread_8h_a28c2302dea7cc0ccaa65453cc5dabead}{}int {\bfseries cssem\+\_\+create} (int value\+\_\+init, int value\+\_\+max, cssem\+\_\+t $\ast$handle)\label{lightthread_8h_a28c2302dea7cc0ccaa65453cc5dabead}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file defines some basic wrapper functions of thread, mutex and semaphore. 
+
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/26 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+2015-\/10-\/28 00\+:56\+:06 (+0800) 
+\end{DoxyParagraph}
+
+
+\subsection{Function Documentation}
+\hypertarget{lightthread_8h_a5c3a7fb06b62b05a6dfa3359eb939655}{}\index{lightthread.\+h@{lightthread.\+h}!csmutex\+\_\+create@{csmutex\+\_\+create}}
+\index{csmutex\+\_\+create@{csmutex\+\_\+create}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csmutex\+\_\+create(void)}]{\setlength{\rightskip}{0pt plus 5cm}csmutex\+\_\+t csmutex\+\_\+create (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_a5c3a7fb06b62b05a6dfa3359eb939655}
+
+
+csmutex\+\_\+create csmutex\+\_\+create will create the mutex and print error message if error occurs. 
+
+\begin{DoxyReturn}{Returns}
+N\+U\+L\+L if failed; valid mutex handle if succes. 
+\end{DoxyReturn}
+\hypertarget{lightthread_8h_aab46494a34bf1e3dbd157b8dd6ea04cb}{}\index{lightthread.\+h@{lightthread.\+h}!csmutex\+\_\+destroy@{csmutex\+\_\+destroy}}
+\index{csmutex\+\_\+destroy@{csmutex\+\_\+destroy}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csmutex\+\_\+destroy(csmutex\+\_\+t handle)}]{\setlength{\rightskip}{0pt plus 5cm}void csmutex\+\_\+destroy (
+\begin{DoxyParamCaption}
+\item[{csmutex\+\_\+t}]{handle}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_aab46494a34bf1e3dbd157b8dd6ea04cb}
+
+
+csmutex\+\_\+destroy 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{lightthread_8h_a78561b071805b213f88d0757b381aa92}{}\index{lightthread.\+h@{lightthread.\+h}!csmutex\+\_\+lock@{csmutex\+\_\+lock}}
+\index{csmutex\+\_\+lock@{csmutex\+\_\+lock}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csmutex\+\_\+lock(csmutex\+\_\+t handle)}]{\setlength{\rightskip}{0pt plus 5cm}int csmutex\+\_\+lock (
+\begin{DoxyParamCaption}
+\item[{csmutex\+\_\+t}]{handle}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_a78561b071805b213f88d0757b381aa92}
+
+
+csmutex\+\_\+lock 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if O\+K; -\/1 if failed. 
+\end{DoxyReturn}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lightthread_8h_a78561b071805b213f88d0757b381aa92_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{lightthread_8h_ad3a757691d8d36a947984c914a2fe5b3}{}\index{lightthread.\+h@{lightthread.\+h}!csmutex\+\_\+try\+\_\+lock@{csmutex\+\_\+try\+\_\+lock}}
+\index{csmutex\+\_\+try\+\_\+lock@{csmutex\+\_\+try\+\_\+lock}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csmutex\+\_\+try\+\_\+lock(csmutex\+\_\+t handle, unsigned int msec)}]{\setlength{\rightskip}{0pt plus 5cm}int csmutex\+\_\+try\+\_\+lock (
+\begin{DoxyParamCaption}
+\item[{csmutex\+\_\+t}]{handle, }
+\item[{unsigned int}]{msec}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_ad3a757691d8d36a947984c914a2fe5b3}
+
+
+csmutex\+\_\+try\+\_\+lock This function returns zero if a lock on the mutex object referenced by mutex is acquired. Otherwise, an error number is returned to indicate the error. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & handle specify the mutex. \\
+\hline
+{\em msec} & msec specify the time span to try to lock the mutex.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\begin{DoxyEnumerate}
+\item 0, if success.
+\item -\/1, if timeout.
+\item others error code. 
+\end{DoxyEnumerate}
+\end{DoxyReturn}
+\hypertarget{lightthread_8h_abe0d10d1918d0b3fc8a9966e9710b632}{}\index{lightthread.\+h@{lightthread.\+h}!csmutex\+\_\+unlock@{csmutex\+\_\+unlock}}
+\index{csmutex\+\_\+unlock@{csmutex\+\_\+unlock}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csmutex\+\_\+unlock(csmutex\+\_\+t handle)}]{\setlength{\rightskip}{0pt plus 5cm}void csmutex\+\_\+unlock (
+\begin{DoxyParamCaption}
+\item[{csmutex\+\_\+t}]{handle}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_abe0d10d1918d0b3fc8a9966e9710b632}
+
+
+csmutex\+\_\+unlock This function unlock the numtex. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & handle specify the mutex. \\
+\hline
+\end{DoxyParams}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lightthread_8h_abe0d10d1918d0b3fc8a9966e9710b632_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{lightthread_8h_a903de2b932fc9de89fd5952d217ddd15}{}\index{lightthread.\+h@{lightthread.\+h}!cssleep@{cssleep}}
+\index{cssleep@{cssleep}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{cssleep(unsigned int msec)}]{\setlength{\rightskip}{0pt plus 5cm}void cssleep (
+\begin{DoxyParamCaption}
+\item[{unsigned int}]{msec}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_a903de2b932fc9de89fd5952d217ddd15}
+
+
+cssleep 
+
+
+\begin{DoxyParams}{Parameters}
+{\em msec} & \\
+\hline
+\end{DoxyParams}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=282pt]{lightthread_8h_a903de2b932fc9de89fd5952d217ddd15_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{lightthread_8h_a56ae5a13616435e42ec013020a35cf59}{}\index{lightthread.\+h@{lightthread.\+h}!csthread\+\_\+create@{csthread\+\_\+create}}
+\index{csthread\+\_\+create@{csthread\+\_\+create}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csthread\+\_\+create(csthread\+\_\+proc\+\_\+t proc, void $\ast$pargs, csthread\+\_\+t $\ast$handle)}]{\setlength{\rightskip}{0pt plus 5cm}int csthread\+\_\+create (
+\begin{DoxyParamCaption}
+\item[{csthread\+\_\+proc\+\_\+t}]{proc, }
+\item[{void $\ast$}]{pargs, }
+\item[{csthread\+\_\+t $\ast$}]{handle}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_a56ae5a13616435e42ec013020a35cf59}
+
+
+csthread\+\_\+create 
+
+
+\begin{DoxyParams}{Parameters}
+{\em proc} & \\
+\hline
+{\em pargs} & the thread handle\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+csthread\+\_\+create
+
+The following block describe the unix thread functions. \hypertarget{lightthread_8h_a16e901a07d7391faed2f6e41af336708}{}\index{lightthread.\+h@{lightthread.\+h}!csthread\+\_\+getpid@{csthread\+\_\+getpid}}
+\index{csthread\+\_\+getpid@{csthread\+\_\+getpid}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csthread\+\_\+getpid(void)}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int csthread\+\_\+getpid (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_a16e901a07d7391faed2f6e41af336708}
+
+
+csthread\+\_\+getpid 
+
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=318pt]{lightthread_8h_a16e901a07d7391faed2f6e41af336708_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{lightthread_8h_a3be8a03a3c7ab0758d4dfe1c1a4939dd}{}\index{lightthread.\+h@{lightthread.\+h}!csthread\+\_\+wait\+\_\+terminate@{csthread\+\_\+wait\+\_\+terminate}}
+\index{csthread\+\_\+wait\+\_\+terminate@{csthread\+\_\+wait\+\_\+terminate}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csthread\+\_\+wait\+\_\+terminate(csthread\+\_\+t handle)}]{\setlength{\rightskip}{0pt plus 5cm}void csthread\+\_\+wait\+\_\+terminate (
+\begin{DoxyParamCaption}
+\item[{csthread\+\_\+t}]{handle}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_a3be8a03a3c7ab0758d4dfe1c1a4939dd}
+
+
+csthread\+\_\+wait\+\_\+terminate 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+\end{DoxyParams}
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lightthread_8h_a3be8a03a3c7ab0758d4dfe1c1a4939dd_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{lightthread_8h_a40598371a661aa6085b63b001f161a71}{}\index{lightthread.\+h@{lightthread.\+h}!csthread\+N\+\_\+wait\+\_\+terminate@{csthread\+N\+\_\+wait\+\_\+terminate}}
+\index{csthread\+N\+\_\+wait\+\_\+terminate@{csthread\+N\+\_\+wait\+\_\+terminate}!lightthread.\+h@{lightthread.\+h}}
+\subsubsection[{csthread\+N\+\_\+wait\+\_\+terminate(csthread\+\_\+t $\ast$handle, int count)}]{\setlength{\rightskip}{0pt plus 5cm}void csthread\+N\+\_\+wait\+\_\+terminate (
+\begin{DoxyParamCaption}
+\item[{csthread\+\_\+t $\ast$}]{handle, }
+\item[{int}]{count}
+\end{DoxyParamCaption}
+)}\label{lightthread_8h_a40598371a661aa6085b63b001f161a71}
+
+
+csthread\+N\+\_\+wait\+\_\+terminate 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+{\em count} & \\
+\hline
+\end{DoxyParams}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{lightthread_8h_a40598371a661aa6085b63b001f161a71_cgraph}
+\end{center}
+\end{figure}
+
+

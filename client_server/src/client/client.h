@@ -1,6 +1,6 @@
 /**
  * @file client.h
- * @brief This file provide the interfaces of udp client.
+ * @brief This file provide the basic helper funstion for client struct.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30

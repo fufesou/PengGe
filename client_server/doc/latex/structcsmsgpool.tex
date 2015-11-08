@@ -1,0 +1,101 @@
+\hypertarget{structcsmsgpool}{}\section{csmsgpool Struct Reference}
+\label{structcsmsgpool}\index{csmsgpool@{csmsgpool}}
+
+
+csmsgpool contains basic members for send receive buffer and thread operations. The members of struct csmsgpool should be set with configuration.  
+
+
+
+
+{\ttfamily \#include $<$msgpool.\+h$>$}
+
+
+
+Collaboration diagram for csmsgpool\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{structcsmsgpool__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structcsmsgpool_a3a54f33ded9e2dca3aae11bd2360d4f5}{}int {\bfseries num\+\_\+thread}\label{structcsmsgpool_a3a54f33ded9e2dca3aae11bd2360d4f5}
+
+\item 
+\hypertarget{structcsmsgpool_a18960e59cac87bd3db96978b5ad01ce5}{}int {\bfseries len\+\_\+item}\label{structcsmsgpool_a18960e59cac87bd3db96978b5ad01ce5}
+
+\item 
+\hypertarget{structcsmsgpool_a4fc562000466f47cd9dc3e4f58ea9b15}{}int {\bfseries num\+\_\+item}\label{structcsmsgpool_a4fc562000466f47cd9dc3e4f58ea9b15}
+
+\item 
+\hypertarget{structcsmsgpool_a1828032c5206f6d03095c133575f010f}{}struct \hyperlink{structarray__buf}{array\+\_\+buf} {\bfseries filled\+\_\+buf}\label{structcsmsgpool_a1828032c5206f6d03095c133575f010f}
+
+\item 
+\hypertarget{structcsmsgpool_a5cb22f9beccddb5a7177719a6f97c7f3}{}struct \hyperlink{structarray__buf}{array\+\_\+buf} {\bfseries empty\+\_\+buf}\label{structcsmsgpool_a5cb22f9beccddb5a7177719a6f97c7f3}
+
+\item 
+\hypertarget{structcsmsgpool_ab2f992ea0595aecf88e68939a5a742c1}{}\hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} \hyperlink{structcsmsgpool_ab2f992ea0595aecf88e68939a5a742c1}{socket}\label{structcsmsgpool_ab2f992ea0595aecf88e68939a5a742c1}
+
+\begin{DoxyCompactList}\small\item\em socket \end{DoxyCompactList}\item 
+\hypertarget{structcsmsgpool_a990d35a81d5e6e8823029fd0f4d8c3d4}{}csmutex\+\_\+t \hyperlink{structcsmsgpool_a990d35a81d5e6e8823029fd0f4d8c3d4}{hmutex}\label{structcsmsgpool_a990d35a81d5e6e8823029fd0f4d8c3d4}
+
+\begin{DoxyCompactList}\small\item\em hmutex \end{DoxyCompactList}\item 
+\hypertarget{structcsmsgpool_af85d9571d64d3471517331ce9c1f16a2}{}csthread\+\_\+t $\ast$ \hyperlink{structcsmsgpool_af85d9571d64d3471517331ce9c1f16a2}{hthread}\label{structcsmsgpool_af85d9571d64d3471517331ce9c1f16a2}
+
+\begin{DoxyCompactList}\small\item\em hthread \end{DoxyCompactList}\item 
+int \hyperlink{structcsmsgpool_a7d814c8195e4baacad1f4045c8e63ad8}{threadexit}
+\begin{DoxyCompactList}\small\item\em threadexit threadexit is used to make thread exit normally. If threadexit is 1, thread will exit; if threadexit is 0, thread keep on running. \end{DoxyCompactList}\item 
+\hypertarget{structcsmsgpool_a3e8ddb48e68c25fb6874520af10d58be}{}cssem\+\_\+t \hyperlink{structcsmsgpool_a3e8ddb48e68c25fb6874520af10d58be}{hsem\+\_\+filled}\label{structcsmsgpool_a3e8ddb48e68c25fb6874520af10d58be}
+
+\begin{DoxyCompactList}\small\item\em hsem\+\_\+filled Be careful, csmsgpool call cssem\+\_\+wait() and cssem\+\_\+post() by default. \end{DoxyCompactList}\item 
+int \hyperlink{structcsmsgpool_ab79b44d003c02515c83d5772eb53c937}{use\+\_\+sem\+\_\+in\+\_\+pool}
+\begin{DoxyCompactList}\small\item\em use\+\_\+sem\+\_\+in\+\_\+pool 1 turn on semaphore wait or post, 0 turn off. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+csmsgpool contains basic members for send receive buffer and thread operations. The members of struct csmsgpool should be set with configuration. 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000003}{Todo}]write a cofigure parser to set the members \end{DoxyRefDesc}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structcsmsgpool_a7d814c8195e4baacad1f4045c8e63ad8}{}\index{csmsgpool@{csmsgpool}!threadexit@{threadexit}}
+\index{threadexit@{threadexit}!csmsgpool@{csmsgpool}}
+\subsubsection[{threadexit}]{\setlength{\rightskip}{0pt plus 5cm}int csmsgpool\+::threadexit}\label{structcsmsgpool_a7d814c8195e4baacad1f4045c8e63ad8}
+
+
+threadexit threadexit is used to make thread exit normally. If threadexit is 1, thread will exit; if threadexit is 0, thread keep on running. 
+
+\begin{DoxyNote}{Note}
+thread entry must test this value to determine whether exit or not, as the following code shows.
+\end{DoxyNote}
+
+\begin{DoxyCode}
+func()
+\{
+    \textcolor{keywordflow}{while} (1) \{
+        \textcolor{keywordflow}{if} (\hyperlink{structcsmsgpool_a7d814c8195e4baacad1f4045c8e63ad8}{threadexit}) \{
+            \textcolor{keywordflow}{break};
+        \}
+    \}
+\}
+\end{DoxyCode}
+ \hypertarget{structcsmsgpool_ab79b44d003c02515c83d5772eb53c937}{}\index{csmsgpool@{csmsgpool}!use\+\_\+sem\+\_\+in\+\_\+pool@{use\+\_\+sem\+\_\+in\+\_\+pool}}
+\index{use\+\_\+sem\+\_\+in\+\_\+pool@{use\+\_\+sem\+\_\+in\+\_\+pool}!csmsgpool@{csmsgpool}}
+\subsubsection[{use\+\_\+sem\+\_\+in\+\_\+pool}]{\setlength{\rightskip}{0pt plus 5cm}int csmsgpool\+::use\+\_\+sem\+\_\+in\+\_\+pool}\label{structcsmsgpool_ab79b44d003c02515c83d5772eb53c937}
+
+
+use\+\_\+sem\+\_\+in\+\_\+pool 1 turn on semaphore wait or post, 0 turn off. 
+
+\begin{DoxyNote}{Note}
+use\+\_\+sem\+\_\+in\+\_\+pool only works in cspool\+\_\+pulldata and cspool\+\_\+pushdata. user shoud call semaphore wait and post explicit while calling cspool\+\_\+pullitem and cspool\+\_\+pushitem. 
+\end{DoxyNote}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/\hyperlink{msgpool_8h}{msgpool.\+h}\end{DoxyCompactItemize}

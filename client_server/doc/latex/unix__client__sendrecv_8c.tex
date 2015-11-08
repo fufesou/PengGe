@@ -1,0 +1,124 @@
+\hypertarget{unix__client__sendrecv_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/unix\+\_\+client\+\_\+sendrecv.c File Reference}
+\label{unix__client__sendrecv_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/unix\+\_\+client\+\_\+sendrecv.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/unix\+\_\+client\+\_\+sendrecv.\+c}}
+
+
+This file provide the linux version of client sendrecv.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include $<$setjmp.\+h$>$}\\*
+{\ttfamily \#include $<$signal.\+h$>$}\\*
+{\ttfamily \#include $<$sys/socket.\+h$>$}\\*
+{\ttfamily \#include $<$arpa/inet.\+h$>$}\\*
+{\ttfamily \#include $<$pthread.\+h$>$}\\*
+{\ttfamily \#include $<$semaphore.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}macros.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}unprtt.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lightthread.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+wrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}bufarray.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgpool.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgwrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utility\+\_\+wrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}client.\+h\char`\"{}}\\*
+Include dependency graph for unix\+\_\+client\+\_\+sendrecv.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{unix__client__sendrecv_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+ssize\+\_\+t \hyperlink{unix__client__sendrecv_8c_aeecc65b7dbf1e0ac8f806ba8f518dab9}{csclient\+\_\+sendrecv} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+sendrecv \end{DoxyCompactList}\item 
+\hypertarget{unix__client__sendrecv_8c_a4fb698628f5356d8926c28c83e17ea55}{}void \hyperlink{unix__client__sendrecv_8c_a4fb698628f5356d8926c28c83e17ea55}{cssendrecv\+\_\+init} (void)\label{unix__client__sendrecv_8c_a4fb698628f5356d8926c28c83e17ea55}
+
+\begin{DoxyCompactList}\small\item\em cssendrecv\+\_\+init This function shoud better be called before the first call of csclient\+\_\+sendrecv. \end{DoxyCompactList}\item 
+\hypertarget{unix__client__sendrecv_8c_a5f15ec99768625f23952938f2619c020}{}void \hyperlink{unix__client__sendrecv_8c_a5f15ec99768625f23952938f2619c020}{cssendrecv\+\_\+clear} (void)\label{unix__client__sendrecv_8c_a5f15ec99768625f23952938f2619c020}
+
+\begin{DoxyCompactList}\small\item\em cssendrecv\+\_\+clear This function must be called after client communication done. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provide the linux version of client sendrecv. 
+
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/31 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+周五 2015-\/11-\/06 12\+:15\+:06 中国标准时间 
+\end{DoxyParagraph}
+
+
+\subsection{Function Documentation}
+\hypertarget{unix__client__sendrecv_8c_aeecc65b7dbf1e0ac8f806ba8f518dab9}{}\index{unix\+\_\+client\+\_\+sendrecv.\+c@{unix\+\_\+client\+\_\+sendrecv.\+c}!csclient\+\_\+sendrecv@{csclient\+\_\+sendrecv}}
+\index{csclient\+\_\+sendrecv@{csclient\+\_\+sendrecv}!unix\+\_\+client\+\_\+sendrecv.\+c@{unix\+\_\+client\+\_\+sendrecv.\+c}}
+\subsubsection[{csclient\+\_\+sendrecv(struct csclient $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}ssize\+\_\+t csclient\+\_\+sendrecv (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli, }
+\item[{const struct sockaddr $\ast$}]{servaddr, }
+\item[{cssocklen\+\_\+t}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{unix__client__sendrecv_8c_aeecc65b7dbf1e0ac8f806ba8f518dab9}
+
+
+csclient\+\_\+sendrecv 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & \\
+\hline
+{\em servaddr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\begin{DoxyEnumerate}
+\item number of bytes received.
+\item -\/1, if timeout.
+\item -\/2, if sendto error occurs.
+\item -\/3, if recvfrom error occurs.
+\end{DoxyEnumerate}
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{client_8h_a4fb698628f5356d8926c28c83e17ea55}{cssendrecv\+\_\+init} \hyperlink{client_8h_a5f15ec99768625f23952938f2619c020}{cssendrecv\+\_\+clear} 
+\end{DoxySeeAlso}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{unix__client__sendrecv_8c_aeecc65b7dbf1e0ac8f806ba8f518dab9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{unix__client__sendrecv_8c_aeecc65b7dbf1e0ac8f806ba8f518dab9_icgraph}
+\end{center}
+\end{figure}
+
+

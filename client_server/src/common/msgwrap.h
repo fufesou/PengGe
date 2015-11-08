@@ -1,6 +1,6 @@
 /**
  * @file msgwrap.h	
- * @brief  This file describe the message for sending and receiving.
+ * @brief  This file describe the message header for sending and receiving.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19

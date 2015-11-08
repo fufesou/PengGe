@@ -1,0 +1,71 @@
+\hypertarget{bufarray_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/bufarray.c File Reference}
+\label{bufarray_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/bufarray.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/bufarray.\+c}}
+
+
+0.\+1  
+
+
+{\ttfamily \#include $<$malloc.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}bufarray.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}macros.\+h\char`\"{}}\\*
+Include dependency graph for bufarray.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{bufarray_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{bufarray_8c_ad78700c530a64f81391a2639952d85c6}{init\+\_\+buf} (struct \hyperlink{structarray__buf}{array\+\_\+buf} $\ast$buf, int numitem, int lenitem, int nmalloc)
+\begin{DoxyCompactList}\small\item\em init\+\_\+buf initialize struct array\+\_\+buf$\ast$. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+0.\+1 
+
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/17 
+\end{DoxyDate}
+
+
+\subsection{Function Documentation}
+\hypertarget{bufarray_8c_ad78700c530a64f81391a2639952d85c6}{}\index{bufarray.\+c@{bufarray.\+c}!init\+\_\+buf@{init\+\_\+buf}}
+\index{init\+\_\+buf@{init\+\_\+buf}!bufarray.\+c@{bufarray.\+c}}
+\subsubsection[{init\+\_\+buf(struct array\+\_\+buf $\ast$buf, int numitem, int lenitem, int nmalloc)}]{\setlength{\rightskip}{0pt plus 5cm}void init\+\_\+buf (
+\begin{DoxyParamCaption}
+\item[{struct {\bf array\+\_\+buf} $\ast$}]{buf, }
+\item[{int}]{numitem, }
+\item[{int}]{lenitem, }
+\item[{int}]{nmalloc}
+\end{DoxyParamCaption}
+)}\label{bufarray_8c_ad78700c530a64f81391a2639952d85c6}
+
+
+init\+\_\+buf initialize struct array\+\_\+buf$\ast$. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buf} & is the struct array\+\_\+buf$\ast$ to init. \\
+\hline
+{\em numitem} & is the number of items in struct \hyperlink{structarray__buf}{array\+\_\+buf}. \textquotesingle{}num\+\_\+item\textquotesingle{} will be set to the smallest number that fit\+: ((num\+\_\+item $>$= numitem) \&\& ((num\+\_\+item \% 4) == 0)) \\
+\hline
+{\em lenitem} & is the length of every item in struct \hyperlink{structarray__buf}{array\+\_\+buf}. \textquotesingle{}len\+\_\+item\textquotesingle{} will be set to the smallest number that fit\+: ((len\+\_\+item $>$= lenitem) \&\& ((len\+\_\+iem \% 512) == 0)) \\
+\hline
+{\em nmalloc} & is the number of item data to be malloc. This parameter will be change in the following principles in the function\+:
+\begin{DoxyEnumerate}
+\item if nmalloc is less than 0 or greater equal than \textquotesingle{}numitem\textquotesingle{}, nmalloc will be set to \textquotesingle{}numitem\textquotesingle{}.
+\item otherwise nmalloc will be set to the smallest number that fit\+: ((nmalloc $>$= numitem) \&\& ((nmalloc \% 4) == 0)) 
+\end{DoxyEnumerate}\\
+\hline
+\end{DoxyParams}

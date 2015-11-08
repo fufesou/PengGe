@@ -1,0 +1,4 @@
+<map id="csclient_sendrecv" name="csclient_sendrecv">
+<area shape="rect" id="node2" href="$client__udp_8c.html#a571252c127c68c849fdf766d6cef63e2" title="csclient_udp_once This function process udp send&amp;recv one time. " alt="" coords="179,5,309,32"/>
+<area shape="rect" id="node3" href="$client__udp_8c.html#a8be5e8ba05fdac392536b4bb22d8914b" title="csclient_udp This function process udp communication with server. This function call csclient_udp_onc..." alt="" coords="357,5,452,32"/>
+</map>

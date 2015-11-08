@@ -1,0 +1,9 @@
+<map id="cssock_get_last_error" name="cssock_get_last_error">
+<area shape="rect" id="node2" href="$client_8h.html#a5aa275fcd29cc40dc4e8b04aca4836a8" title="csclient_init " alt="" coords="403,11,494,37"/>
+<area shape="rect" id="node3" href="$sock__wrap_8h.html#a842dda0d61b2e39aab64b40764adddd1" title="cssock_open cssock_open will create a socket handle according to tcpudp option. " alt="" coords="229,36,328,63"/>
+<area shape="rect" id="node5" href="$sock__wrap_8h.html#acd994aca6a58e8d8e201d2d8a3f6268e" title="cssock_close " alt="" coords="227,111,330,137"/>
+<area shape="rect" id="node6" href="$sock__wrap_8h.html#a098e3c55e9e87fb357ca535aa1511ff2" title="cssock_getsockname " alt="" coords="204,161,353,188"/>
+<area shape="rect" id="node7" href="$sock__wrap_8h.html#a31487252f4a7328c3a19272520b131a7" title="cssock_getpeername " alt="" coords="205,212,352,239"/>
+<area shape="rect" id="node8" href="$server_8h.html#ac7933c6a5f3d883731c1e0102d718f4d" title="csserver_udp This function process communication for udp socket. " alt="" coords="229,263,328,289"/>
+<area shape="rect" id="node4" href="$server_8h.html#ab4f2b6b305b68d61db2932c5d0a50695" title="csserver_init " alt="" coords="401,73,496,100"/>
+</map>

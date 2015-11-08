@@ -1,6 +1,7 @@
 /**
  * @file msgpool.h
- * @brief  
+ * @brief  This file defines message buffer pool operations.
+ * With thread, mutex, semaphore used, This struct csmsgpool can be used for constructing multithread environment.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
@@ -9,8 +10,6 @@
 
 #ifndef  MSGPOOL_H
 #define  MSGPOOL_H
-
-#include    "macros.h"
 
 #ifdef __cplusplus
 extern "C" {

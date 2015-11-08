@@ -1,6 +1,6 @@
 /**
  * @file server_msgdispatch.h
- * @brief This file provide differenct kinds of message handler functions.
+ * @brief This file provide differenct kinds of message process functions, and dispatches message to corresponding handler.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-18

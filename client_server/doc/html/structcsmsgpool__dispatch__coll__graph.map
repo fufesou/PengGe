@@ -1,0 +1,4 @@
+<map id="csmsgpool_dispatch" name="csmsgpool_dispatch">
+<area shape="rect" id="node2" href="$structcsmsgpool.html" title="csmsgpool contains basic members for send receive buffer and thread operations. The members of struct..." alt="" coords="33,109,119,136"/>
+<area shape="rect" id="node3" href="$structarray__buf.html" title="array_buf is used to hold data. This struct works like circle queue(tail&#45;in head&#45;out). " alt="" coords="39,5,113,32"/>
+</map>

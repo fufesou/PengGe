@@ -1,0 +1,28 @@
+digraph data_trans {
+    node [shape=plaintext];
+
+    subgraph cluster_client {
+        csend [label="sendto()"];
+        crecv [label="recvfrom()"];
+
+        "user input" -> csend [label="data"];
+
+        style = filled;
+        color = lightgray;
+        label = <<FONT POINT-SIZE="18" COLOR="royalblue">client</FONT>>;
+    }
+    subgraph cluster_server {
+        ssend [label="sendto()"];
+        srecv [label="recvfrom()"];
+
+        srecv -> sprocess -> ssend;
+
+        style = filled;
+        color = lightgray;
+        label = <<FONT POINT-SIZE="18" COLOR="royalblue">server</FONT>>;
+    }
+
+    csend -> srecv [label="msgitm seq=X"];
+    ssend -> crecv;
+    crecv -> cprocess
+}

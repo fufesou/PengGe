@@ -1,6 +1,6 @@
 /**
  * @file bufarray.h
- * @brief  
+ * @brief  The basic buffer operations that implemented with circular queue.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-17

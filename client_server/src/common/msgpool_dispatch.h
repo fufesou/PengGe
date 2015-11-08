@@ -1,8 +1,8 @@
 /**
  * @file msgpool_dispatch.h
- * @brief  This file simply process message in send and recv pool. 
- * 1. When prcess recv message. It firstly pull message from the recv pool, then process message by calling designated process function, and at last push the message to send pool.
- * 2. When prcess send message. It firstly pull message from the send pool, then send message to the peer port.
+ * @brief  This file is the process register module. It simply process message in unprocessed pool(message that received from peer port) and processed pool(message prcessed).
+ * 1. When prcess recieved message. It firstly pull message from the unprocessed pool, then process message by calling designated process function, and at last push the message to processed pool.
+ * 2. When prcess processed message. It firstly pull message from the processed pool, then call process_af(if this function pointer is not NULL).
  *
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1

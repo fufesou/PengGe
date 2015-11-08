@@ -1,0 +1,4 @@
+<map id="csthread_getpid" name="csthread_getpid">
+<area shape="rect" id="node2" href="$msgpool__dispatch_8h.html#a45b7e54d8d8abaa2042d2835dea4c39a" title="csmsgpool_process This is the thread function of send pool. " alt="" coords="176,5,315,32"/>
+<area shape="rect" id="node3" href="$msgpool__dispatch_8h.html#af38f74003b2a41b9b56599b5a87a5cbd" title="csmsgpool_process_af This is the thread function of recv pool. " alt="" coords="168,56,323,83"/>
+</map>

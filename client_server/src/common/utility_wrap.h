@@ -1,6 +1,6 @@
 /**
  * @file utility_wrap.h
- * @brief  
+ * @brief  This function defines some utility wrap functions, such as memcpy.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-29

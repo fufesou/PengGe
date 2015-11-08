@@ -1,0 +1,11 @@
+<map id="csmutex_lock" name="csmutex_lock">
+<area shape="rect" id="node2" href="$msgpool_8h.html#a83f09a2407be63d0ce25eb505f7a04c4" title="cspool_pushitem " alt="" coords="156,81,276,108"/>
+<area shape="rect" id="node8" href="$msgpool_8h.html#a14439a45efe508d7c98e10cef3737104" title="cspool_pullitem " alt="" coords="160,132,272,159"/>
+<area shape="rect" id="node9" href="$msgpool_8h.html#a577ed27293ca2b80f656a3722857cddb" title="cspool_pushdata This function push one buffer item data to pool. This procedure can be splitted into ..." alt="" coords="156,183,276,209"/>
+<area shape="rect" id="node10" href="$msgpool_8h.html#a3edf21b1efef5632e038e45e07d12216" title="cspool_pulldata This function pull one buffer item data from filled buffer and move the item into the..." alt="" coords="160,233,272,260"/>
+<area shape="rect" id="node3" href="$msgpool__dispatch_8h.html#a45b7e54d8d8abaa2042d2835dea4c39a" title="csmsgpool_process This is the thread function of send pool. " alt="" coords="332,56,471,83"/>
+<area shape="rect" id="node4" href="$msgpool__dispatch_8h.html#af38f74003b2a41b9b56599b5a87a5cbd" title="csmsgpool_process_af This is the thread function of recv pool. " alt="" coords="324,107,479,133"/>
+<area shape="rect" id="node5" href="$msgwrap_8h.html#ad813358703a8d2859cc883e8ee15c286" title="csmsg_push2pool will firstly copy message data and the unit header to single char array..." alt="" coords="338,157,465,184"/>
+<area shape="rect" id="node6" href="$msgwrap_8h.html#a116afb019547278f14bc11309ba7c387" title="csmsg_pull_from_pool works the opposite as csmsg_push2pool does. The procedure can be splitted into t..." alt="" coords="326,208,477,235"/>
+<area shape="rect" id="node7" href="$server_8h.html#ac7933c6a5f3d883731c1e0102d718f4d" title="csserver_udp This function process communication for udp socket. " alt="" coords="352,5,451,32"/>
+</map>

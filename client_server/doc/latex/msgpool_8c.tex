@@ -1,0 +1,279 @@
+\hypertarget{msgpool_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/msgpool.c File Reference}
+\label{msgpool_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/msgpool.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/common/msgpool.\+c}}
+{\ttfamily \#include $<$sys/socket.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$malloc.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$semaphore.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}macros.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utility\+\_\+wrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}bufarray.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lightthread.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgpool.\+h\char`\"{}}\\*
+Include dependency graph for msgpool.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{msgpool_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{msgpool_8c_a109babd9ac01b0ecab978146c55b4ad7}{cspool\+\_\+init} (struct \hyperlink{structcsmsgpool}{csmsgpool} $\ast$pool, int itemlen, int itemnum, int threadnum, \hyperlink{sock__types_8h_aff065565f761db4433fff15fc7b7c471}{cssock\+\_\+t} socket, csthread\+\_\+proc\+\_\+t proc, void $\ast$pargs)
+\begin{DoxyCompactList}\small\item\em cspool\+\_\+init This function must be called before any of pool operation begins. \end{DoxyCompactList}\item 
+void \hyperlink{msgpool_8c_a96331601cf8234f326ec86d31c05d4a2}{cspool\+\_\+clear} (struct \hyperlink{structcsmsgpool}{csmsgpool} $\ast$pool)
+\begin{DoxyCompactList}\small\item\em cspool\+\_\+clear This function will do some clear works such as free memory. \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{msgpool_8c_a83f09a2407be63d0ce25eb505f7a04c4}{cspool\+\_\+pushitem} (struct \hyperlink{structcsmsgpool}{csmsgpool} $\ast$pool, struct \hyperlink{structarray__buf}{array\+\_\+buf} $\ast$buf, char $\ast$item)
+\begin{DoxyCompactList}\small\item\em cspool\+\_\+pushitem \end{DoxyCompactList}\item 
+char $\ast$ \hyperlink{msgpool_8c_a14439a45efe508d7c98e10cef3737104}{cspool\+\_\+pullitem} (struct \hyperlink{structcsmsgpool}{csmsgpool} $\ast$pool, struct \hyperlink{structarray__buf}{array\+\_\+buf} $\ast$buf)
+\begin{DoxyCompactList}\small\item\em cspool\+\_\+pullitem \end{DoxyCompactList}\item 
+int \hyperlink{msgpool_8c_a577ed27293ca2b80f656a3722857cddb}{cspool\+\_\+pushdata} (struct \hyperlink{structcsmsgpool}{csmsgpool} $\ast$pool, const char $\ast$data, int datalen)
+\begin{DoxyCompactList}\small\item\em cspool\+\_\+pushdata This function push one buffer item data to pool. This procedure can be splitted into two steps\+: \end{DoxyCompactList}\item 
+int \hyperlink{msgpool_8c_a3edf21b1efef5632e038e45e07d12216}{cspool\+\_\+pulldata} (struct \hyperlink{structcsmsgpool}{csmsgpool} $\ast$pool, char $\ast$data, int datalen)
+\begin{DoxyCompactList}\small\item\em cspool\+\_\+pulldata This function pull one buffer item data from filled buffer and move the item into the empty buffer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/19 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+Sat 2015-\/11-\/07 14\+:53\+:04 (+0800) 
+\end{DoxyParagraph}
+
+
+\subsection{Function Documentation}
+\hypertarget{msgpool_8c_a96331601cf8234f326ec86d31c05d4a2}{}\index{msgpool.\+c@{msgpool.\+c}!cspool\+\_\+clear@{cspool\+\_\+clear}}
+\index{cspool\+\_\+clear@{cspool\+\_\+clear}!msgpool.\+c@{msgpool.\+c}}
+\subsubsection[{cspool\+\_\+clear(struct csmsgpool $\ast$pool)}]{\setlength{\rightskip}{0pt plus 5cm}void cspool\+\_\+clear (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csmsgpool} $\ast$}]{pool}
+\end{DoxyParamCaption}
+)}\label{msgpool_8c_a96331601cf8234f326ec86d31c05d4a2}
+
+
+cspool\+\_\+clear This function will do some clear works such as free memory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{msgpool_8c_a109babd9ac01b0ecab978146c55b4ad7}{}\index{msgpool.\+c@{msgpool.\+c}!cspool\+\_\+init@{cspool\+\_\+init}}
+\index{cspool\+\_\+init@{cspool\+\_\+init}!msgpool.\+c@{msgpool.\+c}}
+\subsubsection[{cspool\+\_\+init(struct csmsgpool $\ast$pool, int itemlen, int itemnum, int threadnum, cssock\+\_\+t socket, csthread\+\_\+proc\+\_\+t proc, void $\ast$pargs)}]{\setlength{\rightskip}{0pt plus 5cm}void cspool\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csmsgpool} $\ast$}]{pool, }
+\item[{int}]{itemlen, }
+\item[{int}]{itemnum, }
+\item[{int}]{threadnum, }
+\item[{{\bf cssock\+\_\+t}}]{socket, }
+\item[{csthread\+\_\+proc\+\_\+t}]{proc, }
+\item[{void $\ast$}]{pargs}
+\end{DoxyParamCaption}
+)}\label{msgpool_8c_a109babd9ac01b0ecab978146c55b4ad7}
+
+
+cspool\+\_\+init This function must be called before any of pool operation begins. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool} & the operating pool \\
+\hline
+{\em itemlen} & length for each buffer item. \\
+\hline
+{\em itemnum} & number of buffer items. \\
+\hline
+{\em threadnum} & number of threads that the buffer contains. \\
+\hline
+{\em pfunc} & the initial operation that each thread will operate once created. \\
+\hline
+{\em pargs} & this args of pfunc. \\
+\hline
+\end{DoxyParams}
+\hypertarget{msgpool_8c_a3edf21b1efef5632e038e45e07d12216}{}\index{msgpool.\+c@{msgpool.\+c}!cspool\+\_\+pulldata@{cspool\+\_\+pulldata}}
+\index{cspool\+\_\+pulldata@{cspool\+\_\+pulldata}!msgpool.\+c@{msgpool.\+c}}
+\subsubsection[{cspool\+\_\+pulldata(struct csmsgpool $\ast$pool, char $\ast$data, int datalen)}]{\setlength{\rightskip}{0pt plus 5cm}int cspool\+\_\+pulldata (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csmsgpool} $\ast$}]{pool, }
+\item[{char $\ast$}]{data, }
+\item[{int}]{datalen}
+\end{DoxyParamCaption}
+)}\label{msgpool_8c_a3edf21b1efef5632e038e45e07d12216}
+
+
+cspool\+\_\+pulldata This function pull one buffer item data from filled buffer and move the item into the empty buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool} & \\
+\hline
+{\em data} & \\
+\hline
+{\em datalen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success. 1 if there is no filled buffer. 2 if wait semaphore failed. -\/1 if size of data is not large enough. 
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{msgpool_8c_a3edf21b1efef5632e038e45e07d12216_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{msgpool_8c_a14439a45efe508d7c98e10cef3737104}{}\index{msgpool.\+c@{msgpool.\+c}!cspool\+\_\+pullitem@{cspool\+\_\+pullitem}}
+\index{cspool\+\_\+pullitem@{cspool\+\_\+pullitem}!msgpool.\+c@{msgpool.\+c}}
+\subsubsection[{cspool\+\_\+pullitem(struct csmsgpool $\ast$pool, struct array\+\_\+buf $\ast$buf)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ cspool\+\_\+pullitem (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csmsgpool} $\ast$}]{pool, }
+\item[{struct {\bf array\+\_\+buf} $\ast$}]{buf}
+\end{DoxyParamCaption}
+)}\label{msgpool_8c_a14439a45efe508d7c98e10cef3737104}
+
+
+cspool\+\_\+pullitem 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool} & \\
+\hline
+{\em buf} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+L\+L if failed, else success. 
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=288pt]{msgpool_8c_a14439a45efe508d7c98e10cef3737104_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=316pt]{msgpool_8c_a14439a45efe508d7c98e10cef3737104_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{msgpool_8c_a577ed27293ca2b80f656a3722857cddb}{}\index{msgpool.\+c@{msgpool.\+c}!cspool\+\_\+pushdata@{cspool\+\_\+pushdata}}
+\index{cspool\+\_\+pushdata@{cspool\+\_\+pushdata}!msgpool.\+c@{msgpool.\+c}}
+\subsubsection[{cspool\+\_\+pushdata(struct csmsgpool $\ast$pool, const char $\ast$data, int datalen)}]{\setlength{\rightskip}{0pt plus 5cm}int cspool\+\_\+pushdata (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csmsgpool} $\ast$}]{pool, }
+\item[{const char $\ast$}]{data, }
+\item[{int}]{datalen}
+\end{DoxyParamCaption}
+)}\label{msgpool_8c_a577ed27293ca2b80f656a3722857cddb}
+
+
+cspool\+\_\+pushdata This function push one buffer item data to pool. This procedure can be splitted into two steps\+: 
+
+
+\begin{DoxyEnumerate}
+\item take out one item from the empty buffer.
+\item copy data from \textquotesingle{}data\textquotesingle{} to the buffer item.
+\item push buffer item into the filled buffer.
+\end{DoxyEnumerate}
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool} & the operating pool. \\
+\hline
+{\em data} & \\
+\hline
+{\em datalen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 if success. There is at least one empty buffer. 1 if fail. There is no empty buffer. -\/1 if fail. copy data error. 
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{msgpool_8c_a577ed27293ca2b80f656a3722857cddb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{msgpool_8c_a83f09a2407be63d0ce25eb505f7a04c4}{}\index{msgpool.\+c@{msgpool.\+c}!cspool\+\_\+pushitem@{cspool\+\_\+pushitem}}
+\index{cspool\+\_\+pushitem@{cspool\+\_\+pushitem}!msgpool.\+c@{msgpool.\+c}}
+\subsubsection[{cspool\+\_\+pushitem(struct csmsgpool $\ast$pool, struct array\+\_\+buf $\ast$buf, char $\ast$item)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ cspool\+\_\+pushitem (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csmsgpool} $\ast$}]{pool, }
+\item[{struct {\bf array\+\_\+buf} $\ast$}]{buf, }
+\item[{char $\ast$}]{item}
+\end{DoxyParamCaption}
+)}\label{msgpool_8c_a83f09a2407be63d0ce25eb505f7a04c4}
+
+
+cspool\+\_\+pushitem 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pool} & \\
+\hline
+{\em buf} & \\
+\hline
+{\em item} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+N\+U\+L\+L if failed, else success. 
+\end{DoxyReturn}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=294pt]{msgpool_8c_a83f09a2407be63d0ce25eb505f7a04c4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=322pt]{msgpool_8c_a83f09a2407be63d0ce25eb505f7a04c4_icgraph}
+\end{center}
+\end{figure}
+
+

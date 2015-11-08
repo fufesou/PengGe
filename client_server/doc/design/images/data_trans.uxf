@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="13.3">
+  <zoom_level>12</zoom_level>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>696</x>
+      <y>0</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>server
+fontsize=25
+valign=center
+halign=center
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>444</x>
+      <y>0</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>client
+fontsize=25
+valign=center
+halign=center
+
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>444</x>
+      <y>60</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>用户输入
+fontsize=18
+valign=center
+halign=center
+
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>660</x>
+      <y>576</y>
+      <w>228</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>从待处理消息池取出消息，处理结束后放入已处理消息池
+fontsize=18
+valign=center
+halign=center
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>492</x>
+      <y>96</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+输入数据
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>324</y>
+      <w>192</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+填充addr和addrlen后
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;60.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>456</x>
+      <y>888</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>接收
+fontsize=18
+valign=center
+halign=center
+
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>204</y>
+      <w>204</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+msgitm, seq=X
+fg=magenta</panel_attributes>
+    <additional_attributes>150.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>708</x>
+      <y>276</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>接收
+fontsize=18
+valign=center
+halign=center
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>444</y>
+      <w>36</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>480</y>
+      <w>84</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread1
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>708</x>
+      <y>480</y>
+      <w>84</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread2
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>792</x>
+      <y>480</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread...
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>480</y>
+      <w>300</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=blue</panel_attributes>
+    <additional_attributes>230.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>888</x>
+      <y>480</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+threadN1
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>708</x>
+      <y>396</y>
+      <w>132</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>放入待处理消息池
+fontsize=18
+valign=center
+halign=center
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>660</x>
+      <y>780</y>
+      <w>228</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>从已处理消息池取出消息，发送消息
+fontsize=18
+valign=center
+halign=center
+
+fg=blue</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>756</x>
+      <y>648</y>
+      <w>36</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>684</y>
+      <w>84</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread1
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>708</x>
+      <y>684</y>
+      <w>84</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread2
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>792</x>
+      <y>684</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread...
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>684</y>
+      <w>300</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=blue</panel_attributes>
+    <additional_attributes>230.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>888</x>
+      <y>684</y>
+      <w>108</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+threadN2
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>552</x>
+      <y>828</y>
+      <w>156</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+msgitm
+fg=blue</panel_attributes>
+    <additional_attributes>10.0;70.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>456</x>
+      <y>1200</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>放入待处理消息池
+fontsize=18
+valign=center
+halign=center
+
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>492</x>
+      <y>984</y>
+      <w>48</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>type=decision
+seq == X ?
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>1020</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+接收成功
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>924</y>
+      <w>36</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>396</x>
+      <y>984</y>
+      <w>120</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+接收失败
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;20.0;80.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>360</x>
+      <y>984</y>
+      <w>48</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>type=decision
+seq == X ?
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>288</x>
+      <y>192</y>
+      <w>204</w>
+      <h>840</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+超时重发
+fg=magenta</panel_attributes>
+    <additional_attributes>150.0;10.0;20.0;10.0;10.0;680.0;60.0;680.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>372</x>
+      <y>1020</y>
+      <w>96</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+超时放弃
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>444</x>
+      <y>180</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>发送
+fontsize=18
+valign=center
+halign=center
+
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>324</x>
+      <y>1068</y>
+      <w>120</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>结束
+fontsize=18
+valign=center
+halign=center
+
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>1248</y>
+      <w>36</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>372</x>
+      <y>1284</y>
+      <w>84</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread1
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>456</x>
+      <y>1284</y>
+      <w>84</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread2
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>540</x>
+      <y>1284</y>
+      <w>96</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+thread...
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>372</x>
+      <y>1284</y>
+      <w>300</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=-
+fg=magenta</panel_attributes>
+    <additional_attributes>230.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>636</x>
+      <y>1284</y>
+      <w>108</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+threadN3
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Text</id>
+    <coordinates>
+      <x>408</x>
+      <y>1380</y>
+      <w>228</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>从待处理消息池取出消息，处理消息
+fontsize=18
+valign=center
+halign=center
+
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>492</x>
+      <y>1104</y>
+      <w>48</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>type=decision
+seq == X ?
+fg=magenta</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>288</x>
+      <y>996</y>
+      <w>228</w>
+      <h>156</h>
+    </coordinates>
+    <panel_attributes>lt=-
+seq != X
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;110.0;170.0;110.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>504</x>
+      <y>1140</y>
+      <w>96</w>
+      <h>84</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+seq == X
+fg=magenta</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+</diagram>

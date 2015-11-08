@@ -1,6 +1,6 @@
 /**
  * @file lightthread.h
- * @brief  
+ * @brief  This file defines some basic wrapper functions of thread, mutex and semaphore.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-26

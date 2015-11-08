@@ -1,0 +1,8 @@
+<map id="D:/project/PengGe/client_server/src/common/msgpool_dispatch.c" name="D:/project/PengGe/client_server/src/common/msgpool_dispatch.c">
+<area shape="rect" id="node9" href="$bufarray_8h.html" title="The basic buffer operations that implemented with circular queue. " alt="" coords="727,109,805,136"/>
+<area shape="rect" id="node10" href="$sock__types_8h.html" title="This file defines some basic socket types and macros for this application. " alt="" coords="829,109,929,136"/>
+<area shape="rect" id="node11" href="$lightthread_8h.html" title="This file defines some basic wrapper functions of thread, mutex and semaphore. " alt="" coords="954,109,1047,136"/>
+<area shape="rect" id="node12" href="$msgpool_8h.html" title="This file defines message buffer pool operations. With thread, mutex, semaphore used, This struct csmsgpool can be used for constructing multithread environment. " alt="" coords="1071,109,1154,136"/>
+<area shape="rect" id="node13" href="$msgwrap_8h.html" title="This file describe the message header for sending and receiving. " alt="" coords="1178,109,1263,136"/>
+<area shape="rect" id="node14" href="$msgpool__dispatch_8h.html" title="This file is the process register module. It simply process message in unprocessed pool(message that ..." alt="" coords="1287,109,1426,136"/>
+</map>

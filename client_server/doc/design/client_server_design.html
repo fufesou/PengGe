@@ -431,17 +431,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#服务器">1.1. 服务器</a></li>
 <li><a href="#客户端">1.2. 客户端</a></li>
-<li><a href="#界面">1.3. 界面</a></li>
-<li><a href="#log">1.4. log</a></li>
 </ul>
 </li>
 <li><a href="#详细设计">2. 详细设计</a>
 <ul class="sectlevel2">
-<li><a href="#服务器客户端">2.1. 服务器客户端</a>
+<li><a href="#服务器客户端程序">2.1. 服务器客户端程序</a>
 <ul class="sectlevel3">
-<li><a href="#通用模块">2.1.1. 通用模块</a></li>
-<li><a href="#服务器_2">2.1.2. 服务器</a></li>
-<li><a href="#客户端_2">2.1.3. 客户端</a></li>
+<li><a href="#消息结构">2.1.1. 消息结构</a></li>
+<li><a href="#数据传输过程">2.1.2. 数据传输过程</a></li>
+<li><a href="#通用模块">2.1.3. 通用模块</a></li>
+<li><a href="#服务器_2">2.1.4. 服务器</a></li>
+<li><a href="#客户端_2">2.1.5. 客户端</a></li>
 </ul>
 </li>
 </ul>
@@ -458,75 +458,27 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </blockquote>
 </div>
 <div class="paragraph">
-<p><a href="https://github.com/fufesou/PengGe">项目git地址</a>中的client_server/Qt_winsock(<a href="https://github.com/fufesou/PengGe/tree/master/client_server/Qt_winsock">点我</a>)为服务器客户端的工程。</p>
+<p><a href="https://github.com/fufesou/PengGe">项目git地址</a>中的client_server(<a href="https://github.com/fufesou/PengGe/tree/master/client_server">点我</a>)为服务器客户端的工程。</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="总述">1. 总述</h2>
 <div class="sectionbody">
-<div class="openblock">
-<div class="content">
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>采用C语言写客户端和服务器程序。</p>
-</li>
-<li>
-<p>用Qt做界面，界面包括：</p>
-</li>
-<li>
-<p>log。</p>
-</li>
-</ol>
-</div>
-</div>
-</div>
-<div class="openblock">
-<div class="title">注意</div><div class="content">
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>目前编译的是windows64位的程序，程序需要winsock2版本的支持。</p>
-</li>
-<li>
-<p>现在只是用的IPv4，后面改成IPv6。</p>
-</li>
-<li>
-<p>代码中没写注释，这两天把注释补全。</p>
-</li>
-<li>
-<p>代码调试差不多的话，就开始做界面吗？</p>
-</li>
-</ol>
-</div>
-</div>
-</div>
 <div class="sect2">
 <h3 id="服务器">1.1. 服务器</h3>
 <div class="paragraph">
-<p>我写的程序只监听一个端口，程序服务器要监听4个端口，就开4个程序。</p>
+<p>程序只监听一个端口，程序服务器要监听4个端口，需开4个程序。</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="客户端">1.2. 客户端</h3>
 <div class="paragraph">
-<p>客户端分为两个界面(界面还没开始做)，初始界面与登录界面，通过用户名和密码验证后，客户端由初始界面转入登录界面(目前的实现为打印enter login interface的信息)。</p>
-</div>
-<div class="paragraph">
-<p>登录方式为输入"login: 64bit 8-15bytes"，登录后客户端控制台会打印返回信息(现在的返回信息为输入信息)。</p>
+<p>登录方式为输入"login: 64bit 8-15bytes"。</p>
 </div>
 <div class="paragraph">
 <p>客户端使用rtt算法确保消息送达服务器与消息的顺序。</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="界面">1.3. 界面</h3>
-
-</div>
-<div class="sect2">
-<h3 id="log">1.4. log</h3>
-
 </div>
 </div>
 </div>
@@ -534,7 +486,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="详细设计">2. 详细设计</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="服务器客户端">2.1. 服务器客户端</h3>
+<h3 id="服务器客户端程序">2.1. 服务器客户端程序</h3>
 <div class="paragraph">
 <p>服务器客户端主要分成三个模块。</p>
 </div>
@@ -556,16 +508,166 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 </div>
 <div class="sect3">
-<h4 id="通用模块">2.1.1. 通用模块</h4>
+<h4 id="消息结构">2.1.1. 消息结构</h4>
+<div class="paragraph">
+<p>通信消息数据结构如<a href="#data_overview">通信消息数据</a>所示。</p>
+</div>
+<div id="data_overview" class="imageblock" style="text-align: center">
+<div class="content">
+<img src="images/data_overview.svg" alt="图片无法显示，请参考./images/data_overview.svg">
+</div>
+<div class="title">Figure 1. 通信消息数据</div>
+</div>
+<div class="paragraph">
+<p>message header数据结构定义在msgwrap.h中，基结构如<a href="#csmsg_header">csmsg_header</a>所示。</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>前两个成员用于记录对端的socket地址。</p>
+</li>
+<li>
+<p>header用于判断确认消息号和记录消息发送时间。</p>
+</li>
+<li>
+<p>numbytes于用记录消息数据(除开头部)的长度。</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">csmsg_header</div>
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-c" data-lang="c">struct csmsg_header
+{
+    struct sockaddr addr;
+    int addrlen;
+    struct hdr header;
+    int numbytes;
+};
 
+struct hdr
+{
+    uint32_t seq;
+    uint32_t ts;
+};</code></pre>
+</div>
+</div>
 </div>
 <div class="sect3">
-<h4 id="服务器_2">2.1.2. 服务器</h4>
-
+<h4 id="数据传输过程">2.1.2. 数据传输过程</h4>
+<div class="paragraph">
+<p>消息的传输过程如<a href="#data_trans">完整的消息传输过程</a>所示。</p>
+</div>
+<div id="data_trans" class="imageblock" style="text-align: center">
+<div class="content">
+<img src="images/data_trans.svg" alt="图片无法显示，请参考./images/data_trans.svg">
+</div>
+<div class="title">Figure 2. 一次完整的消息传输过程</div>
+</div>
 </div>
 <div class="sect3">
-<h4 id="客户端_2">2.1.3. 客户端</h4>
-
+<h4 id="通用模块">2.1.3. 通用模块</h4>
+<div class="paragraph">
+<p>客户端服务器程序用C语言编写，在Ubuntu和Windows上运行正确。程序实现中使用了socket，thread，mutex等wrap函数。
+下面列出各文件与功能的对应。</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>macros.h 常用的宏及配置数据(目前没有写配置文件读写)。</p>
+</li>
+<li>
+<p>global.c 常用的配置数据。</p>
+</li>
+<li>
+<p>error.h error.c 错误处理函数。</p>
+</li>
+<li>
+<p>timespan.h timespan.c 定义了time的获取以及计算time span的操作。</p>
+</li>
+<li>
+<p>utility_wrap.h utility_wrap.c 定义了一个memcpy和memcpy_s的wrap函数。(memcpy_s在c11标准中也有)</p>
+</li>
+<li>
+<p>unprtt.h rtt.c rtt超时判断函数。此文件直接从<a href="#unix network programming">[unix network programming]</a>3rd的源码中拷贝过来的。</p>
+</li>
+<li>
+<p>lightthread.h lightthread.c 对thread, mutex, semaphore的wrap函数。</p>
+</li>
+<li>
+<p>sock_types.h sock_wrap.h sock_wrap.c 定义了socket的基本wrap函数。</p>
+</li>
+<li>
+<p>list.h list.c list的实现，从linux源码中扒出来的文件。</p>
+</li>
+<li>
+<p>bufarray.h bufarray.c buflist.h buflist.c 缓冲区的基本操作，分别用循环队列和链表实现。</p>
+</li>
+<li>
+<p>msgpool.h msgpool.c 消息缓冲区struct csmsgpool实现。一个消息缓冲区中包含一个emtpy buffer和一个filled buffer，emtpy buffer存放可用的单元，filled buffer存放处理数据单元。另外struct csmsgpool还定义了thread，mutex和semaphore，多线程操作和同步。</p>
+</li>
+<li>
+<p>msgpool_dispatch.h msgpool_dispatch.c 定义了基本的处理数据注册操作。这个部分的函数最终被用于server_udp.c和client_udp.c。 <span class="red">这个部分有点乱</span>。</p>
+</li>
+<li>
+<p>msg_wrap.h msg_wrap.c 定义了传输消息头以及消息头和消息数据合并的基本操作。</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="服务器_2">2.1.4. 服务器</h4>
+<div class="paragraph">
+<p>服务器socket为阻塞socket。</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>server.h server.c 常用的服务器socket初始化操作和收发数据操作。</p>
+</li>
+<li>
+<p>server_udp.c 定义了udp通信的while(1)部分，并注册process message和send message操作到struct csmsgpool_dispatch中。</p>
+</li>
+<li>
+<p>server_dispatch.h server_dispatch.c 定义了process message操作。</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="客户端_2">2.1.5. 客户端</h4>
+<div class="paragraph">
+<p>客户端socket为非阻塞socket。客户端文件结构与服务器相仿。</p>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>client.h client.c 常用的客户端socket初始化操作和收发数据操作。</p>
+</li>
+<li>
+<p>client_udp.c 定义了udp通信的while(1)部分，并注册process message和send message操作到struct csmsgpool_dispatch中。</p>
+</li>
+<li>
+<p>client_dispatch.h client_dispatch.c 定义了process message操作。</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -574,7 +676,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2015-10-12 00:29:41 中国标准时间
+Last updated 2015-11-08 18:22:21 中国标准时间
 </div>
 </div>
 </body>

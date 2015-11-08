@@ -1,0 +1,57 @@
+\hypertarget{server__msgdispatch_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/server/server\+\_\+msgdispatch.c File Reference}
+\label{server__msgdispatch_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/server/server\+\_\+msgdispatch.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/server/server\+\_\+msgdispatch.\+c}}
+{\ttfamily \#include $<$sys/socket.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$semaphore.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}lightthread.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utility\+\_\+wrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}bufarray.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgpool.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgwrap.\+h\char`\"{}}\\*
+Include dependency graph for server\+\_\+msgdispatch.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{server__msgdispatch_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{server__msgdispatch_8c_ae491cecad213a2fb897b8e2829e1417b}{}void {\bfseries csserver\+\_\+process\+\_\+msg} (char $\ast$inmsg, char $\ast$outmsg, int $\ast$outmsglen, void $\ast$unused)\label{server__msgdispatch_8c_ae491cecad213a2fb897b8e2829e1417b}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{server__msgdispatch_8c_a4520db064bea79e42630a63a529a450c}{}const char $\ast$ {\bfseries g\+\_\+loginmsg\+\_\+header}\label{server__msgdispatch_8c_a4520db064bea79e42630a63a529a450c}
+
+\item 
+\hypertarget{server__msgdispatch_8c_a60cacc9239d0662a686899339cf5b127}{}const char $\ast$ {\bfseries g\+\_\+loginmsg\+\_\+\+S\+U\+C\+C\+E\+S\+S}\label{server__msgdispatch_8c_a60cacc9239d0662a686899339cf5b127}
+
+\item 
+\hypertarget{server__msgdispatch_8c_ab241e51fd6b4014566bd16db0e23de58}{}const char $\ast$ {\bfseries g\+\_\+loginmsg\+\_\+\+F\+A\+I\+L}\label{server__msgdispatch_8c_ab241e51fd6b4014566bd16db0e23de58}
+
+\item 
+\hypertarget{server__msgdispatch_8c_a533bdde78cc9c28ca1a7c9418177f6a7}{}const char {\bfseries g\+\_\+login\+\_\+delimiter}\label{server__msgdispatch_8c_a533bdde78cc9c28ca1a7c9418177f6a7}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/10-\/18 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+Sat 2015-\/11-\/07 13\+:22\+:11 (+0800) 
+\end{DoxyParagraph}

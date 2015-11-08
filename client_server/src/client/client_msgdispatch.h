@@ -1,6 +1,6 @@
 /**
  * @file client_msgdispatch.h
- * @brief  
+ * @brief  This file provides the process functions for message received from server. And the process function dispatches the message to corresponding handler.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07

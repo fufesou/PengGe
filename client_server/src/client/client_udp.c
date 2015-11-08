@@ -1,7 +1,7 @@
 /**
  * @file client_udp.c
- * @brief  This file prcess client udp message sendrecv. For now a lot config data is hard coded, reimplementation must be done when config parser complete.
-
+ * @brief  This file prcess client udp message sendrecv.
+ * For now a lot config data is hard coded, reimplementation must be done when config parser complete.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07

@@ -1,6 +1,6 @@
 /**
  * @file error.h
- * @brief  
+ * @brief  This file defines some crude error handlers.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-24

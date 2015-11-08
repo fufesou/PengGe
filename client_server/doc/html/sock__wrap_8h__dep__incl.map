@@ -1,0 +1,8 @@
+<map id="D:/project/PengGe/client_server/src/common/sock_wrap.h" name="D:/project/PengGe/client_server/src/common/sock_wrap.h">
+<area shape="rect" id="node2" href="$client_8c.html" title="D:/project/PengGe/client\l_server/src/client/client.c" alt="" coords="5,102,172,143"/>
+<area shape="rect" id="node3" href="$client__udp_8c.html" title="This file prcess client udp message sendrecv. For now a lot config data is hard coded, reimplementation must be done when config parser complete. " alt="" coords="197,102,391,143"/>
+<area shape="rect" id="node4" href="$unix__client__sendrecv_8c.html" title="This file provide the linux version of client sendrecv. " alt="" coords="416,95,580,151"/>
+<area shape="rect" id="node5" href="$error_8c.html" title="D:/project/PengGe/client\l_server/src/common/error.c" alt="" coords="604,102,784,143"/>
+<area shape="rect" id="node6" href="$sock__wrap_8c.html" title="D:/project/PengGe/client\l_server/src/common/sock_wrap.c" alt="" coords="809,102,1025,143"/>
+<area shape="rect" id="node7" href="$server_8c.html" title="The functions prefexed with &quot;s_&quot; are static functions. " alt="" coords="1049,102,1221,143"/>
+</map>

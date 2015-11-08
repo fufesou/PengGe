@@ -1,6 +1,6 @@
 /**
  * @file list.h
- * @brief  
+ * @brief  This file comes from linux source code. Some unused functions are castrated.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16

@@ -1,0 +1,155 @@
+\hypertarget{client__udp_8c}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/client\+\_\+udp.c File Reference}
+\label{client__udp_8c}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/client\+\_\+udp.\+c@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/client\+\_\+udp.\+c}}
+
+
+This file prcess client udp message sendrecv. For now a lot config data is hard coded, reimplementation must be done when config parser complete.  
+
+
+{\ttfamily \#include $<$sys/socket.\+h$>$}\\*
+{\ttfamily \#include $<$netinet/in.\+h$>$}\\*
+{\ttfamily \#include $<$pthread.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$assert.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$semaphore.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}macros.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}bufarray.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+types.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}lightthread.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}utility\+\_\+wrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgpool.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sock\+\_\+wrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgwrap.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}msgpool\+\_\+dispatch.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}client.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}client\+\_\+msgdispatch.\+h\char`\"{}}\\*
+Include dependency graph for client\+\_\+udp.\+c\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client__udp_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{client__udp_8c_a8be5e8ba05fdac392536b4bb22d8914b}{csclient\+\_\+udp} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, F\+I\+L\+E $\ast$fp, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+udp This function process udp communication with server. This function call csclient\+\_\+udp\+\_\+once in a loop. \end{DoxyCompactList}\item 
+void \hyperlink{client__udp_8c_a571252c127c68c849fdf766d6cef63e2}{csclient\+\_\+udp\+\_\+once} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+udp\+\_\+once This function process udp send\&recv one time. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{client__udp_8c_a174a730c25e8784070b32a669e817448}{}const char $\ast$ {\bfseries g\+\_\+exit}\label{client__udp_8c_a174a730c25e8784070b32a669e817448}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file prcess client udp message sendrecv. For now a lot config data is hard coded, reimplementation must be done when config parser complete. 
+
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/11-\/07 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+Sat 2015-\/11-\/07 15\+:57\+:32 (+0800) 
+\end{DoxyParagraph}
+
+
+\subsection{Function Documentation}
+\hypertarget{client__udp_8c_a8be5e8ba05fdac392536b4bb22d8914b}{}\index{client\+\_\+udp.\+c@{client\+\_\+udp.\+c}!csclient\+\_\+udp@{csclient\+\_\+udp}}
+\index{csclient\+\_\+udp@{csclient\+\_\+udp}!client\+\_\+udp.\+c@{client\+\_\+udp.\+c}}
+\subsubsection[{csclient\+\_\+udp(struct csclient $\ast$cli, F\+I\+L\+E $\ast$fp, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}void csclient\+\_\+udp (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli, }
+\item[{F\+I\+L\+E $\ast$}]{fp, }
+\item[{const struct sockaddr $\ast$}]{servaddr, }
+\item[{cssocklen\+\_\+t}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{client__udp_8c_a8be5e8ba05fdac392536b4bb22d8914b}
+
+
+csclient\+\_\+udp This function process udp communication with server. This function call csclient\+\_\+udp\+\_\+once in a loop. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & \\
+\hline
+{\em fp} & is the F\+I\+L\+E pointer where input data comes from. \\
+\hline
+{\em servaddr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{client_8h_a571252c127c68c849fdf766d6cef63e2}{csclient\+\_\+udp\+\_\+once} 
+\end{DoxySeeAlso}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client__udp_8c_a8be5e8ba05fdac392536b4bb22d8914b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{client__udp_8c_a571252c127c68c849fdf766d6cef63e2}{}\index{client\+\_\+udp.\+c@{client\+\_\+udp.\+c}!csclient\+\_\+udp\+\_\+once@{csclient\+\_\+udp\+\_\+once}}
+\index{csclient\+\_\+udp\+\_\+once@{csclient\+\_\+udp\+\_\+once}!client\+\_\+udp.\+c@{client\+\_\+udp.\+c}}
+\subsubsection[{csclient\+\_\+udp\+\_\+once(struct csclient $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}void csclient\+\_\+udp\+\_\+once (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli, }
+\item[{const struct sockaddr $\ast$}]{servaddr, }
+\item[{cssocklen\+\_\+t}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{client__udp_8c_a571252c127c68c849fdf766d6cef63e2}
+
+
+csclient\+\_\+udp\+\_\+once This function process udp send\&recv one time. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & cli has already been filled with data(end with \textquotesingle{}\textbackslash{}0\textquotesingle{}) to send. \\
+\hline
+{\em servaddr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client__udp_8c_a571252c127c68c849fdf766d6cef63e2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{client__udp_8c_a571252c127c68c849fdf766d6cef63e2_icgraph}
+\end{center}
+\end{figure}
+
+

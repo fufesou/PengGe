@@ -12,10 +12,11 @@
 #include  <windows.h>
 #else
 #include  <sys/time.h>
+#include  <linux/errno.h>
 #endif
 
-#include	"timespan.h"
 #include  <stdio.h>
+#include	"timespan.h"
 
 void csgettimeofday(struct timeval* tv, void* tz)
 {

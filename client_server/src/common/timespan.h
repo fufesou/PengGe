@@ -1,6 +1,6 @@
 /**
  * @file timespan.h
- * @brief  
+ * @brief  This file defines "get time" functions and "time span" functions.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-26
@@ -11,11 +11,8 @@
 #define _TIMESPAN_H
 
 #ifdef WIN32
-#include  <Windows.h>
 #define cstimelong_t ULARGE_INTEGER
 #else
-#include  <sys/time.h>
-#include  <linux/errno.h>
 #define cstimelong_t struct timeval
 #endif
 

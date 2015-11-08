@@ -1,6 +1,7 @@
 /**
  * @file macros.h
- * @brief  
+ * @brief  This file define some basic macro operations and functions.
+ * And .. some macros stand for config data(recode this file after config parser done).
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16

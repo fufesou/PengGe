@@ -1,0 +1,23 @@
+digraph data_flow {
+	msgitem [shape=none, margin=0, label=<
+		<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+		<TR><TD COLSPAN="16" BORDER="0"><FONT COLOR="royalblue" POINT-SIZE="18.0"> msgitm </FONT></TD>
+		</TR>
+		<TR><TD COLSPAN="4" BORDER = "0" ALIGN="LEFT">0 </TD>
+			<TD COLSPAN="1" BORDER = "0" ALIGN="LEFT">4 </TD>
+			<TD COLSPAN="2" BORDER = "0" ALIGN="LEFT">5 </TD>
+			<TD COLSPAN="1" BORDER = "0" ALIGN="LEFT">7 </TD>
+			<TD COLSPAN="8" BORDER = "0" ALIGN="LEFT">8 </TD>
+			<TD BORDER="0" ALIGN="LEFT">N</TD>
+		</TR>
+		<TR><TD COLSPAN="4">sockaddr</TD>
+		    <TD COLSPAN="1">addrlen</TD>
+			<TD COLSPAN="2">hdr</TD>
+			<TD COLSPAN="1">numbytes</TD>
+			<TD COLSPAN="8" BGCOLOR="cyan" PORT="TheData">actual message data</TD>
+		</TR>
+		<TR><TD COLSPAN="8" BORDER="0">message header</TD>
+		    <TD COLSPAN="8" BORDER="0">message data</TD>
+		</TR>
+		</TABLE>>];
+}

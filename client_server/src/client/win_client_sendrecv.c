@@ -1,6 +1,6 @@
 /**
  * @file client_sendrecv.c
- * @brief 
+ * @brief This file provide the windows version of client sendrecv.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03

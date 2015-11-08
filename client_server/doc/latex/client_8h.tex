@@ -1,0 +1,313 @@
+\hypertarget{client_8h}{}\section{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/client.h File Reference}
+\label{client_8h}\index{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/client.\+h@{D\+:/project/\+Peng\+Ge/client\+\_\+server/src/client/client.\+h}}
+
+
+This file provide the basic helper funstion for client struct.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+Include dependency graph for client.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{client_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structcsclient}{csclient}
+\begin{DoxyCompactList}\small\item\em struct csclient contains necessary members and functions for client operations. This struct object must be initialized (by calling csclient\+\_\+init) before any operations applied to it. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{client_8h_a5aa275fcd29cc40dc4e8b04aca4836a8}{csclient\+\_\+init} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, int tcpudp)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+init \end{DoxyCompactList}\item 
+void \hyperlink{client_8h_ae3752395d79c6d9a2920d96c73eb81ed}{csclient\+\_\+clear} (struct \hyperlink{structcsclient}{csclient} $\ast$cli)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+clear There may be some clear works after communication, such as free the memory. \end{DoxyCompactList}\item 
+\hypertarget{client_8h_a20e5a0eb2e564b26d13f5ab34c1a5986}{}void {\bfseries csclient\+\_\+connect} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)\label{client_8h_a20e5a0eb2e564b26d13f5ab34c1a5986}
+
+\item 
+int \hyperlink{client_8h_aa263fe24e3c96c3a1b1b8c087eb518b7}{csclient\+\_\+print} (const struct \hyperlink{structcsclient}{csclient} $\ast$cli)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+print csclient\+\_\+print will test and print client socket information. If test fail, process will clear the socket environmtn and exit. \end{DoxyCompactList}\item 
+void \hyperlink{client_8h_a8be5e8ba05fdac392536b4bb22d8914b}{csclient\+\_\+udp} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, F\+I\+L\+E $\ast$fp, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+udp This function process udp communication with server. This function call csclient\+\_\+udp\+\_\+once in a loop. \end{DoxyCompactList}\item 
+void \hyperlink{client_8h_a571252c127c68c849fdf766d6cef63e2}{csclient\+\_\+udp\+\_\+once} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+udp\+\_\+once This function process udp send\&recv one time. \end{DoxyCompactList}\item 
+ssize\+\_\+t \hyperlink{client_8h_aeecc65b7dbf1e0ac8f806ba8f518dab9}{csclient\+\_\+sendrecv} (struct \hyperlink{structcsclient}{csclient} $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)
+\begin{DoxyCompactList}\small\item\em csclient\+\_\+sendrecv \end{DoxyCompactList}\item 
+\hypertarget{client_8h_a4fb698628f5356d8926c28c83e17ea55}{}void \hyperlink{client_8h_a4fb698628f5356d8926c28c83e17ea55}{cssendrecv\+\_\+init} (void)\label{client_8h_a4fb698628f5356d8926c28c83e17ea55}
+
+\begin{DoxyCompactList}\small\item\em cssendrecv\+\_\+init This function shoud better be called before the first call of csclient\+\_\+sendrecv. \end{DoxyCompactList}\item 
+\hypertarget{client_8h_a5f15ec99768625f23952938f2619c020}{}void \hyperlink{client_8h_a5f15ec99768625f23952938f2619c020}{cssendrecv\+\_\+clear} (void)\label{client_8h_a5f15ec99768625f23952938f2619c020}
+
+\begin{DoxyCompactList}\small\item\em cssendrecv\+\_\+clear This function must be called after client communication done. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This file provide the basic helper funstion for client struct. 
+
+\begin{DoxyAuthor}{Author}
+cxl, \href{mailto:shuanglongchen@yeah.net}{\tt shuanglongchen@yeah.\+net} 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2015-\/09-\/30 
+\end{DoxyDate}
+\begin{DoxyParagraph}{last modified}
+Sat 2015-\/11-\/07 15\+:59\+:14 (+0800) 
+\end{DoxyParagraph}
+
+
+\subsection{Function Documentation}
+\hypertarget{client_8h_ae3752395d79c6d9a2920d96c73eb81ed}{}\index{client.\+h@{client.\+h}!csclient\+\_\+clear@{csclient\+\_\+clear}}
+\index{csclient\+\_\+clear@{csclient\+\_\+clear}!client.\+h@{client.\+h}}
+\subsubsection[{csclient\+\_\+clear(struct csclient $\ast$cli)}]{\setlength{\rightskip}{0pt plus 5cm}void csclient\+\_\+clear (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli}
+\end{DoxyParamCaption}
+)}\label{client_8h_ae3752395d79c6d9a2920d96c73eb81ed}
+
+
+csclient\+\_\+clear There may be some clear works after communication, such as free the memory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & \\
+\hline
+\end{DoxyParams}
+\hypertarget{client_8h_a5aa275fcd29cc40dc4e8b04aca4836a8}{}\index{client.\+h@{client.\+h}!csclient\+\_\+init@{csclient\+\_\+init}}
+\index{csclient\+\_\+init@{csclient\+\_\+init}!client.\+h@{client.\+h}}
+\subsubsection[{csclient\+\_\+init(struct csclient $\ast$cli, int tcpudp)}]{\setlength{\rightskip}{0pt plus 5cm}void csclient\+\_\+init (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli, }
+\item[{int}]{tcpudp}
+\end{DoxyParamCaption}
+)}\label{client_8h_a5aa275fcd29cc40dc4e8b04aca4836a8}
+
+
+csclient\+\_\+init 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & \\
+\hline
+{\em tcpudp} & Tcp socket will be created if S\+O\+C\+K\+\_\+\+S\+T\+R\+E\+A\+M is set, upd socket will be created if S\+O\+C\+K\+\_\+\+D\+G\+R\+A\+M is set.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+
+\begin{DoxyEnumerate}
+\item This function must be called after init\+\_\+sock\+\_\+environment being called.
+\item Socket is set to be non-\/blocking socket by default. Call cssock\+\_\+block explicitly if you need the socket to be blocking.
+\end{DoxyEnumerate}
+\end{DoxyNote}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{sock__wrap_8h_a60b0fd1896802faae9fd9dd341fadc54}{cssock\+\_\+block} \hyperlink{sock__wrap_8h_a842dda0d61b2e39aab64b40764adddd1}{cssock\+\_\+open} 
+\end{DoxySeeAlso}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8h_a5aa275fcd29cc40dc4e8b04aca4836a8_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{client_8h_aa263fe24e3c96c3a1b1b8c087eb518b7}{}\index{client.\+h@{client.\+h}!csclient\+\_\+print@{csclient\+\_\+print}}
+\index{csclient\+\_\+print@{csclient\+\_\+print}!client.\+h@{client.\+h}}
+\subsubsection[{csclient\+\_\+print(const struct csclient $\ast$cli)}]{\setlength{\rightskip}{0pt plus 5cm}int csclient\+\_\+print (
+\begin{DoxyParamCaption}
+\item[{const struct {\bf csclient} $\ast$}]{cli}
+\end{DoxyParamCaption}
+)}\label{client_8h_aa263fe24e3c96c3a1b1b8c087eb518b7}
+
+
+csclient\+\_\+print csclient\+\_\+print will test and print client socket information. If test fail, process will clear the socket environmtn and exit. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\begin{DoxyEnumerate}
+\item -\/1, if socket is not a valid socket.
+\item 0, if socket is connected.
+\item 1, if socket is not connected.
+\end{DoxyEnumerate}
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{sock__wrap_8h_a047455240499ada0472e5722cd50640b}{cssock\+\_\+print} 
+\end{DoxySeeAlso}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=262pt]{client_8h_aa263fe24e3c96c3a1b1b8c087eb518b7_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{client_8h_aeecc65b7dbf1e0ac8f806ba8f518dab9}{}\index{client.\+h@{client.\+h}!csclient\+\_\+sendrecv@{csclient\+\_\+sendrecv}}
+\index{csclient\+\_\+sendrecv@{csclient\+\_\+sendrecv}!client.\+h@{client.\+h}}
+\subsubsection[{csclient\+\_\+sendrecv(struct csclient $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}ssize\+\_\+t csclient\+\_\+sendrecv (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli, }
+\item[{const struct sockaddr $\ast$}]{servaddr, }
+\item[{cssocklen\+\_\+t}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{client_8h_aeecc65b7dbf1e0ac8f806ba8f518dab9}
+
+
+csclient\+\_\+sendrecv 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & \\
+\hline
+{\em servaddr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\begin{DoxyEnumerate}
+\item number of bytes received.
+\item -\/1, if timeout.
+\item -\/2, if sendto error occurs.
+\item -\/3, if recvfrom error occurs.
+\end{DoxyEnumerate}
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{client_8h_a4fb698628f5356d8926c28c83e17ea55}{cssendrecv\+\_\+init} \hyperlink{client_8h_a5f15ec99768625f23952938f2619c020}{cssendrecv\+\_\+clear} 
+\end{DoxySeeAlso}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8h_aeecc65b7dbf1e0ac8f806ba8f518dab9_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8h_aeecc65b7dbf1e0ac8f806ba8f518dab9_icgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{client_8h_a8be5e8ba05fdac392536b4bb22d8914b}{}\index{client.\+h@{client.\+h}!csclient\+\_\+udp@{csclient\+\_\+udp}}
+\index{csclient\+\_\+udp@{csclient\+\_\+udp}!client.\+h@{client.\+h}}
+\subsubsection[{csclient\+\_\+udp(struct csclient $\ast$cli, F\+I\+L\+E $\ast$fp, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}void csclient\+\_\+udp (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli, }
+\item[{F\+I\+L\+E $\ast$}]{fp, }
+\item[{const struct sockaddr $\ast$}]{servaddr, }
+\item[{cssocklen\+\_\+t}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{client_8h_a8be5e8ba05fdac392536b4bb22d8914b}
+
+
+csclient\+\_\+udp This function process udp communication with server. This function call csclient\+\_\+udp\+\_\+once in a loop. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & \\
+\hline
+{\em fp} & is the F\+I\+L\+E pointer where input data comes from. \\
+\hline
+{\em servaddr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{client_8h_a571252c127c68c849fdf766d6cef63e2}{csclient\+\_\+udp\+\_\+once} 
+\end{DoxySeeAlso}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8h_a8be5e8ba05fdac392536b4bb22d8914b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{client_8h_a571252c127c68c849fdf766d6cef63e2}{}\index{client.\+h@{client.\+h}!csclient\+\_\+udp\+\_\+once@{csclient\+\_\+udp\+\_\+once}}
+\index{csclient\+\_\+udp\+\_\+once@{csclient\+\_\+udp\+\_\+once}!client.\+h@{client.\+h}}
+\subsubsection[{csclient\+\_\+udp\+\_\+once(struct csclient $\ast$cli, const struct sockaddr $\ast$servaddr, cssocklen\+\_\+t addrlen)}]{\setlength{\rightskip}{0pt plus 5cm}void csclient\+\_\+udp\+\_\+once (
+\begin{DoxyParamCaption}
+\item[{struct {\bf csclient} $\ast$}]{cli, }
+\item[{const struct sockaddr $\ast$}]{servaddr, }
+\item[{cssocklen\+\_\+t}]{addrlen}
+\end{DoxyParamCaption}
+)}\label{client_8h_a571252c127c68c849fdf766d6cef63e2}
+
+
+csclient\+\_\+udp\+\_\+once This function process udp send\&recv one time. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cli} & cli has already been filled with data(end with \textquotesingle{}\textbackslash{}0\textquotesingle{}) to send. \\
+\hline
+{\em servaddr} & \\
+\hline
+{\em addrlen} & \\
+\hline
+\end{DoxyParams}
+
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{client_8h_a571252c127c68c849fdf766d6cef63e2_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+Here is the caller graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=285pt]{client_8h_a571252c127c68c849fdf766d6cef63e2_icgraph}
+\end{center}
+\end{figure}
+
+

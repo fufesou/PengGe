@@ -18,6 +18,7 @@
 #include  <string.h>
 #include  <stdint.h>
 #include  <semaphore.h>
+#include    "macros.h"
 #include    "lightthread.h"
 #include    "sock_types.h"
 #include    "utility_wrap.h"
