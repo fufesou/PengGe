@@ -1,0 +1,91 @@
+= 账号管理设计
+陈小龙 <34814491@qq.com>
+v1.0, 2015-9-19
+:library: Asciidoctor
+:imagesdir: images
+:lang: zh-cmn-Hans
+:doctype: article
+:description:
+:icons: font
+:source-highlighter: highlightjs
+:linkcss!:
+:numbered:
+:idprefix:
+:toc: right
+:toclevels: 3
+:experimental:
+
+:numbered!:
+
+[abstract]
+
+要求
+--
+. 注册登录
+. 手机注册，短信验证码
+. 账号等级
+. 账号信息暂时用二进制存在本地文件中
+--
+
+:numbered:
+== 总述
+
+== 详细设计
+
+==== 账号
+
+[source,c]
+.账号结构
+----
+#define UNLOG_USER_GRADE 0xFFFF
+
+struct csaccount {
+    uint8_t grade;
+    uint32_t id;
+    char username[256];
+};
+----
+
+==== 操作
+
+不同等级的用户操作函数原型都一样。
+
+[source,c]
+.请求操作原型
+----
+typedef int requestfunc(uint32_t id, char* funcname, void* pargs);
+----
+
+服务器响应请求的函数放在链表中，链表的element结构为：
+[source,c]
+.请求函数链表单元结构
+----
+#define __in
+#define __out
+#define __inout
+
+struct request_list_element {
+    char funcname[64];
+    int (*pfunc)(void* pargs, void* outmsg, __inout int* outmsglen);
+    uint8_t grade_lowest;
+};
+----
+
+解析服务器返回的回答，原型也一样。
+[source,c]
+.解析操作原型
+----
+typedef int parsereply(uint32_t id, void* inmsg, void* outmsg, __inout int* outmsglen);
+----
+
+==== 请求
+
+请求消息结构如<<request data structure, 请求消息结构>>所示。
+
+[[rs]]
+.request data structure
+image::request_structure.svg[图片无法显示，请参考./images/request_structure.svg, align="center"]
+
+==== 短信验证
+
+生成验证码不难，生成随机数据即可。但不知如何发送短信。

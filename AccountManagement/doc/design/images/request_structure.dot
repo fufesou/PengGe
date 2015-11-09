@@ -1,0 +1,14 @@
+digraph request_structure {
+	rs [shape=none, margin=0, label=<
+		<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+		<TR><TD COLSPAN="16" BORDER="0"><FONT COLOR="royalblue" POINT-SIZE="18.0"> request message structure </FONT></TD>
+		</TR>
+		<TR><TD COLSPAN="4" BORDER = "0" ALIGN="LEFT">0 </TD>
+			<TD COLSPAN="8" BORDER = "0" ALIGN="LEFT">4 </TD>
+			<TD BORDER="0" ALIGN="LEFT">N</TD>
+		</TR>
+		<TR><TD COLSPAN="4">account id</TD>
+			<TD COLSPAN="8" BGCOLOR="cyan" PORT="TheData">request data</TD>
+		</TR>
+		</TABLE>>];
+}
