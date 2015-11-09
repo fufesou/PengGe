@@ -32,7 +32,18 @@ v1.0, 2015-9-19
 
 == 详细设计
 
-==== 账号
+=== 功能
+
+--
+. 创建账户
+. 登录账户
+. 用户查询
+. 修改呢称
+. 修改密码
+. 修改等级
+--
+
+=== 账号
 
 [source,c]
 .账号结构
@@ -42,18 +53,18 @@ v1.0, 2015-9-19
 struct csaccount {
     uint8_t grade;
     uint32_t id;
-    char username[256];
+    char username[64];
 };
 ----
 
-==== 操作
+=== 操作原型
 
 不同等级的用户操作函数原型都一样。
 
 [source,c]
 .请求操作原型
 ----
-typedef int requestfunc(uint32_t id, char* funcname, void* pargs);
+typedef int requestfunc(char* funcname, void* pargs);
 ----
 
 服务器响应请求的函数放在链表中，链表的element结构为：
@@ -75,10 +86,10 @@ struct request_list_element {
 [source,c]
 .解析操作原型
 ----
-typedef int parsereply(uint32_t id, void* inmsg, void* outmsg, __inout int* outmsglen);
+typedef int parsereply(void* inmsg, void* outmsg, __inout int* outmsglen);
 ----
 
-==== 请求
+=== 请求
 
 请求消息结构如<<request data structure, 请求消息结构>>所示。
 
@@ -86,6 +97,6 @@ typedef int parsereply(uint32_t id, void* inmsg, void* outmsg, __inout int* outm
 .request data structure
 image::request_structure.svg[图片无法显示，请参考./images/request_structure.svg, align="center"]
 
-==== 短信验证
+=== 短信验证
 
 生成验证码不难，生成随机数据即可。但不知如何发送短信。
