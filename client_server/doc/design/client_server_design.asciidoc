@@ -80,6 +80,13 @@ struct hdr
 };
 ----
 
+==== buffer结构
+
+程序中buffer是成对出现的，即filled buffer和empty buffer成对使用。其使用方法如<<buf_usage,buffer用法>>所示。
+[[buf_usage]]
+.buffer使用
+image::buffer_usage.svg[图片无法显示，请参考./images/buffer_usage.svg, align="center"]
+
 ==== 数据传输过程
 
 消息的传输过程如<<data_trans, 完整的消息传输过程>>所示。

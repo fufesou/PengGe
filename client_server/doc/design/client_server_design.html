@@ -438,10 +438,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#服务器客户端程序">2.1. 服务器客户端程序</a>
 <ul class="sectlevel3">
 <li><a href="#消息结构">2.1.1. 消息结构</a></li>
-<li><a href="#数据传输过程">2.1.2. 数据传输过程</a></li>
-<li><a href="#通用模块">2.1.3. 通用模块</a></li>
-<li><a href="#服务器_2">2.1.4. 服务器</a></li>
-<li><a href="#客户端_2">2.1.5. 客户端</a></li>
+<li><a href="#buffer结构">2.1.2. buffer结构</a></li>
+<li><a href="#数据传输过程">2.1.3. 数据传输过程</a></li>
+<li><a href="#通用模块">2.1.4. 通用模块</a></li>
+<li><a href="#服务器_2">2.1.5. 服务器</a></li>
+<li><a href="#客户端_2">2.1.6. 客户端</a></li>
 </ul>
 </li>
 </ul>
@@ -558,7 +559,19 @@ struct hdr
 </div>
 </div>
 <div class="sect3">
-<h4 id="数据传输过程">2.1.2. 数据传输过程</h4>
+<h4 id="buffer结构">2.1.2. buffer结构</h4>
+<div class="paragraph">
+<p>程序中buffer是成对出现的，即filled buffer和empty buffer成对使用。其使用方法如<a href="#buf_usage">buffer用法</a>所示。</p>
+</div>
+<div id="buf_usage" class="imageblock" style="text-align: center">
+<div class="content">
+<img src="images/buffer_usage.svg" alt="图片无法显示，请参考./images/buffer_usage.svg">
+</div>
+<div class="title">Figure 2. buffer使用</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="数据传输过程">2.1.3. 数据传输过程</h4>
 <div class="paragraph">
 <p>消息的传输过程如<a href="#data_trans">完整的消息传输过程</a>所示。</p>
 </div>
@@ -566,11 +579,11 @@ struct hdr
 <div class="content">
 <img src="images/data_trans.svg" alt="图片无法显示，请参考./images/data_trans.svg">
 </div>
-<div class="title">Figure 2. 一次完整的消息传输过程</div>
+<div class="title">Figure 3. 一次完整的消息传输过程</div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="通用模块">2.1.3. 通用模块</h4>
+<h4 id="通用模块">2.1.4. 通用模块</h4>
 <div class="paragraph">
 <p>客户端服务器程序用C语言编写，在Ubuntu和Windows上运行正确。程序实现中使用了socket，thread，mutex等wrap函数。
 下面列出各文件与功能的对应。</p>
@@ -624,7 +637,7 @@ struct hdr
 </div>
 </div>
 <div class="sect3">
-<h4 id="服务器_2">2.1.4. 服务器</h4>
+<h4 id="服务器_2">2.1.5. 服务器</h4>
 <div class="paragraph">
 <p>服务器socket为阻塞socket。</p>
 </div>
@@ -647,7 +660,7 @@ struct hdr
 </div>
 </div>
 <div class="sect3">
-<h4 id="客户端_2">2.1.5. 客户端</h4>
+<h4 id="客户端_2">2.1.6. 客户端</h4>
 <div class="paragraph">
 <p>客户端socket为非阻塞socket。客户端文件结构与服务器相仿。</p>
 </div>
@@ -676,7 +689,7 @@ struct hdr
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2015-11-08 18:22:21 中国标准时间
+Last updated 2015-11-09 18:15:03 中国标准时间
 </div>
 </div>
 </body>

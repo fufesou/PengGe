@@ -1,0 +1,13 @@
+digraph buffer_usage {
+    eb [shape=box, fixedsize=true, width=2.5, height=0.5, style=filled, fillcolor="cyan", label=<<FONT POINT-SIZE="16">empty buffer</FONT>>]
+    fill [style=filled, fillcolor="indianred", label="fill item data"]
+    process [style=filled, fillcolor="indianred", label="process item data"]
+    fb [shape=box, fixedsize=true, width=2.5, height=0.5, style=filled, fillcolor="cyan", label=<<FONT POINT-SIZE="16">filled buffer</FONT>>]
+
+    eb -> fill [label="empty item"]
+    fill -> fb [label="filled item"]
+    fb -> process [label="process item"]
+    process -> eb [label="processed item"]
+
+    { rank=same; fill; process; }
+}
