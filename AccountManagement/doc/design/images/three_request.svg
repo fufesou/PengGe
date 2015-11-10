@@ -1,0 +1,43 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1"
+ width="600px" height="106px"
+ viewBox="0 0 600 106"
+ xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"
+ stroke-width="1" text-rendering="geometricPrecision">
+<polygon fill="white" points="134,7 164,7 164,16 134,16"/>
+<text x="150" y="16" textLength="28" font-family="Helvetica" font-size="12" fill="black" text-anchor="middle">
+
+client
+</text>
+<polygon fill="white" points="432,7 466,7 466,16 432,16"/>
+<text x="450" y="16" textLength="33" font-family="Helvetica" font-size="12" fill="black" text-anchor="middle">
+
+server
+</text>
+<line x1="150" y1="22" x2="150" y2="50" stroke="black"/>
+<line x1="450" y1="22" x2="450" y2="50" stroke="black"/>
+<line x1="150" y1="33" x2="450" y2="33" stroke="black"/>
+<polygon fill="black" points="450,33 440,39 440,27"/>
+<polygon fill="white" points="252,23 346,23 346,32 252,32"/>
+<text x="253" y="32" textLength="92" font-family="Helvetica" font-size="12" fill="black">
+request message
+</text>
+<line x1="150" y1="50" x2="150" y2="78" stroke="black"/>
+<line x1="450" y1="50" x2="450" y2="78" stroke="black"/>
+<line x1="450" y1="61" x2="150" y2="61" stroke="black"/>
+<polygon fill="black" points="150,61 160,67 160,55"/>
+<polygon fill="white" points="259,51 339,51 339,60 259,60"/>
+<text x="260" y="60" textLength="78" font-family="Helvetica" font-size="12" fill="black">
+reply message
+</text>
+<line x1="150" y1="78" x2="150" y2="106" stroke="black"/>
+<line x1="450" y1="78" x2="450" y2="106" stroke="black"/>
+<path d="M 150 95 A148,6 0 0,1 150,83" stroke="black" fill="none"/><polygon fill="black" points="150,95 140,101 140,89"/>
+<polygon fill="white" points="150,79 221,79 221,88 150,88"/>
+<text x="151" y="88" textLength="69" font-family="Helvetica" font-size="12" fill="black">
+react to reply
+</text>
+<line x1="150" y1="100" x2="150" y2="106" stroke="black"/>
+<line x1="450" y1="100" x2="450" y2="106" stroke="black"/>
+</svg>

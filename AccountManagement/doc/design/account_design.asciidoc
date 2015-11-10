@@ -32,17 +32,6 @@ v1.0, 2015-9-19
 
 == 详细设计
 
-=== 功能
-
---
-. 创建账户
-. 登录账户
-. 用户查询
-. 修改呢称
-. 修改密码
-. 修改等级
---
-
 === 账号
 
 [source,c]
@@ -57,36 +46,37 @@ struct csaccount {
 };
 ----
 
+=== 功能
+
+--
+. 创建账户
+. 登录账户
+. 用户查询
+. 修改呢称
+. 修改密码
+. 修改等级
+--
+
+=== 用户请求过程
+
+用户要完成一次请求，需要执行三次操作，如<<three_request,请求三次操作>>所示。
+
+[[tree_request]]
+.完成请求所需三次操作
+image::three_request.svg[图片无法显示，请参考./images/three_request.svg, align="center"]
+
 === 操作原型
 
-不同等级的用户操作函数原型都一样。
+reply和react函数原型一样。
 
 [source,c]
-.请求操作原型
-----
-typedef int requestfunc(char* funcname, void* pargs);
-----
-
-服务器响应请求的函数放在链表中，链表的element结构为：
-[source,c]
-.请求函数链表单元结构
+.reply和react操作原型
 ----
 #define __in
 #define __out
 #define __inout
 
-struct request_list_element {
-    char funcname[64];
-    int (*pfunc)(void* pargs, void* outmsg, __inout int* outmsglen);
-    uint8_t grade_lowest;
-};
-----
-
-解析服务器返回的回答，原型也一样。
-[source,c]
-.解析操作原型
-----
-typedef int parsereply(void* inmsg, void* outmsg, __inout int* outmsglen);
+typedef int processfunc(char* inmsg, int inmsglen, char* outmsg, __inout outmsglen);
 ----
 
 === 请求

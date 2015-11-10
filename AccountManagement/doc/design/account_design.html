@@ -460,7 +460,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>== 详细设计</p>
 </div>
 <div class="paragraph">
-<p>==== 账号</p>
+<p>=== 账号</p>
 </div>
 <div class="listingblock">
 <div class="title">账号结构</div>
@@ -470,50 +470,69 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 struct csaccount {
     uint8_t grade;
     uint32_t id;
-    char username[256];
+    char username[64];
 };</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>==== 操作</p>
+<p>=== 功能</p>
+</div>
+</div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>创建账户</p>
+</li>
+<li>
+<p>登录账户</p>
+</li>
+<li>
+<p>用户查询</p>
+</li>
+<li>
+<p>修改呢称</p>
+</li>
+<li>
+<p>修改密码</p>
+</li>
+<li>
+<p>修改等级</p>
+</li>
+</ol>
+</div>
+<div class="openblock">
+<div class="content">
+<div class="paragraph">
+<p>=== 用户请求过程</p>
 </div>
 <div class="paragraph">
-<p>不同等级的用户操作函数原型都一样。</p>
+<p>用户要完成一次请求，需要执行三次操作，如<a href="#three_request">请求三次操作</a>所示。</p>
+</div>
+<div id="tree_request" class="imageblock" style="text-align: center">
+<div class="content">
+<img src="images/three_request.svg" alt="图片无法显示，请参考./images/three_request.svg">
+</div>
+<div class="title">Figure 1. 完成请求所需三次操作</div>
+</div>
+<div class="paragraph">
+<p>=== 操作原型</p>
+</div>
+<div class="paragraph">
+<p>三次操作函数原型都一样。</p>
 </div>
 <div class="listingblock">
 <div class="title">请求操作原型</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">typedef int requestfunc(uint32_t id, char* funcname, void* pargs);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>服务器响应请求的函数放在链表中，链表的element结构为：</p>
-</div>
-<div class="listingblock">
-<div class="title">请求函数链表单元结构</div>
 <div class="content">
 <pre class="highlightjs highlight"><code class="language-c" data-lang="c">#define __in
 #define __out
 #define __inout
 
-struct request_list_element {
-    char funcname[64];
-    int (*pfunc)(void* pargs, void* outmsg, __inout int* outmsglen);
-    uint8_t grade_lowest;
-};</code></pre>
+typedef int processfunc(char* inmsg, int inmsglen, char* outmsg, __inout outmsglen);</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>解析服务器返回的回答，原型也一样。</p>
-</div>
-<div class="listingblock">
-<div class="title">解析操作原型</div>
-<div class="content">
-<pre class="highlightjs highlight"><code class="language-c" data-lang="c">typedef int parsereply(uint32_t id, void* inmsg, void* outmsg, __inout int* outmsglen);</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>==== 请求</p>
+<p>=== 请求</p>
 </div>
 <div class="paragraph">
 <p>请求消息结构如<a href="#rs">请求消息结构</a>所示。</p>
@@ -522,10 +541,10 @@ struct request_list_element {
 <div class="content">
 <img src="images/request_structure.svg" alt="图片无法显示，请参考./images/request_structure.svg">
 </div>
-<div class="title">Figure 1. request data structure</div>
+<div class="title">Figure 2. request data structure</div>
 </div>
 <div class="paragraph">
-<p>==== 短信验证</p>
+<p>=== 短信验证</p>
 </div>
 <div class="paragraph">
 <p>生成验证码不难，生成随机数据即可。但不知如何发送短信。</p>
@@ -538,7 +557,7 @@ struct request_list_element {
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br>
-Last updated 2015-11-09 19:00:56 中国标准时间
+Last updated 2015-11-10 16:31:22 中国标准时间
 </div>
 </div>
 </body>

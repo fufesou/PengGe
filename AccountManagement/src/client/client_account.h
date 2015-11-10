@@ -1,10 +1,10 @@
 /**
  * @file client_account.h
- * @brief  This file contains some client request operations for account. 'amc_' means accout management client.
+ * @brief  This file contains some client request operations for account.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Mon 2015-11-09 22:57:33 (+0800)
+ * @modified  周二 2015-11-10 20:05:55 中国标准时间
  */
 
 #ifndef _CLIENT_ACCOUNT_H
@@ -16,49 +16,37 @@ extern "C"
 #endif
 
 /**
- * @brief  amc_account_create This function will generate the request message for creating account. The message will be transport to the server and handled by server.
+ * @brief  am_account_create_request This function start a creating account session.
  *
- * @param request the generated message.
- * @param datalen value-result argument that stands for the length of request.
+ * @param inmsg The message of user, such as telephone number.
+ * @param inmsglen The length of income message.
+ * @param userid This useris can be any value.
+ * @param outmsg The request message for server.
+ * @param outmsglen This value-result argument is used to show the length of output message.
+ *
+ * @return   0 if generate request succeed, 1 if fail.
+ *
+ * @note We support only telephone account creation for now.
  */
-void amc_account_create(char* request, __inout int* datalen);
+int am_account_create_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
 
 /**
- * @brief  amc_account_login 
+ * @brief  am_account_create_verify_request 
  *
- * @param username
- * @param password
- * @param request
- * @param datalen
- */
-void amc_account_login(const char* username, const char* password, char* request, __inout int* datalen);
-
-void amc_account_inquire(uint32_t id, char* request, __inout int* datalen);
-
-/**
- * @brief  amc_account_changeusername 
+ * @param inmsg
+ * @param inmsglen
+ * @param userid
+ * @param outmsg
+ * @param outmsglen
  *
- * @param id
- * @param password
- * @param newusername
- * @param request
- * @param datalen
+ * @return   
  */
-void amc_account_changeusername(uint32_t id, const char* password, const char* newusername, char* request, __inout int* datalen);
-
-/**
- * @brief  amc_account_changepasswd 
- *
- * @param id
- * @param oldpasswd
- * @param newpasswd
- * @param request
- * @param datalen
- */
-void amc_account_changepasswd(uint32_t id, const char* oldpasswd, const char* newpasswd, char* request, __inout int* datalen);
-
-
-void amc_account_changegrade(uint32_t id, char* request, __inout int* datalen);
+int am_account_create_verify_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
+int am_account_login_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
+int am_account_inquire_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
+int am_account_changeusername_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
+int am_account_changepasswd_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
+int am_account_changegrade_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
 
 #ifdef __cplusplus
 }
