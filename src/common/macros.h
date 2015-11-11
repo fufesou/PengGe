@@ -11,9 +11,17 @@
 #ifndef  MACROS_H
 #define  MACROS_H
 
+#ifndef __in
 #define __in
+#endif
+
+#ifndef __out
 #define __out
+#endif
+
+#ifndef __inout
 #define __inout
+#endif
 
 // #define _CHECK_ARGS
 
@@ -38,10 +46,15 @@
  * @param type   the type of the container struct this is embedded in.
  * @param member the name of the member within the struct.
  *
+ * @note msvc2013 seems not to support 'typeof()'.
  */
+#ifdef WIN32
+#define container_of(ptr, type, member) ((type *)((char *)ptr - offsetof(type, member)))
+#else
 #define container_of(ptr, type, member) ({          \
 	const typeof(((type *)0)->member)*__mptr = (ptr);    \
 		     (type *)((char *)__mptr - offsetof(type, member)); })
+#endif
 #endif
 
 /**

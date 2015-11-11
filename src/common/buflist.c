@@ -9,9 +9,9 @@
 #include  <malloc.h>
 #include  <stdio.h>
 #include  <assert.h>
+#include  "macros.h"
 #include  "list.h"
 #include  "buflist.h"
-#include  "macros.h"
 
 #ifdef __cplusplus
 extern "C" {

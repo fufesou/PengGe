@@ -60,7 +60,7 @@ void s_cserr_operation(void* data, enum cserr_op errop)
 
     if (errop == cserr_exit) {
         cssock_envclear();
-        exit(*(cserr_t*)data);
+        exit((int)*(cserr_t*)data);
     }
 
     errop &= (~cserr_exit);

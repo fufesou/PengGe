@@ -72,39 +72,3 @@ int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* d
     
     return 0;
 }
-
-int csmsg_push2pool(const char* data, const struct csmsg_header* msgheader, struct csmsgpool* pool)
-{
-    char* bufitem = cspool_pullitem(pool, &pool->empty_buf);
-
-    if (bufitem == NULL) {
-        return -1;
-    }
-
-    if (csmsg_merge(msgheader, data, bufitem, pool->len_item) != 0) {
-        printf("copy data to pool error, omit current data.\n");
-        cspool_pushitem(pool, &pool->empty_buf, bufitem);
-        return 1;
-    }
-
-    cspool_pushitem(pool, &pool->filled_buf, bufitem);
-    return 0;
-}
-
-int csmsg_pull_from_pool(char* data, int datalen, struct csmsg_header* msgheader, struct csmsgpool* pool)
-{
-    char* bufitem = cspool_pullitem(pool, &pool->filled_buf);
-
-    if (bufitem == NULL) {
-        return -1;
-    }
-
-    if (csmsg_extract_copy(bufitem, msgheader, data, datalen) != 0) {
-        fprintf(stderr, "copy data from pool error, cancel.\n");
-        cspool_pushitem(pool, &pool->filled_buf, bufitem);
-        return 1;
-    }
-
-    cspool_pushitem(pool, &pool->empty_buf, bufitem);
-    return 0;
-}

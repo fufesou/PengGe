@@ -8,6 +8,7 @@
  */
 
 #include  <memory.h>
+#include  <stdio.h>
 #include    "macros.h"
 #include    "error.h"
 #include    "utility_wrap.h"

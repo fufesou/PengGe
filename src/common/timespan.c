@@ -36,7 +36,7 @@ void csgettimeofday(struct timeval* tv, void* tz)
     tm.tm_sec     = wtm.wSecond;
     tm. tm_isdst  = -1;
     clock = mktime(&tm);
-    tv->tv_sec = clock;
+    tv->tv_sec = (long)clock;
     tv->tv_usec = wtm.wMilliseconds * 1000;
 #else
 	gettimeofday(tv, tz);
