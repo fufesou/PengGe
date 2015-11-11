@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  周三 2015-11-11 18:10:46 中国标准时间
+ * @modified  周三 2015-11-11 19:10:06 中国标准时间
  */
 
 #ifndef _CLIENT_ACCOUNT_H
@@ -30,18 +30,6 @@ extern "C"
  */
 int am_account_create_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
 
-/**
- * @brief  am_account_create_verify_request 
- *
- * @param inmsg
- * @param inmsglen
- * @param userid
- * @param outmsg
- * @param outmsglen
- *
- * @return   
- */
-int am_account_create_verify_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
 int am_account_login_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
 int am_account_inquire_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
 int am_account_changeusername_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);

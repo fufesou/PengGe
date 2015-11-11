@@ -4,22 +4,28 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  周三 2015-11-11 18:49:56 中国标准时间
+ * @modified  周三 2015-11-11 19:30:28 中国标准时间
  */
 
 #ifndef _ACCOUNT_H
 #define _ACCOUNT_H
+
+#pragma pack(4)
+struct account_basic_t {
+	uint8_t grade;
+	uint32_t id;
+	char username[64];
+};
+#pragma pack()
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-
 typedef int procfunc(char*, int, char*, __inout int*);
 
 DECLARE_ACCOUNT_METHOD(account_create)
-DECLARE_ACCOUNT_METHOD(account_create_verify)
 DECLARE_ACCOUNT_METHOD(account_login)
 DECLARE_ACCOUNT_METHOD(account_inquire)
 DECLARE_ACCOUNT_METHOD(account_changeusername)

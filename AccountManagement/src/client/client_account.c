@@ -4,7 +4,7 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周三 2015-11-11 18:12:15 中国标准时间
+ * @modified  周三 2015-11-11 19:10:34 中国标准时间
  */
 
 #include    "account_macros.h"
@@ -46,7 +46,6 @@ int s_general_msg_create(const char* inmsg, int inmsglen, uint32_t userid, uint3
     }
 
 REQUEST_GENERATE(account_create)
-REQUEST_GENERATE(account_create_verify)
 REQUEST_GENERATE(account_login)
 REQUEST_GENERATE(account_inquire)
 REQUEST_GENERATE(account_changeusername)
@@ -80,27 +79,6 @@ int am_account_create_react(char* inmsg, int inmsglen, char* outmsg, __inout int
     return 0;
 }
 
-/**
- * @brief  am_account_create_verify_react If successfully create an account, this function will fill the account information into 'outmsg'.
- *
- * @param inmsg This message contains the account creation result and account information if succeed.
- * @param inmsglen
- * @param outmsg This pointer points to an account object.
- * @param outmsglen
- *
- * @return   0 if an account is created, 1 otherwise.
- */
-int am_account_create_verify_react(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
-{
-    int ret = 0;
-    if (strncmp(inmsg + sizeof(uint32_t)*2, g_succeed, strlen(g_succeed)) == 0) {
-        ret = (cs_memcpy(
-                    outmsglen, *outmsglen,
-                    inmsg + sizeof(uint32_t)*2 + strlen(g_succeed), inmsglen - sizeof(uint32_t)*2 + strlen(g_succeed)));
-    }
-    *outmsglen = 0;
-    return ret;
-}
 
 /**
  * @brief  am_account_login_react This function estimate whether the login succeed. The account information will be filled into outmsg if successfully logined in.
@@ -114,26 +92,33 @@ int am_account_create_verify_react(char* inmsg, int inmsglen, char* outmsg, __in
  */
 int am_account_login_react(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
-    return am_account_create_verify_react(inmsg, inmsglen, outmsg, outmsglen);
+    int ret = 0;
+    if (strncmp(inmsg + sizeof(uint32_t)*2, g_succeed, strlen(g_succeed)) == 0) {
+        ret = (cs_memcpy(
+                    outmsglen, *outmsglen,
+                    inmsg + sizeof(uint32_t)*2 + strlen(g_succeed), inmsglen - sizeof(uint32_t)*2 + strlen(g_succeed)));
+    }
+    *outmsglen = 0;
+    return ret;
 }
 
 int am_account_inquire_react(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
-    return am_account_create_verify_react(inmsg, inmsglen, outmsg, outmsglen);
+    return am_account_login_react(inmsg, inmsglen, outmsg, outmsglen);
 }
 
 int am_account_changeusername_react(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
-    return am_account_create_verify_react(inmsg, inmsglen, outmsg, outmsglen);
+    return am_account_login_react(inmsg, inmsglen, outmsg, outmsglen);
 }
 
 int am_account_changepasswd_react(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
-    return am_account_create_verify_react(inmsg, inmsglen, outmsg, outmsglen);
+    return am_account_login_react(inmsg, inmsglen, outmsg, outmsglen);
 }
 
 int am_account_changegrade_react(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
-    return am_account_create_verify_react(inmsg, inmsglen, outmsg, outmsglen);
+    return am_account_login_react(inmsg, inmsglen, outmsg, outmsglen);
 }
 

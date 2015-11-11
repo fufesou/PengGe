@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周三 2015-11-11 18:46:25 中国标准时间
+ * @modified  周三 2015-11-11 19:11:59 中国标准时间
  */
 
 #include    "account_macros.h"
@@ -31,7 +31,6 @@ extern "C"
 
 REGISTER_ACCOUNT_PROCESS_BEGIN
     REGISTER_ACCOUNT_PROCESS(account_create)
-    REGISTER_ACCOUNT_PROCESS(account_create_verify)
     REGISTER_ACCOUNT_PROCESS(account_login)
     REGISTER_ACCOUNT_PROCESS(account_inquire)
     REGISTER_ACCOUNT_PROCESS(account_changeusername)
