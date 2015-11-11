@@ -4,11 +4,25 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周二 2015-11-10 19:45:17 中国标准时间
+ * @modified  周三 2015-11-11 18:46:25 中国标准时间
  */
 
 #include    "account_macros.h"
 #include    "account.h"
+
+#define REGISTER_ACCOUNT_PROCESS_BEGIN \
+    static struct account_method_t s_methodarr[] = { 
+
+#define REGISTER_ACCOUNT_PROCESS(method)
+        { \
+            .methodname = #method, \
+            .reply = am_##method##_reply, \
+            .react = am_##method##_react \
+        }, 
+
+#define REGISTER_ACCOUNT_PROCESS_END \
+    };
+
 
 #ifdef __cplusplus
 extern "C"

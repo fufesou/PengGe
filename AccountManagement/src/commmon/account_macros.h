@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周二 2015-11-10 19:44:44 中国标准时间
+ * @modified  周三 2015-11-11 18:46:33 中国标准时间
  */
 
 #ifndef _ACCOUNT_MACROS_H
@@ -23,18 +23,6 @@
 #define INVALID_METHOD_ID 0xFFFFFFFF
 #define INVALID_USER_ID 0xFFFFFFFF
 
-#define REGISTER_ACCOUNT_PROCESS_BEGIN \
-    static struct account_method_t s_methodarr[] = { 
-
-#define REGISTER_ACCOUNT_PROCESS(method)
-        { \
-            .methodname = #method, \
-            .reply = am_##method##_reply, \
-            .react = am_##method##_react \
-        }, 
-
-#define REGISTER_ACCOUNT_PROCESS_END \
-    };
 
 
 #endif //ACCOUNT_MACROS_H

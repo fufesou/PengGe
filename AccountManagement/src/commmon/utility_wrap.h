@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-29
- * @modified  周二 2015-11-10 19:06:08 中国标准时间
+ * @modified  周三 2015-11-11 18:12:38 中国标准时间
  */
 
 #ifndef _UTILITY_WRAP_H
@@ -38,6 +38,17 @@ extern "C"
  *  @note c11 has introduced memcpy_s.
  */
 int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count);
+
+/**
+ * @brief cs_fopen
+ * @param streamptr
+ * @param filename
+ * @param mode
+ * @return
+ *
+ * @todo move this function to common lib.
+ */
+int cs_fopen(FILE** streamptr, const char* filename, const char* mode);
 
 
 #ifndef WIN32

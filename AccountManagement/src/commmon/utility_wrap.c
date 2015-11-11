@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-29
- * @modified  Sat 2015-10-31 17:32:24 (+0800)
+ * @modified  周三 2015-11-11 17:54:20 中国标准时间
  */
 
 #include  <memory.h>
@@ -33,6 +33,18 @@ int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count)
     return 0;
 }
 
+int cs_fopen(FILE** streamptr, const char* filename, const char* mode)
+{
+#ifdef WIN32
+    if (fopen_s(streamptr, filename, mode) != 0) {
+#else
+    if (((*streamptr) = fopen(filename, mode)) == NULL) {
+#endif
+        /* printf("open %s error, error code: %d.\n", filename, ); */
+        return 1;
+    }
+    return 0;
+}
 
 #ifndef WIN32
 #include  <signal.h>
