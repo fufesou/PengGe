@@ -4,10 +4,21 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周三 2015-11-11 19:28:56 中国标准时间
+ * @modified  鍛ㄤ笁 2015-11-11 23:55:18 涓浗鏍囧噯鏃堕棿
  */
 
+#ifdef WIN32
+#include  <winsock2.h>
+#else
+#include  <sys/socket.h>
+#include  <netinet/in.h>
+#endif
+
+#include  <stdint.h>
+#include  <stdlib.h>
 #include    "list.h"
+#include    "sock_types.h"
+#include    "account_macros.h"
 #include    "account.h"
 
 #pragma pack(4)
@@ -19,7 +30,7 @@ struct account_login_t {
 };
 
 struct list_login {
-    struct list_heade listnode;
+    struct list_head listnode;
     struct account_login_t account;
 };
 
@@ -30,7 +41,7 @@ extern "C"
 {
 #endif
 
-static LIST_HEAD(s_list_login)
+static LIST_HEAD(s_list_login);
 
 static void s_add_login();
 
@@ -40,25 +51,31 @@ static void s_add_login();
 
 int am_account_create_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
+    return 1;
 }
 
 int am_account_login_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
+    return 1;
 }
 
 int am_account_inquire_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
+    return 1;
 }
 
 int am_account_changeusername_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
+    return 1;
 }
 
 int am_account_changepasswd_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
+    return 1;
 }
 
 int am_account_changegrade_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
+    return 1;
 }
 

@@ -4,16 +4,19 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周三 2015-11-11 19:11:59 中国标准时间
+ * @modified  周三 2015-11-11 23:46:37 中国标准时间
  */
 
+#include  <stdint.h>
+#include  <stdlib.h>
+#include  <string.h>
 #include    "account_macros.h"
 #include    "account.h"
 
 #define REGISTER_ACCOUNT_PROCESS_BEGIN \
     static struct account_method_t s_methodarr[] = { 
 
-#define REGISTER_ACCOUNT_PROCESS(method)
+#define REGISTER_ACCOUNT_PROCESS(method) \
         { \
             .methodname = #method, \
             .reply = am_##method##_reply, \
@@ -43,7 +46,7 @@ static int s_sizeof_method = SIZEOF_ARR(s_methodarr);
 
 static inline int s_comp_method(const void* lhs, const void* rhs)
 {
-    return strcmp(((const struct account_method_t*)lhs)->methodname, (const struct account_method_t*)rhs.methodname);
+    return strcmp(((const struct account_method_t*)lhs)->methodname, ((const struct account_method_t*)rhs)->methodname);
 }
 
 static uint32_t s_findmethod_sorted(const char* methodname);
@@ -55,13 +58,13 @@ static uint32_t s_findmethod_unsorted(const char* methodname);
 
 void am_method_sort()
 {
-    qsort(s_methodarr, s_sizeof_method, sizeof(s_methodarr[0]), s_comp_str);
+    qsort(s_methodarr, s_sizeof_method, sizeof(s_methodarr[0]), s_comp_method);
     s_method_sorted = 1;
 }
 
 const struct account_method_t* am_method_getname(uint32_t methodid)
 {
-    if (methodid < s_sizeof_method) {
+    if ((int)methodid < s_sizeof_method) {
         return &s_methodarr[methodid];
     } else {
         return NULL;
@@ -93,7 +96,7 @@ uint32_t s_findmethod_sorted(const char* methodname)
             return mid;
         }
 
-        while ((strcmp(method, s_methodarr[mid].methodname) > 0) && (low < high)) {
+        while ((strcmp(methodname, s_methodarr[mid].methodname) > 0) && (low < high)) {
             low = mid + 1;
             mid = (low + high) >> 1;
         }
@@ -108,7 +111,8 @@ uint32_t s_findmethod_sorted(const char* methodname)
 
 uint32_t s_findmethod_unsorted(const char* methodname)
 {
-    for (int i=0; i<s_sizeof_method; ++i) {
+    int i = 0;
+    for (; i<s_sizeof_method; ++i) {
         if (strcmp(methodname, s_methodarr[i].methodname) == 0) {
             return (uint32_t)i;
         }

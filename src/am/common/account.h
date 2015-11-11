@@ -23,7 +23,6 @@ extern "C"
 {
 #endif
 
-typedef int procfunc(char*, int, char*, __inout int*);
 
 DECLARE_ACCOUNT_METHOD(account_create)
 DECLARE_ACCOUNT_METHOD(account_login)
@@ -32,13 +31,16 @@ DECLARE_ACCOUNT_METHOD(account_changeusername)
 DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
+
+typedef int (*procptr)(char*, int, char*, __inout int*);
+
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.
  */
 struct account_method_t { 
-    const char* methodname, 
-    procfunc* reply, 
-    procfunc* react, 
+    const char* methodname;
+    procptr reply;
+    procptr react;
 };
 
 /**

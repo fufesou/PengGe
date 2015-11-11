@@ -4,13 +4,14 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  周三 2015-11-11 17:54:02 中国标准时间
+ * @modified  周三 2015-11-11 23:47:19 中国标准时间
  */
 
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <stdint.h>
 #include  <string.h>
+#include    "utility_wrap.h"
 #include    "account_config.h"
 
 #ifndef offsetof

@@ -4,9 +4,12 @@
  * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周三 2015-11-11 19:10:34 中国标准时间
+ * @modified  鍛ㄤ笁 2015-11-11 23:31:06 涓浗鏍囧噯鏃堕棿
  */
 
+#include  <stdint.h>
+#include  <stdio.h>
+#include  <string.h>
 #include    "account_macros.h"
 #include    "utility_wrap.h"
 #include    "account.h"
@@ -93,6 +96,9 @@ int am_account_create_react(char* inmsg, int inmsglen, char* outmsg, __inout int
 int am_account_login_react(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
     int ret = 0;
+
+    (void)outmsg;
+
     if (strncmp(inmsg + sizeof(uint32_t)*2, g_succeed, strlen(g_succeed)) == 0) {
         ret = (cs_memcpy(
                     outmsglen, *outmsglen,

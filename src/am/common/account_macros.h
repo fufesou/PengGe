@@ -4,15 +4,23 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周三 2015-11-11 18:46:33 中国标准时间
+ * @modified  周三 2015-11-11 23:33:54 中国标准时间
  */
 
 #ifndef _ACCOUNT_MACROS_H
 #define _ACCOUNT_MACROS_H
 
+#ifndef __in
 #define __in
+#endif
+
+#ifndef __out
 #define __out
+#endif
+
+#ifndef __inout
 #define __inout
+#endif
 
 #define SIZEOF_ARR(arr) (sizeof(arr)/sizeof((arr)[0]))
 
