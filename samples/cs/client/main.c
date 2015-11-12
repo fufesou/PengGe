@@ -31,8 +31,8 @@ int main(int argc, char* argv[])
     struct csclient udpclient;
     struct sockaddr_in serveraddr;
 
-    if (argc < 2) {
-        printf("usage: client <port>.");
+    if (argc < 3) {
+        printf("usage: client <server ip> <port>.");
         exit(1);
     }
 
@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
     csclient_init(&udpclient, SOCK_DGRAM);
 
     serveraddr.sin_family = AF_INET;
-    serveraddr.sin_port = htons((unsigned short)atoi(argv[1]));
-    serveraddr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serveraddr.sin_port = htons((unsigned short)atoi(argv[2]));
+    serveraddr.sin_addr.s_addr = inet_addr(argv[1]);
     csclient_udp(&udpclient, stdin, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 
 	cssock_envclear();

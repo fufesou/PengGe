@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  周三 2015-11-11 23:47:19 中国标准时间
+ * @modified  周四 2015-11-12 18:32:22 中国标准时间
  */
 
 #include  <stdio.h>
@@ -57,6 +57,15 @@ int am_account_find_username(const char* username, struct account_data_t* accoun
         return 1;
     }
     return s_account_find_common((void*)username, strlen(username) + 1, offsetof(struct account_data_t, username), account);
+}
+
+int am_account_find_tel(const char* tel, struct account_data_t* account)
+{
+    if (strlen(tel) >= sizeof(account->tel)) {
+        fprintf(stderr, "account find error, the size of key is too large.\n");
+        return 1;
+    }
+    return s_account_find_common((void*)tel, strlen(tel) + 1, offsetof(struct account_data_t, tel), account);
 }
 
 

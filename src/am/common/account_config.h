@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  周三 2015-11-11 17:53:20 中国标准时间
+ * @modified  周四 2015-11-12 18:32:05 中国标准时间
  */
 
 #ifndef _ACCOUNT_CONFIG_H
@@ -13,6 +13,7 @@
 struct account_data_t {
     uint8_t grade;
     uint32_t id;
+    char tel[16];
     char username[64];
     char passwd[32];
 };
@@ -54,6 +55,16 @@ int am_account_find_id(uint32_t id, struct account_data_t* account);
  * @todo atomic write should be guaranteed here.
  */
 int am_account_find_username(const char* username, struct account_data_t* account);
+
+/**
+ * @brief  am_account_find_tel 
+ *
+ * @param tel
+ * @param account
+ *
+ * @return   
+ */
+int am_account_find_tel(const char* tel, struct account_data_t* account);
 
 #ifdef __cplusplus
 }
