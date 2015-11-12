@@ -1,10 +1,10 @@
 /**
  * @file account_config.h
- * @brief  This file process account writing and finding operations.
+ * @brief  This file process account writing and finding operations. A crude mutex protection is used here to promise atomic file operation.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  周四 2015-11-12 18:32:05 中国标准时间
+ * @modified  周五 2015-11-13 01:56:15 中国标准时间
  */
 
 #ifndef _ACCOUNT_CONFIG_H
@@ -26,6 +26,7 @@ extern "C" {
 void am_account_config_init(void);
 void am_account_config_clear(void);
 int am_account_print(FILE* streamptr, const struct account_data_t* account);
+int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic);
 
 /**
  * @brief am_account_write
@@ -40,7 +41,7 @@ int am_account_write(const struct account_data_t* account);
  * @brief am_account_find_id
  * @param id
  * @param account
- * @return
+ * @return return 0 if account is found, or return 1.
  *
  * @note atomic write should be guaranteed here.
  */
@@ -50,7 +51,7 @@ int am_account_find_id(uint32_t id, struct account_data_t* account);
  * @brief am_account_find_username
  * @param username
  * @param account
- * @return
+ * @return return 0 if account is found, or return 1.
  *
  * @todo atomic write should be guaranteed here.
  */
@@ -62,9 +63,20 @@ int am_account_find_username(const char* username, struct account_data_t* accoun
  * @param tel
  * @param account
  *
- * @return   
+ * @return return 0 if account is found, or return 1.
  */
 int am_account_find_tel(const char* tel, struct account_data_t* account);
+
+
+/**
+ * @brief  am_account_find_tel_username This function find the account whose tel or username is equal to tel_username.
+ *
+ * @param tel_username
+ * @param account
+ *
+ * @return return 0 if account is found, or return 1.
+ */
+int am_account_find_tel_username(const char* tel_username, struct account_data_t* account);
 
 #ifdef __cplusplus
 }

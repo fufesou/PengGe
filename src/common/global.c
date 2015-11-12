@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周二 2015-11-10 19:33:42 中国标准时间
+ * @modified  周五 2015-11-13 00:50:47 中国标准时间
  */
 
 #ifdef __cplusplus
@@ -20,8 +20,8 @@ const char g_login_delimiter = ' ';
 const char* g_exit = "exit";
 const char* g_close = "close";
 
-char* g_succeed = "0";
-char* g_fail = "1";
+char g_succeed = '0';
+char g_fail = '1';
 
 #ifdef __cplusplus
 }

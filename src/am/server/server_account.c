@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周四 2015-11-12 19:51:35 中国标准时间
+ * @modified  周五 2015-11-13 01:48:22 中国标准时间
  */
 
 #ifdef WIN32
@@ -46,6 +46,8 @@ extern "C"
 #endif
 
 extern int g_len_randomcode;
+extern char g_succeed;
+extern char g_fail;
 extern uint32_t g_curmaxid;
 
 static LIST_HEAD(s_list_login);
@@ -65,6 +67,34 @@ static int s_create_account(const char* tel, const char* randcode, struct sockad
 static void s_send_randcode(const char* tel, const char* randcode);
 
 static void s_add_login(const struct account_data_t* account, const struct sockaddr* addr, cssocklen_t addrlen);
+
+/**
+ * @brief  s_login_exist 
+ *
+ * @param account
+ * @param addr
+ * @param addrlen
+ *
+ * @return   
+ * 1. 0 if no login of this account happened.
+ * 2. 1 if login of the account happened on other socket.
+ * 3. 2 if login  happened on the same socket.
+ */
+static int s_login_exist(const struct account_data_t* account, const struct sockaddr* addr, cssocklen_t addrlen);
+
+/**
+ * @brief  s_update_login This function will add new login account to login account list if previous same login have not happened.
+ *
+ * @param account
+ * @param addr
+ * @param addrlen
+ *
+ * @return
+ * 1. 0 if no login of this account happened.
+ * 2. 1 if login of the account happened on other socket.
+ * 3. 2 if login  happened on the same socket.
+ */
+static int s_update_login(const struct account_data_t* account, const struct sockaddr* addr, cssocklen_t addrlen);
 
 #ifdef __cplusplus
 }
@@ -89,6 +119,7 @@ int s_create_account(const char* tel, const char* randcode, struct account_data_
     if (csprintf(account->tel, SIZEOF_ARR(account->tel), tel, strlen(len) + 1) != 0) {
         return 1;
     }
+    memset(account->passwd, '\0', sizeof(account->passwd));
     return csprintf(account->passwd, SIZEOF_ARR(account->passwd), randcode, strlen(randcode) + 1);
 }
 
@@ -107,36 +138,160 @@ void s_add_login(const struct account_data_t* account, const struct sockaddr* ad
     list_add(&login_node->listnode, &s_list_login);
 }
 
+int s_login_exist(const struct account_data_t* account, const struct sockaddr* addr, cssocklen_t addrlen)
+{
+    int login_status = 0;
+    struct list_login_t* login_data = NULL;
+    struct list_head* node_login = s_list_login.next;
+
+    while (node_login != (&s_list_login)) {
+        login_data = container_of(delnode, struct list_login_t, listnode);
+        if (login_data->account_basic.id == account->id) {
+            login_status = 1;
+
+            if (memcpy(&login_data->addr, addr, addrlen) == 0) {
+                login_status = 2;
+                return login_status;
+            }
+        }
+        node_login = node_login->next;
+    }
+
+    return login_status;
+}
+
+int s_update_login(const struct account_data_t* account, const struct sockaddr* addr, cssocklen_t addrlen)
+{
+    int login_status = s_login_eixt(account, addr, addrlen);
+    if (login_status == 0) {
+        s_add_login(account, addr, addrlen);
+    }
+    return login_status;
+}
+
+/**
+ * @brief  am_account_create_reply This function handle the request of creating a new account
+ *
+ * @param inmsg The format of inmsg here is: 
+ * ------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | tel(char*) | ... |
+ * ------------------------------------------------------------------------------------
+ *
+ * @param inmsglen
+ * @param outmsg The format of outmsg here is:
+ * -------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | account(struct account_basic_t) | ... | 
+ * -------------------------------------------------------------------------------------------------------------------------
+ *  or
+ * ------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | fail(char) | ... |
+ * ------------------------------------------------------------------------------------
+ *
+ * @param outmsglen
+ *
+ * @return  0 if succeed, 1 if fail. 
+ */
 int am_account_create_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
+    static int fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
     char* randcode = NULL;
     struct account_data_t account;
+    struct account_basic_t account_basic;
 
     randcode = (char*)malloc(sizeof(char) * g_len_randomcode);
     s_gen_randcode(g_len_randomcode, randcode, '0', '9');
 
-    /**
-     * @brief The format of inmsg here is: 
-     * ----------------------------------------------------------------------------------
-     * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | tel(char*) ... |
-     * ----------------------------------------------------------------------------------
-     */
-    if (s_create_account(inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t), randcode, &account) != 0) {
+    cs_memcpy(outmsg, *outmsglen, inmsg, fixedlen);
+
+    if (s_create_account(inmsg + fixedlen, randcode, &account) != 0) {
+        outmsg[fixedlen] = g_fail;
+        ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1;
+        *outmsglen = fixedlen + 1;
         return 1;
     }
     s_add_login(&account, &((struct csmsg_header*)inmsg)->sockaddr, addrlen);
 
     am_config_write(&account);
 
-    csprintf(oustmsg, *outmsglen, &account, sizeof(account));
-    *outmsglen = sizeof(account);
+    outmsg[fixedlen] = g_succeed;
+    ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1 + sizeof(account);
+
+    am_account_data2basic(&account, &account_bacic);
+    csprintf(oustmsg + fixedlen + 1, *outmsglen - fixedlen - 1, &account_baic, sizeof(account_basic));
+    *outmsglen = sizeof(account_basic) + fixedlen + 1;
 
     return 0;
 }
 
+/**
+ * @brief  am_account_login_reply 
+ *
+ * @param inmsg The format of inmsg here is: 
+ * --------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | tel or username(char*) | passwd(char*) ... |
+ * --------------------------------------------------------------------------------------------------------------
+ *
+ * @param inmsglen
+ * @param outmsg
+ * -------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | account(struct account_basic_t) | ... | 
+ * -------------------------------------------------------------------------------------------------------------------------
+ *  or
+ * ----------------------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | account(struct account_basic_t) | additional message | 
+ * ----------------------------------------------------------------------------------------------------------------------------------------
+ *  or
+ * ----------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
+ * ----------------------------------------------------------------------------------------------------
+ *
+ * @param outmsglen
+ *
+ * @return  0 if succeed, 1 if fail. 
+ */
 int am_account_login_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
 {
-    return 1;
+    static int fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
+    int login_status = 0;
+    struct account_data_t account;
+    struct account_basic_t account_basic;
+    char* login_begin = inmsg + len_before_login;
+    const char* msg_account_not_exist = "account not exist.";
+    const char* msg_account_login_fail = "tel(user name) or password error.";
+    const char* msg_account_login_other = "this account have been logined on other socket.";
+
+    cs_memcpy(outmsg, *outmsglen, inmsg, fixedlen);
+
+    if (am_account_find_tel_username(login_begin, &account) != 0) {
+        csprintf(outmsg + fixedlen, *outmsglen - fixedlen, "%c%s", g_fail, msg_account_not_exist);
+        ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1 + strlen(msg_account_not_exist) + 1;
+        *outmsglen = fixedlen + 1 + strlen(msg_account_not_exist) + 1;
+        return 1;
+    }
+    if (strncmp(strchr(login_begin, '\0'), account.passwd, strlen(account.passwd) + 1) != 0) {
+        csprintf(outmsg + fixedlen, *outmsglen - fixedlen, "%c%s", g_fail, msg_account_login_fail);
+        ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1 + strlen(msg_account_login_fail) + 1;
+        *outmsglen = fixedlen + 1 + strlen(msg_account_login_fail) + 1;
+        return 1;
+    }
+
+    am_account_data2basic(&account, &account_basic);
+    outmsg[fixedlen] = g_succeed;
+    csprintf(oustmsg + fixedlen + 1, *outmsglen - fixedlen - 1, &account_basic, sizeof(account_basic));
+
+    login_status = s_update_login(&account, &((struct csmsg_header*)inmsg)->addr, ((struct csmsg_header*)inmsg)->addrlen);
+    if (login_status == 1) {
+        csprintf(outmsglen + fixedlen + 1 + sizeof(account_basic),
+                *outmsglen - fixedlen - 1 - sizeof(account_basic),
+                msg_account_login_other,
+                strlen(msg_account_login_other) + 1);
+
+        *outmsglen = sizeof(account_basic) + fixedlen + 1 + strlen(msg_account_login_other) + 1;
+    } else {
+        *outmsglen = sizeof(account_basic) + fixedlen + 1;
+    }
+
+    return 0;
 }
 
 int am_account_inquire_reply(char* inmsg, int inmsglen, char* outmsg, __inout int* outmsglen)
