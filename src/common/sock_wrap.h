@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
- * @modified  Fri 2015-11-06 01:06:43 (+0800)
+ * @modified  周五 2015-11-13 18:09:06 中国标准时间
  */
 
 #ifndef  SOCK_WRAP_H
@@ -117,6 +117,14 @@ int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addr
  * @return
  */
 int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
+
+#ifdef WIN32
+const char* cssock_inet_ntop(int af, const void* src, char* dst, cssocklen_t size);
+int cssock_inet_pton(int af, const char* src, void* dst);
+#else
+#define cssock_inet_ntop inet_ntop
+#define cssock_inet_pton inet_pton
+#endif
 
 
 #ifdef __cplusplus

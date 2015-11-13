@@ -8,6 +8,7 @@
  */
 
 #ifdef WIN32
+#include  <ws2tcpip.h>
 #include  <winsock2.h>
 #include  <windows.h>
 #else
@@ -84,9 +85,12 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
     ((struct csmsg_header*)inbuf)->addrlen = addrlen;
 
 #ifdef _DEBUG
-    printf("server: recefrom() client ip: %s, port: %d.\n",
-           inet_ntoa(((struct sockaddr_in*)&cliaddr)->sin_addr),
-           htons(((struct sockaddr_in*)&cliaddr)->sin_port));
+    {
+        char addrstr[INET6_ADDRSTRLEN + 1];
+        printf("server: recefrom() client ip: %s, port: %d.\n",
+               cssock_inet_ntop(AF_INET, &((struct sockaddr_in*)&cliaddr)->sin_addr, addrstr, sizeof(addrstr)),
+               htons(((struct sockaddr_in*)&cliaddr)->sin_port));
+    }
 #endif
 
 #ifdef _DEBUG
@@ -107,9 +111,12 @@ void csserver_send(cssock_t handle, void* outmsg)
     msghdr = (struct csmsg_header*)outmsg;
 
 #ifdef _DEBUG
-    printf("server: client ip: %s, port: %d.\n",
-           inet_ntoa(((struct sockaddr_in*)&msghdr->addr)->sin_addr),
-           htons(((struct sockaddr_in*)&msghdr->addr)->sin_port));
+    {
+        char addrstr[INET6_ADDRSTRLEN + 1];
+        printf("server: client ip: %s, port: %d.\n",
+               cssock_inet_ntop(AF_INET, &((struct sockaddr_in*)&msghdr->addr)->sin_addr, addrstr, sizeof(addrstr)),
+               htons(((struct sockaddr_in*)&msghdr->addr)->sin_port));
+    }
 #endif
 
     sendbytes = sendto(handle, outmsg, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);

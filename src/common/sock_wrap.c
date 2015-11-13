@@ -4,10 +4,11 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
- * @modified  Fri 2015-11-06 01:09:43 (+0800)
+ * @modified  周五 2015-11-13 18:19:12 中国标准时间
  */
 
 #ifdef WIN32
+#include  <ws2tcpip.h>
 #include  <winsock2.h>
 #include  <windows.h>
 #define BLOCK_RW        0
@@ -41,7 +42,6 @@ int cssock_envinit()
     if (WSAStartup(MAKEWORD(2,2), &wsadata) != 0)
     {
          printf("WSAStartup failed with error %d\n", WSAGetLastError());
-         // exit(-1);
          return -1;
     }
     else
@@ -55,7 +55,6 @@ int cssock_envinit()
          printf("The dll do not support the Winsock version %u.%u!\n",
                    LOBYTE(wsadata.wVersion),HIBYTE(wsadata.wVersion));
          WSACleanup();
-         // exit(-1);
          return -1;
     }
     else
@@ -228,6 +227,7 @@ int cssock_print(cssock_t handle, const char* header)
 #endif
     nlen = sizeof(struct sockaddr_in);
     const char* msgheader = "";
+    char addrstr[INET6_ADDRSTRLEN];
 
     if (!IS_SOCK_HANDLE(handle)) {
         return -1;
@@ -236,7 +236,8 @@ int cssock_print(cssock_t handle, const char* header)
 	msgheader = (header == NULL) ? msgheader : header;
 
     if (getsockname(handle, (struct sockaddr*)&addr_in, &nlen) == 0) {
-        fprintf(stdout, "%s IP(s) used: %s\n", msgheader, inet_ntoa(addr_in.sin_addr));
+        cssock_inet_ntop(AF_INET, &addr_in.sin_addr, addrstr, sizeof(addrstr));
+        fprintf(stdout, "%s IP(s) used: %s\n", msgheader, addrstr);
         fprintf(stdout, "%s port used: %d\n", msgheader, htons(addr_in.sin_port));
         return 0;
     }
@@ -261,3 +262,72 @@ int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addr
 	return res;
 }
 
+#ifdef WIN32
+const char* cssock_inet_ntop(int af, const void* src, char* dst, cssocklen_t size)
+{
+    struct sockaddr_storage ss;
+    unsigned long s = size;
+    
+    ZeroMemory(&ss, sizeof(ss));
+    ss.ss_family = af;
+
+    switch (af) {
+        case AF_INET:
+            ((struct sockaddr_in*)&ss)->sin_addr = *(struct in_addr*)src;
+            break;
+        case AF_INET6:
+            ((struct sockaddr_in6*)&ss)->sin6_addr = *(struct in6_addr*)src;
+            break;
+
+        default:
+            return NULL;
+    }
+
+#ifdef UNICODE
+    {
+        LPWSTR wdst = (LPWSTR)malloc(sizeof(WCHAR) * s);
+        if (WSAAddressToString((struct sockaddr*)&ss, sizeof(ss), NULL, wdst, &s) != 0) {
+            return NULL;
+        }
+        WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, wdst, -1, dst, size,  NULL, NULL);
+        return dst;
+    }
+#else
+    return (WSAAddressToString((struct sockaddr*)&ss, sizeof(ss), NULL, dst, &s) == 0) ? dst : NULL;
+#endif
+}
+
+int cssock_inet_pton(int af, const char* src, void* dst)
+{
+    struct sockaddr_storage ss;
+    int size = sizeof(ss);
+
+#ifdef UNICODE
+    WCHAR src_copy[INET6_ADDRSTRLEN];
+#else
+    char src_copy[INET6_ADDRSTRLEN];
+#endif
+
+    ZeroMemory(&ss, sizeof(ss));
+
+#ifdef UNICODE
+    swprintf_s(src_copy, sizeof(src_copy) / sizeof(src_copy[0]), L"%hs", src);
+#else
+    strncpy(src_copy, src, INET6_ADDRSTRLEN);
+#endif
+
+    src_copy[INET6_ADDRSTRLEN] = 0;
+
+    if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr*)&ss, &size) == 0) {
+        switch (af) {
+            case AF_INET:
+                *(struct in_addr*)dst = ((struct sockaddr_in*)&ss)->sin_addr;
+                return 1;
+            case AF_INET6:
+                *(struct in6_addr*)dst = ((struct sockaddr_in6*)&ss)->sin6_addr;
+                return 1;
+        }
+    }
+    return 0;
+}
+#endif

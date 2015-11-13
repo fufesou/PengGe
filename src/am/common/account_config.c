@@ -4,16 +4,29 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  周五 2015-11-13 01:55:34 中国标准时间
+ * @modified  周五 2015-11-13 19:24:56 中国标准时间
  */
 
+#ifdef WIN32
+#include  <process.h>
+#else
+#include  <errno.h>
+#include  <pthread.h>
+#include  <unistd.h>
+#include  <sys/time.h>
+#define THREAD_IDEL_TIMESLICE_MS 20
+#endif
+
+#include  <time.h>
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <stdint.h>
 #include  <string.h>
 #include    "error.h"
-#include    "lightthread"
+#include    "lightthread.h"
 #include    "utility_wrap.h"
+#include    "account_macros.h"
+#include    "account.h"
 #include    "account_config.h"
 
 #ifndef offsetof
@@ -25,7 +38,7 @@ extern "C" {
 #endif
 
 static FILE* s_cfgfile = NULL;
-static csmutex s_filemutex;
+static csmutex_t s_filemutex;
 
 static int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account);
 
@@ -75,13 +88,13 @@ int am_account_find_tel_username(const char* tel_username, struct account_data_t
 {
     static int offset_tel = offsetof(struct account_data_t, tel);
     static int offset_username = offsetof(struct account_data_t, username);
-    int keylen = strlen(tel_username) + 1;
+    size_t keylen = strlen(tel_username) + 1;
 
     if ((keylen - 1) >= sizeof(account->username) && (keylen - 1) >= sizeof(account->tel)) {
         return 1;
     }
     if (strlen(tel_username) > sizeof(account->username)) {
-        return am_account_find_tel(tel_username, accout);
+        return am_account_find_tel(tel_username, account);
     }
     if (strlen(tel_username) > sizeof(account->tel)) {
         return am_account_find_username(tel_username, account);

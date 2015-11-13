@@ -33,7 +33,7 @@ DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
 
-typedef int (*procptr)(char*, int, char*, __inout int*);
+typedef int (*procptr)(char*, char*, __inout int*);
 
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.

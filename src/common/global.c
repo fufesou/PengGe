@@ -4,8 +4,10 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周五 2015-11-13 00:50:47 中国标准时间
+ * @modified  鍛ㄤ簲 2015-11-13 20:07:12 涓浗鏍囧噯鏃堕棿
  */
+
+#include  <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,6 +24,10 @@ const char* g_close = "close";
 
 char g_succeed = '0';
 char g_fail = '1';
+
+uint32_t g_curmaxid = 0;
+
+int g_len_randomcode = 4;
 
 #ifdef __cplusplus
 }

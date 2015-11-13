@@ -14,6 +14,8 @@
 extern "C" {
 #endif
 
+#define GET_HEADER_DATA(ptr, mem) (((struct csmsg_header*)ptr)->mem)
+
 #pragma pack(4)
 /**
  * @brief  csmsg_header describe the header in pool item. csmsg_header is followed by the actual message data.
