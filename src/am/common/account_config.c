@@ -22,6 +22,7 @@
 #include  <stdlib.h>
 #include  <stdint.h>
 #include  <string.h>
+#include  <semaphore.h>
 #include    "config_macros.h"
 #include    "error.h"
 #include    "lightthread.h"

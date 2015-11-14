@@ -13,7 +13,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sat 2015-11-14 11:35:15 (+0800)
+ * @modified  Sat 2015-11-14 17:50:12 (+0800)
  */
 
 #ifdef WIN32
@@ -28,6 +28,8 @@
 #include  <stdint.h>
 #include  <stdio.h>
 #include  <stdlib.h>
+#include  <string.h>
+#include  <config_macros.h>
 #include    "macros.h"
 #include    "list.h"
 #include    "sock_types.h"
@@ -61,6 +63,9 @@ extern int g_len_randomcode;
 extern char g_succeed;
 extern char g_fail;
 extern uint32_t g_curmaxid;
+
+
+static uint32_t s_headerlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
 
 static LIST_HEAD(s_list_login);
 
@@ -203,7 +208,6 @@ int s_update_login(const struct account_data_t* account, const struct sockaddr* 
  */
 int am_account_create_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
-    static int fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
     char* randcode = NULL;
     struct account_data_t account;
     struct account_basic_t account_basic;
@@ -211,21 +215,21 @@ int am_account_create_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
     randcode = (char*)malloc(sizeof(char) * g_len_randomcode);
     s_gen_randcode(g_len_randomcode, randcode, '0', '9');
 
-    cs_memcpy(outmsg, *outmsglen, inmsg, fixedlen);
+    cs_memcpy(outmsg, *outmsglen, inmsg, s_headerlen);
 
-    if (s_create_account(inmsg + fixedlen, randcode, &account) != 0) {
-        outmsg[fixedlen] = g_fail;
+    if (s_create_account(inmsg + s_headerlen, randcode, &account) != 0) {
+        outmsg[s_headerlen] = g_fail;
         ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1;
-        *outmsglen = fixedlen + 1;
+        *outmsglen = s_headerlen + 1;
         return 1;
     }
     s_add_login(&account, &GET_HEADER_DATA(inmsg, addr), GET_HEADER_DATA(inmsg, addrlen));
 
     am_account_write(&account);
 
-    outmsg[fixedlen] = g_succeed;
+    outmsg[s_headerlen] = g_succeed;
     ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1 + sizeof(account);
-    *outmsglen = fixedlen + 1;
+    *outmsglen = s_headerlen + 1;
 
     return 0;
 }
@@ -234,22 +238,22 @@ int am_account_create_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  * @brief  am_account_login_reply 
  *
  * @param inmsg The format of inmsg here is: 
- * --------------------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | tel or username(char*) | passwd(char*) ... |
- * --------------------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | (*) user id(uint32_t) | process id(int32_t) | tel or username(char*) | passwd(char*) | ... |
+ * --------------------------------------------------------------------------------------------------------------------
  *
  * @param outmsg
  * -------------------------------------------------------------------------------------------------------------------------
  * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | account(struct account_basic_t) | ... | 
  * -------------------------------------------------------------------------------------------------------------------------
  *  or
- * ----------------------------------------------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | account(struct account_basic_t) | additional message | 
- * ----------------------------------------------------------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | account(struct account_basic_t) | additional message | ... |
+ * ----------------------------------------------------------------------------------------------------------------------------------------------
  *  or
- * ----------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
- * ----------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | (*) user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
+ * --------------------------------------------------------------------------------------------------------
  *
  * @param outmsglen
  *
@@ -257,54 +261,74 @@ int am_account_create_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  */
 int am_account_login_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
-    static int fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
     int login_status = 0;
     struct account_data_t account;
     struct account_basic_t account_basic;
-    char* login_begin = inmsg + fixedlen;
+    char* login_begin = inmsg + s_headerlen;
     const char* msg_account_not_exist = "account not exist.";
     const char* msg_account_login_fail = "tel(user name) or password error.";
     const char* msg_account_login_other = "this account have been logined on other socket.";
 
-    cs_memcpy(outmsg, *outmsglen, inmsg, fixedlen);
+    cs_memcpy(outmsg, *outmsglen, inmsg, s_headerlen);
 
     if (am_account_find_tel_username(login_begin, &account) != 0) {
-        csprintf(outmsg + fixedlen, *outmsglen - fixedlen, "%c%s", g_fail, msg_account_not_exist);
+        csprintf(outmsg + s_headerlen, *outmsglen - s_headerlen, "%c%s", g_fail, msg_account_not_exist);
         ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1 + strlen(msg_account_not_exist) + 1;
-        *outmsglen = fixedlen + 1 + strlen(msg_account_not_exist) + 1;
+        *outmsglen = s_headerlen + 1 + strlen(msg_account_not_exist) + 1;
         return 1;
     }
     if (strncmp(strchr(login_begin, '\0'), account.passwd, strlen(account.passwd) + 1) != 0) {
-        csprintf(outmsg + fixedlen, *outmsglen - fixedlen, "%c%s", g_fail, msg_account_login_fail);
+        csprintf(outmsg + s_headerlen, *outmsglen - s_headerlen, "%c%s", g_fail, msg_account_login_fail);
         ((struct csmsg_header*)outmsg)->numbytes = sizeof(uint32_t) + sizeof(int32_t) + 1 + strlen(msg_account_login_fail) + 1;
-        *outmsglen = fixedlen + 1 + strlen(msg_account_login_fail) + 1;
+        *outmsglen = s_headerlen + 1 + strlen(msg_account_login_fail) + 1;
         return 1;
     }
 
     am_account_data2basic(&account, &account_basic);
-    outmsg[fixedlen] = g_succeed;
-    cs_memcpy(outmsg + fixedlen + 1, *outmsglen - fixedlen - 1, &account_basic, sizeof(account_basic));
+    outmsg[s_headerlen] = g_succeed;
+    cs_memcpy(outmsg + s_headerlen + 1, *outmsglen - s_headerlen - 1, &account_basic, sizeof(account_basic));
 
     login_status = s_update_login(&account, &((struct csmsg_header*)inmsg)->addr, ((struct csmsg_header*)inmsg)->addrlen);
     if (login_status == 1) {
-        cs_memcpy(outmsg + fixedlen + 1 + sizeof(account_basic),
-                *outmsglen - fixedlen - 1 - sizeof(account_basic),
+        cs_memcpy(outmsg + s_headerlen + 1 + sizeof(account_basic),
+                *outmsglen - s_headerlen - 1 - sizeof(account_basic),
                 msg_account_login_other,
                 strlen(msg_account_login_other) + 1);
 
-        *outmsglen = sizeof(account_basic) + fixedlen + 1 + strlen(msg_account_login_other) + 1;
+        *outmsglen = sizeof(account_basic) + s_headerlen + 1 + strlen(msg_account_login_other) + 1;
     } else {
-        *outmsglen = sizeof(account_basic) + fixedlen + 1;
+		outmsg[sizeof(account_basic) + s_headerlen + 2] = '\0';
+        *outmsglen = sizeof(account_basic) + s_headerlen + 1;
     }
 
     return 0;
 }
 
-int am_account_inquire_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
-{
-    return 1;
-}
-
+/**
+ * @brief  am_account_changeusername_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
+ *
+ * @param inmsg The format of inmsg is
+ * -----------------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |
+ * -----------------------------------------------------------------------------------------------------------------------------------
+ *
+ * @param outmsg The format of outmsg is
+ * ---------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | ... | 
+ * ---------------------------------------------------------------------------------------
+ *  or
+ * ------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | additional message | ... |
+ * ------------------------------------------------------------------------------------------------------------
+ *  or
+ * ----------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
+ * ----------------------------------------------------------------------------------------------------
+ *
+ * @param outmsglen
+ *
+ * @return   
+ */
 int am_account_changeusername_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     return 1;

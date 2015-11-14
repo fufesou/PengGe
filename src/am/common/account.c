@@ -4,14 +4,14 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sat 2015-11-14 11:20:00 (+0800)
+ * @modified  Sat 2015-11-14 17:24:28 (+0800)
  */
 
 #include  <stdint.h>
 #include  <stdlib.h>
 #include  <string.h>
+#include    "macros.h"
 #include    "config_macros.h"
-#include    "account_macros.h"
 #include    "account.h"
 
 #define REGISTER_ACCOUNT_PROCESS_BEGIN \
@@ -36,7 +36,6 @@ extern "C"
 REGISTER_ACCOUNT_PROCESS_BEGIN
     REGISTER_ACCOUNT_PROCESS(account_create)
     REGISTER_ACCOUNT_PROCESS(account_login)
-    REGISTER_ACCOUNT_PROCESS(account_inquire)
     REGISTER_ACCOUNT_PROCESS(account_changeusername)
     REGISTER_ACCOUNT_PROCESS(account_changepasswd)
     REGISTER_ACCOUNT_PROCESS(account_changegrade)

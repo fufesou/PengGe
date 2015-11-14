@@ -4,11 +4,14 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Sat 2015-11-14 11:19:28 (+0800)
+ * @modified  Sat 2015-11-14 17:24:07 (+0800)
  */
 
 #ifndef _ACCOUNT_H
 #define _ACCOUNT_H
+
+#include    "account_macros.h"
+
 
 #pragma pack(4)
 struct account_basic_t {
@@ -27,13 +30,12 @@ extern "C"
 
 DECLARE_ACCOUNT_METHOD(account_create)
 DECLARE_ACCOUNT_METHOD(account_login)
-DECLARE_ACCOUNT_METHOD(account_inquire)
 DECLARE_ACCOUNT_METHOD(account_changeusername)
 DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
 
-typedef int (*procptr)(char*, char*, __inout int*);
+typedef int (*procptr)(char*, char*, __inout uint32_t*);
 
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.
