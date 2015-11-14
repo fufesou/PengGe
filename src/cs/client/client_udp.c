@@ -25,6 +25,7 @@
 #include  <stdint.h>
 #include  <string.h>
 #include  <semaphore.h>
+#include    "config_macros.h"
 #include	"macros.h"
 #include    "bufarray.h"
 #include    "sock_types.h"

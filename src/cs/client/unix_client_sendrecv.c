@@ -19,6 +19,7 @@
 #include  <arpa/inet.h>
 #include  <pthread.h>
 #include  <semaphore.h>
+#include    "config_macros.h"
 #include    "macros.h"
 #include    "unprtt.h"
 #include    "sock_types.h"
@@ -58,7 +59,7 @@ static void s_register_alrm(void);
 
 ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
-	char outbuf[MAX_MSG_LEN];
+    char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
 
     if (s_rttinit == 0) {
@@ -76,9 +77,9 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 
     sendagain:
         s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
-        s_sendhdr.numbytes = strlen(cli->sendbuf) + 1;
+        s_sendhdr.numbytes = htonl((uint32_t)strlen(cli->sendbuf) + 1);
         csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
-        sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + s_sendhdr.numbytes, 0, servaddr, addrlen);
+        sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + ntohl(s_sendhdr.numbytes), 0, servaddr, addrlen);
 
         alarm(rtt_start(&s_rttinfo));
 

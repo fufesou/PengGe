@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  周五 2015-11-13 19:24:56 中国标准时间
+ * @modified  Sat 2015-11-14 11:18:27 (+0800)
  */
 
 #ifdef WIN32
@@ -22,6 +22,7 @@
 #include  <stdlib.h>
 #include  <stdint.h>
 #include  <string.h>
+#include    "config_macros.h"
 #include    "error.h"
 #include    "lightthread.h"
 #include    "utility_wrap.h"

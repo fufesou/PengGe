@@ -18,7 +18,7 @@ extern "C"
 {
 #endif
 
-typedef void csmsg_process_t(char* inmsg, char* outmsg, int* outmsglen, void* pargs);
+typedef void csmsg_process_t(char* inmsg, char* outmsg, uint32_t* outmsglen, void* pargs);
 typedef void csmsg_process_af_t(cssock_t handle, void* outmsg);
 
 struct csmsgpool_dispatch

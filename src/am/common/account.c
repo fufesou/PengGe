@@ -4,12 +4,13 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周三 2015-11-11 23:46:37 中国标准时间
+ * @modified  Sat 2015-11-14 11:20:00 (+0800)
  */
 
 #include  <stdint.h>
 #include  <stdlib.h>
 #include  <string.h>
+#include    "config_macros.h"
 #include    "account_macros.h"
 #include    "account.h"
 

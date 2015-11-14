@@ -5,7 +5,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
- * modified  周二 2015-11-10 19:05:56 中国标准时间
+ * modified  Sat 2015-11-14 11:11:33 (+0800)
  */
 
 #ifndef  MACROS_H
@@ -25,15 +25,8 @@
 
 // #define _CHECK_ARGS
 
-#define MAX_MSG_LEN 1024
-#define MAX_BUF_LEN 2048
 
-/*
- * @todo the following macros should be set by reading the config
- */
-#define NUM_THREAD 8
-#define SERVER_POOL_NUM_ITEM 64
-
+#define SIZEOF_ARR(arr) (sizeof(arr)/sizeof((arr)[0]))
 
 #ifndef offsetof
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)

@@ -33,19 +33,20 @@ int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int
     if (cs_memcpy(&msghdr->addr, sizeof(msghdr->addr), addr, addrlen) != 0) {
         return 1;
     }
-    msghdr->addrlen = addrlen;
+    msghdr->addrlen = htonl(addrlen);
     return 0;
 }
 
-int csmsg_merge(const struct csmsg_header* msgheader, const char* data, char* unit, int unitlen)
+int csmsg_merge(const struct csmsg_header* msgheader, const char* data, char* unit, uint32_t unitlen)
 {
-    int len_unitheader = sizeof(struct csmsg_header);
+    uint32_t len_unitheader = sizeof(struct csmsg_header);
+    uint32_t msgdatalen = ntohl(msgheader->numbytes);
 
-    assert((len_unitheader + msgheader->numbytes) < unitlen);
+    assert((len_unitheader + msgdatalen) < unitlen);
     if (cs_memcpy(unit, unitlen, msgheader, len_unitheader) != 0) {
 		return 1;
 	}
-	if (cs_memcpy(unit + len_unitheader, unitlen - len_unitheader, data, msgheader->numbytes) != 0) {
+    if (cs_memcpy(unit + len_unitheader, unitlen - len_unitheader, data, msgdatalen) != 0) {
 		return 1;
 	}
 
@@ -66,7 +67,7 @@ int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* d
         return 1;
     }
     
-    if (cs_memcpy(data, datalen, unit + len_unitheader, msgheader->numbytes) != 0) {
+    if (cs_memcpy(data, datalen, unit + len_unitheader, ntohl(msgheader->numbytes)) != 0) {
         return 1;
     }
     

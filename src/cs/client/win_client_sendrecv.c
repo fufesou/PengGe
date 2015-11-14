@@ -78,7 +78,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
     ++s_sendhdr.header.seq;
     rtt_newpack(&s_rttinfo);
     cssock_getsockname(cli->hsock, &s_sendhdr.addr, &sendlen);
-    s_sendhdr.addrlen = sendlen;
+    s_sendhdr.addrlen = htonl(sendlen);
 
     s_recv_stat = RECV_RESEND;
     while (RECV_RESEND == s_recv_stat) {

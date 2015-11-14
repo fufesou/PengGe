@@ -15,7 +15,7 @@ extern "C"
 {
 #endif
 
-void csclient_process_msg(char* inmsg, char* outmsg, int* outmsglen, void* clidata);
+void csclient_process_msg(char* inmsg, char* outmsg, uint32_t* outmsglen, void* clidata);
 
 #ifdef __cplusplus
 }

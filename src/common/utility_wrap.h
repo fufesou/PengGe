@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-29
- * @modified  周三 2015-11-11 18:12:38 中国标准时间
+ * @modified  Sat 2015-11-14 11:57:02 (+0800)
  */
 
 #ifndef _UTILITY_WRAP_H

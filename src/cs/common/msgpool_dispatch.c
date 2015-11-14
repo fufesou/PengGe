@@ -52,7 +52,7 @@ unsigned int __stdcall csmsgpool_process(void* pool_dispath)
 void* csmsgpool_process(void* pool_dispath)
 #endif
 {
-	int outmsglen;
+    uint32_t outmsglen;
 	char* msgbuf = NULL;
 	char* outmsg = NULL;
 	struct csmsgpool_dispatch* msgpool_dispatch = (struct csmsgpool_dispatch*)pool_dispath;

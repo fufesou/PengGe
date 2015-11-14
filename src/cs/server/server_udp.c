@@ -23,6 +23,7 @@
 #include  <stdio.h>
 #include  <stdint.h>
 #include  <semaphore.h>
+#include    "config_macros.h"
 #include	"macros.h"
 #include    "bufarray.h"
 #include    "sock_types.h"

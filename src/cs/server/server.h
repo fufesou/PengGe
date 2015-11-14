@@ -41,7 +41,7 @@ void csserver_udp(struct csserver* serv);
 
 ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes);
 
-void csserver_send(cssock_t handle, void* outbuf);
+void csserver_send(cssock_t handle, void* sendbuf);
 
 
 #ifdef __cplusplus

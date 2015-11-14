@@ -82,7 +82,6 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
         return 0;
     }
     csmsg_copyaddr((struct csmsg_header*)inbuf, &cliaddr, addrlen);
-    ((struct csmsg_header*)inbuf)->addrlen = addrlen;
 
 #ifdef _DEBUG
     {
@@ -103,12 +102,13 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
     return recvbytes - sizeof(struct csmsg_header);
 }
 
-void csserver_send(cssock_t handle, void* outmsg)
+void csserver_send(cssock_t handle, void* sendbuf)
 {
     ssize_t sendbytes;
 	struct csmsg_header* msghdr = NULL;
+    uint32_t msgdatalen = ntohl(GET_HEADER_DATA(sendbuf, numbytes));
 
-    msghdr = (struct csmsg_header*)outmsg;
+    msghdr = (struct csmsg_header*)sendbuf;
 
 #ifdef _DEBUG
     {
@@ -119,10 +119,10 @@ void csserver_send(cssock_t handle, void* outmsg)
     }
 #endif
 
-    sendbytes = sendto(handle, outmsg, sizeof(struct csmsg_header) + msghdr->numbytes, 0, &msghdr->addr, msghdr->addrlen);
+    sendbytes = sendto(handle, sendbuf, sizeof(struct csmsg_header) + msgdatalen, 0, &msghdr->addr, ntohl(msghdr->addrlen));
     if (sendbytes < 0) {
         fprintf(stderr, "server: sendto() fail, error code: %d.\n", cssock_get_last_error());
-    } else if (sendbytes != ((ssize_t)sizeof(struct csmsg_header) + msghdr->numbytes)) {
+    } else if (sendbytes != (ssize_t)(sizeof(struct csmsg_header) + msgdatalen)) {
         printf("server: sendto() does not send right number of data.\n");
     }
 }

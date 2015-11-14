@@ -1,10 +1,19 @@
 /**
  * @file server_account.c
- * @brief  
+ * @brief  This file defines some basic account process functions for server. 
+ * * Some message formats are described in the document:
+ * -----------------------------------------------
+ * | data name(type) | (*) data name(type) | ... |
+ * -----------------------------------------------
+ * 1. The data name is the name of this segment, such as 'username'.
+ * 2. The type describe the segement's type, such as 'int8'.
+ * 3. (*) means this segement is not filled with data by now.
+ * 4. ... means unused remainder place.
+
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周五 2015-11-13 19:25:44 中国标准时间
+ * @modified  Sat 2015-11-14 11:35:15 (+0800)
  */
 
 #ifdef WIN32
@@ -175,9 +184,9 @@ int s_update_login(const struct account_data_t* account, const struct sockaddr* 
  * @brief  am_account_create_reply This function handle the request of creating a new account
  *
  * @param inmsg The format of inmsg here is: 
- * ------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | tel(char*) | ... |
- * ------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------------------
+ * | struct csmsg_header | (*) user id(uint32_t) | process id(int32_t) | tel(char*) | ... |
+ * ----------------------------------------------------------------------------------------
  *
  * @param outmsg The format of outmsg here is:
  * ---------------------------------------------------------------------------------------
@@ -192,7 +201,7 @@ int s_update_login(const struct account_data_t* account, const struct sockaddr* 
  *
  * @return  0 if succeed, 1 if fail. 
  */
-int am_account_create_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
+int am_account_create_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     static int fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
     char* randcode = NULL;
@@ -246,7 +255,7 @@ int am_account_create_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
  *
  * @return  0 if succeed, 1 if fail. 
  */
-int am_account_login_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
+int am_account_login_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     static int fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
     int login_status = 0;
@@ -291,22 +300,22 @@ int am_account_login_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
     return 0;
 }
 
-int am_account_inquire_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
+int am_account_inquire_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     return 1;
 }
 
-int am_account_changeusername_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
+int am_account_changeusername_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     return 1;
 }
 
-int am_account_changepasswd_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
+int am_account_changepasswd_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     return 1;
 }
 
-int am_account_changegrade_reply(char* inmsg, char* outmsg, __inout int* outmsglen)
+int am_account_changegrade_reply(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     return 1;
 }

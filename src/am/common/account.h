@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  周四 2015-11-12 18:23:20 中国标准时间
+ * @modified  Sat 2015-11-14 11:19:28 (+0800)
  */
 
 #ifndef _ACCOUNT_H
@@ -14,8 +14,8 @@
 struct account_basic_t {
 	uint8_t grade;
 	uint32_t id;
-    char tel[16];
-	char username[64];
+    char tel[ACCOUNT_TEL_LEN];
+	char username[ACCOUNT_USERNAME_LEN];
 };
 #pragma pack()
 

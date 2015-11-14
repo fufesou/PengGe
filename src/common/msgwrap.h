@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  周五 2015-11-06 12:02:41 中国标准时间
+ * @modified  Sat 2015-11-14 12:11:32 (+0800)
  */
 
 #ifndef  MSGUNIT_H
@@ -22,9 +22,9 @@ extern "C" {
  */
 struct csmsg_header {
     struct sockaddr addr;
-    int addrlen;
+    uint32_t addrlen;
     struct hdr header;
-    int numbytes;
+    uint32_t numbytes;
 };
 #pragma pack()
 
@@ -49,7 +49,7 @@ int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int
  *
  * @return   0 if succeed, 1 if fail.
  */
-int csmsg_merge(const struct csmsg_header* msghdr, const char* data, char* unit, int unitlen);
+int csmsg_merge(const struct csmsg_header* msghdr, const char* data, char* unit, uint32_t unitlen);
 
 /**
  * @brief  csmsg_extract 

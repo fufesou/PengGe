@@ -28,13 +28,13 @@ extern "C"
  *
  * @note We support only telephone account creation for now.
  */
-int am_account_create_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
+int am_account_create_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, __inout uint32_t* outmsglen);
 
-int am_account_login_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
-int am_account_inquire_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
-int am_account_changeusername_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
-int am_account_changepasswd_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
-int am_account_changegrade_request(const char* inmsg, int inmsglen, uint32_t userid, char* outmsg, __inout int* outmsglen);
+int am_account_login_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, __inout uint32_t* outmsglen);
+int am_account_inquire_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, __inout uint32_t* outmsglen);
+int am_account_changeusername_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, __inout uint32_t* outmsglen);
+int am_account_changepasswd_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, __inout uint32_t* outmsglen);
+int am_account_changegrade_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, __inout uint32_t* outmsglen);
 
 #ifdef __cplusplus
 }

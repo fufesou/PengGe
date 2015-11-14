@@ -18,6 +18,7 @@
 #include  <string.h>
 #include  <stdint.h>
 #include  <semaphore.h>
+#include    "config_macros.h"
 #include    "macros.h"
 #include    "lightthread.h"
 #include    "sock_types.h"
@@ -39,15 +40,15 @@ extern const char* g_loginmsg_SUCCESS;
 extern const char* g_loginmsg_FAIL;
 extern const char g_login_delimiter;
 
-static void s_process_login_sessin(char* inmsg, char* outmsg, int* outmsglen, struct csclient* cli);
-static void s_process_communication(char* inmsg, char* outmsg, int* outmsglen, struct csclient* cli);
+static void s_process_login_sessin(char* inmsg, char* outmsg, uint32_t* outmsglen, struct csclient* cli);
+static void s_process_communication(char* inmsg, char* outmsg, uint32_t* outmsglen, struct csclient* cli);
 
 #ifdef __cplusplus
 }
 #endif
 
 
-void csclient_process_msg(char* inmsg, char* outmsg, int* outmsglen, void* clidata)
+void csclient_process_msg(char* inmsg, char* outmsg, uint32_t* outmsglen, void* clidata)
 {
 	struct csclient* cli = (struct csclient*)clidata;
 
@@ -58,7 +59,7 @@ void csclient_process_msg(char* inmsg, char* outmsg, int* outmsglen, void* clida
 	}
 }
 
-void s_process_login_sessin(char* inmsg, char* outmsg, int* outmsglen, struct csclient* cli)
+void s_process_login_sessin(char* inmsg, char* outmsg, uint32_t* outmsglen, struct csclient* cli)
 {
     char* msgdata = NULL;
 
@@ -74,9 +75,10 @@ void s_process_login_sessin(char* inmsg, char* outmsg, int* outmsglen, struct cs
 	}
 }
 
-void s_process_communication(char* inmsg, char* outmsg, int* outmsglen, struct csclient* cli)
+void s_process_communication(char* inmsg, char* outmsg, uint32_t* outmsglen, struct csclient* cli)
 {
     char* msgdata = NULL;
+    uint32_t msgdatalen = ntohl(GET_HEADER_DATA(inmsg, numbytes));
 
 	msgdata = inmsg + sizeof(struct csmsg_header);
 
@@ -85,8 +87,8 @@ void s_process_communication(char* inmsg, char* outmsg, int* outmsglen, struct c
 		printf("%s switch to logout interface.\n", cli->prompt);
 	} else {
 		printf("%s prcess \"%s\" from server.\n", cli->prompt, msgdata);
-		cs_memcpy(outmsg, *outmsglen, msgdata, ((struct csmsg_header*)inmsg)->numbytes);
-		*outmsglen = ((struct csmsg_header*)inmsg)->numbytes;
+        cs_memcpy(outmsg, *outmsglen, msgdata, msgdatalen);
+        *outmsglen = msgdatalen;
 	}
 }
 

@@ -4,18 +4,18 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  周五 2015-11-13 01:56:15 中国标准时间
+ * @modified  Sat 2015-11-14 11:17:57 (+0800)
  */
 
 #ifndef _ACCOUNT_CONFIG_H
 #define _ACCOUNT_CONFIG_H
 
 struct account_data_t {
-    uint8_t grade;
-    uint32_t id;
-    char tel[16];
-    char username[64];
-    char passwd[32];
+    uint8_t		grade;
+    uint32_t	id;
+    char		tel[ACCOUNT_TEL_LEN];
+    char		username[ACCOUNT_USERNAME_LEN];
+    char		passwd[ACCOUNT_PASSWD_LEN];
 };
 
 #ifdef __cplusplus
