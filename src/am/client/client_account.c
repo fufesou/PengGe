@@ -13,13 +13,12 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sun 2015-11-15 16:10:02 (+0800)
+ * @modified  Mon 2015-11-16 01:56:15 (+0800)
  */
 
 #ifdef WIN32
 #include  <winsock2.h>
 #else
-#include  <sys/socket.h>
 #include  <netinet/in.h>
 #endif
 
@@ -29,8 +28,6 @@
 #include    "config_macros.h"
 #include    "account_macros.h"
 #include    "utility_wrap.h"
-#include    "sock_types.h"
-#include    "msgwrap.h"
 #include    "account.h"
 
 
@@ -41,92 +38,177 @@ extern "C" {
 extern char g_succeed;
 extern char g_fail;
 
+static uint32_t s_idlen = sizeof(uint32_t) + sizeof(uint32_t);
+
 static struct account_client_t
 {
 	struct account_basic_t account_basic;
 	char passwd[ACCOUNT_PASSWD_LEN];
 } s_account_client, s_account_tmp;
 
-
-static uint32_t s_headerlen = sizeof(struct csmsg_header) + sizeof(uint32_t) + sizeof(int32_t);
-
-
-int s_genera_msg_create(const char* inmsg, uint32_t userid, uint32_t methodid, char* outmsg, __inout uint32_t outmsglen);
+inline static int s_fill_ids(const char* name_request, char* outmsg, uint32_t outmsglen);
 
 
 #ifdef __cplusplus
 }
 #endif
 
-
-/**
- * @brief  s_general_msg_create 
- *
- * @param inmsg The format of inmsg should be
- * --------------------------------------------------------------------------------------------------------
- * | struct csmsg_header | (*) user id(uint32_t) | (*) process id(int32_t) | user input data(char*) | ... |
- * --------------------------------------------------------------------------------------------------------
- *
- * @param userid The account userid to fill 'user id' message segment.
- * @param methodid The methodid is respond to the id ot request method which is fetched from by 'am_method_getid("method name")'.
- * @param outmsg The out message is just the same as inmsg expect for the filled 'user id' and 'process id'.
- * @param outmsglen
- *
- * @return   
- */
-int s_general_msg_create(const char* inmsg, uint32_t userid, uint32_t methodid, char* outmsg, __inout uint32_t outmsglen)
+int s_fill_ids(const char* name_request, char* outmsg, uint32_t outmsglen)
 {
-	if (cs_memcpy(outmsg, outmsglen, inmsg, GET_HEADER_DATA(inmsg, numbytes)) != 0) {
+	if (outmsglen < s_idlen)
+	{
 		return 1;
 	}
+	*(uint32_t*)(outmsg) = htonl(s_account_client.account_basic.id);
+	*(uint32_t*)(outmsg + sizeof(uint32_t)) = htonl(am_method_getid(name_request));
 
-    *(uint32_t*)(outmsg + sizeof(struct csmsg_header)) = htonl(userid);
-    *(uint32_t*)(outmsg + sizeof(struct csmsg_header) + sizeof(userid)) = htonl(methodid);
-    return 0;
+	return 0;
 }
+
 
 /**************************************************
  **             the request block                 **
  **************************************************/
-int am_account_create_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen)
+int am_account_create_request(const char* tel, char* outmsg, uint32_t* outmsglen)
 {
-	return s_general_msg_create(inmsg, userid, am_method_getid("account_create"), outmsg, outmsglen); 
+	uint32_t len_tel = 0;
+
+	if (s_fill_ids("account_create", outmsg, *outmsglen)) {
+		return 1;
+	}
+
+	len_tel = strlen(tel);
+	if (cs_memcpy(outmsg + s_idlen, *outmsglen - s_idlen, tel, len_tel + 1) != 0) {
+		return 1;
+	}
+
+	*outmsglen = s_idlen + len_tel + 1;
+	return 0;
 }
 
-int am_account_login_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen)
+int am_account_login_request(const char* username_tel, const char* passwd, char* outmsg, uint32_t* outmsglen)
 {	
-	char* passwd = strchr(inmsg + s_headerlen, '\0') + 1;
-	snprintf(s_account_client.passwd, sizeof(s_account_client.passwd), passwd, strlen(passwd) + 1);
+	uint32_t len_username_tel = 0;
+	uint32_t len_passwd = 0;
 
-	return s_general_msg_create(inmsg, userid, am_method_getid("account_login"), outmsg, outmsglen); 
+	if (s_fill_ids("account_login", outmsg, *outmsglen)) {
+		return 1;
+	}
+
+	len_username_tel = strlen(username_tel);
+	len_passwd = strlen(passwd);
+
+	if (cs_memcpy(outmsg + s_idlen, *outmsglen - s_idlen, username_tel, len_username_tel + 1) != 0) {
+		return 1;
+	}
+	if (cs_memcpy(outmsg + s_idlen + len_username_tel + 1, *outmsglen - s_idlen - len_username_tel - 1, passwd, len_passwd + 1) != 0) {
+		return 1;
+	}
+	*outmsglen = s_idlen + len_username_tel + len_passwd + 2;
+    cs_memcpy(s_account_client.passwd, sizeof(s_account_client.passwd), passwd, len_passwd + 1);
+
+	return 0;
 }
 
-int am_account_changeusername_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen)
+int am_account_changeusername_request(
+			const char* username_old,
+			const char* passwd,
+			const char* username_new,
+			char* outmsg,
+            uint32_t* outmsglen)
 {
-	const char* passwd = strchr(inmsg + s_headerlen, '\0');
-	const char* username_new = strchr(passwd + 1, '\0');
+	uint32_t len_username_old = 0;
+	uint32_t len_username_new = 0;
+	uint32_t len_passwd = 0;
+
+	if (s_fill_ids("account_changeusername", outmsg, *outmsglen)) {
+		return 1;
+	}
+
+	len_username_old = strlen(username_old);
+	len_username_new = strlen(username_new);
+	len_passwd = strlen(passwd);
+
+	if (cs_memcpy(outmsg + s_idlen, *outmsglen - s_idlen, username_old, len_username_old + 1) != 0) {
+		return 1;
+	}
+	if (cs_memcpy(outmsg + s_idlen + len_username_old + 1, *outmsglen - s_idlen - len_username_old - 1, passwd, len_passwd + 1) != 0) {
+		return 1;
+	}
+	if (cs_memcpy(outmsg + s_idlen + len_username_old + len_passwd + 2, *outmsglen - s_idlen - len_username_old - len_passwd - 2, username_new, len_username_new + 1) != 0) {
+		return 1;
+	}
+	*outmsglen = s_idlen + len_username_old + len_passwd + len_username_new + 3;
 
 	cs_memcpy(s_account_tmp.account_basic.username, sizeof(s_account_tmp.account_basic.username), username_new, strlen(username_new) + 1);
 
-	return s_general_msg_create(inmsg, userid, am_method_getid("account_changeusername"), outmsg, outmsglen); 
+	return 0;
 }
 
-int am_account_changepasswd_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen)
+int am_account_changepasswd_request(
+			const char* username,
+			const char* passwd_old,
+			const char* passwd_new,
+			char* outmsg,
+            uint32_t* outmsglen)
 {
-	const char* passwd_old = strchr(inmsg + s_headerlen, '\0');
-	const char* passwd_new = strchr(passwd_old + 1, '\0');
+	uint32_t len_username = 0;
+	uint32_t len_passwd_old = 0;
+	uint32_t len_passwd_new = 0;
 
-    cs_memcpy(s_account_tmp.passwd, sizeof(s_account_tmp.passwd), passwd_new, strlen(passwd_new) + 1);
+	if (s_fill_ids("account_changepasswd", outmsg, *outmsglen)) {
+		return 1;
+	}
 
-	return s_general_msg_create(inmsg, userid, am_method_getid("account_changepasswd"), outmsg, outmsglen); 
+	len_username = strlen(username);
+	len_passwd_old = strlen(passwd_old);
+	len_passwd_new = strlen(passwd_new);
+
+	if (cs_memcpy(outmsg + s_idlen, *outmsglen - s_idlen, username, len_username + 1) != 0) {
+		return 1;
+	}
+	if (cs_memcpy(outmsg + s_idlen + len_username + 1, *outmsglen - s_idlen - len_username - 1, passwd_old, len_passwd_old + 1) != 0) {
+		return 1;
+	}
+	if (cs_memcpy(outmsg + s_idlen + len_username + len_passwd_old + 2, *outmsglen - s_idlen - len_username - len_passwd_old - 2, passwd_old, len_passwd_new + 1) != 0) {
+		return 1;
+	}
+	*outmsglen = s_idlen + len_username + len_passwd_old + len_passwd_new + 3;
+
+	cs_memcpy(s_account_tmp.passwd, sizeof(s_account_tmp.passwd), passwd_new, strlen(passwd_new) + 1);
+
+	return 0;
 }
 
-int am_account_changegrade_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen)
+int am_account_changegrade_request(
+			const char* username,
+			const char* passwd,
+			uint32_t grade,
+			char* outmsg,
+            uint32_t* outmsglen)
 {
-	const char* passwd = strchr(inmsg + s_headerlen, '\0');
-    s_account_tmp.account_basic.grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
+	uint32_t len_username = 0;
+	uint32_t len_passwd = 0;
 
-	return s_general_msg_create(inmsg, userid, am_method_getid("account_changepasswd"), outmsg, outmsglen); 
+	if (s_fill_ids("account_grade", outmsg, *outmsglen)) {
+		return 1;
+	}
+
+	len_username = strlen(username);
+	len_passwd = strlen(passwd);
+
+	if (cs_memcpy(outmsg + s_idlen, *outmsglen - s_idlen, username, len_username + 1) != 0) {
+		return 1;
+	}
+	if (cs_memcpy(outmsg + s_idlen + len_username + 1, *outmsglen - s_idlen - len_username - 1, passwd, len_passwd + 1) != 0) {
+		return 1;
+	}
+	*(uint32_t*)(outmsg + s_idlen + len_username + len_passwd + 2) = htonl(grade);
+	*outmsglen = s_idlen + len_username + len_passwd + 2 + sizeof(uint32_t);
+
+	s_account_tmp.account_basic.grade = grade;
+
+	return 0;
 }
 
 
@@ -147,7 +229,7 @@ int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
     (void)outmsg;
     (void)outmsglen;
 
-    if (inmsg[s_headerlen] == g_succeed) {
+    if (inmsg[0] == g_succeed) {
         printf("client: create account succeed, please wait for a moment to receiving the random telcode, then revify it.\n");
     } else {
         printf("client: create account fail.\n");
@@ -174,16 +256,16 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
     (void)outmsg;
     (void)outmsglen;
 
-    if (inmsg[s_headerlen] == g_succeed) {
-        if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + s_headerlen + 1, sizeof(struct account_basic_t)))) != 0) {
+    if (inmsg[0] == g_succeed) {
+        if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
 			fprintf(stderr, "client: login suceed, but client cannot update account data.\n");
 			return ret;
 		}
 
 		fprintf(stdout, "client: login succeed.\n");
 
-		if (inmsg[s_headerlen + 1 + sizeof(struct account_basic_t)] != 0) {
-			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + s_headerlen + 1 + sizeof(struct account_basic_t));
+		if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
+			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
 		}
     } else {
 		fprintf(stderr, "client: login fail.\n");
@@ -196,17 +278,17 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
  * @brief  am_account_changeusername_react The message from server is to tell client whether or not update new username.
  *
  * @param inmsg The format of inmsg is
- * ---------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | ... | 
- * ---------------------------------------------------------------------------------------
+ * -----------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | succeed(char) | ... | 
+ * -----------------------------------------------------------------
  *  or
- * ------------------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | additional message | ... |
- * ------------------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | succeed(char) | additional message | ... |
+ * --------------------------------------------------------------------------------------
  *  or
- * ----------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
- * ----------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
+ * ------------------------------------------------------------------------------
  *
  * @param outmsg Not used.
  * @param outmsglen Not used.
@@ -220,7 +302,7 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
     (void)outmsg;
 	(void)outmsglen;
 
-    if (inmsg[s_headerlen] == g_succeed) {
+    if (inmsg[0] == g_succeed) {
         if ((ret = cs_memcpy(
 						&s_account_client.account_basic.username,
 						sizeof(s_account_client.account_basic.username),
@@ -232,12 +314,12 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
 
 		fprintf(stdout, "client: change username succeed.\n");
 
-		if (inmsg[s_headerlen + 1] != 0) {
-			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + s_headerlen + 1);
+		if (inmsg[1] != 0) {
+			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     }
 	else {
-		fprintf(stderr, "client: change username fail. message: %s.\n", inmsg + s_headerlen);
+		fprintf(stderr, "client: change username fail. message: %s.\n", inmsg);
 		return 1;
 	}
     return ret;
@@ -247,17 +329,17 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
  * @brief  am_account_changepasswd_react The message from server is to tell client whether or not update new passwd.
  *
  * @param inmsg The format of inmsg is
- * ---------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | ... | 
- * ---------------------------------------------------------------------------------------
+ * -----------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | succeed(char) | ... | 
+ * -----------------------------------------------------------------
  *  or
- * ------------------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | additional message | ... |
- * ------------------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | succeed(char) | additional message | ... |
+ * --------------------------------------------------------------------------------------
  *  or
- * ----------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
- * ----------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
+ * ------------------------------------------------------------------------------
  *
  * @param outmsg Not used.
  * @param outmsglen Not used.
@@ -271,7 +353,7 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
     (void)outmsg;
 	(void)outmsglen;
 
-    if (inmsg[s_headerlen] == g_succeed) {
+    if (inmsg[0] == g_succeed) {
         if ((ret = cs_memcpy(
                         &s_account_client.passwd,
                         sizeof(s_account_client.passwd),
@@ -283,12 +365,12 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
 
 		fprintf(stdout, "client: change passwd succeed.\n");
 
-		if (inmsg[s_headerlen + 1] != 0) {
-			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + s_headerlen + 1);
+		if (inmsg[1] != 0) {
+			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     }
 	else {
-		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg + s_headerlen);
+		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg);
 		return 1;
 	}
     return ret;
@@ -298,17 +380,17 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
  * @brief  am_account_changegrade_react The message from server is to tell client whether or not update new grade.
  *
  * @param inmsg The format of inmsg is
- * ---------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | ... | 
- * ---------------------------------------------------------------------------------------
+ * -----------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | succeed(char) | ... | 
+ * -----------------------------------------------------------------
  *  or
- * ------------------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | succeed(char) | additional message | ... |
- * ------------------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | succeed(char) | additional message | ... |
+ * --------------------------------------------------------------------------------------
  *  or
- * ----------------------------------------------------------------------------------------------------
- * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
- * ----------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------------------
+ * | user id(uint32_t) | process id(int32_t) | fail(char) | error message | ... |
+ * ------------------------------------------------------------------------------
  *
  * @param outmsg Not used.
  * @param outmsglen Not used.
@@ -320,16 +402,16 @@ int am_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* ou
     (void)outmsg;
 	(void)outmsglen;
 
-    if (inmsg[s_headerlen] == g_succeed) {
+    if (inmsg[0] == g_succeed) {
 		s_account_client.account_basic.grade = s_account_tmp.account_basic.grade;
 		fprintf(stdout, "client: change passwd succeed.\n");
 
-		if (inmsg[s_headerlen + 1] != 0) {
-			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + s_headerlen + 1);
+		if (inmsg[1] != 0) {
+			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     }
 	else {
-		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg + s_headerlen);
+		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg);
 		return 1;
 	}
     return 0;
