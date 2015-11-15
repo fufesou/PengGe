@@ -16,7 +16,7 @@ SOURCES += main.c \
     ../../../src/common/utility_wrap.c \
     ../../../src/am/client/client_account.c \
     ../../../src/am/common/account.c \
-    ../../../src/am/common/account_config.c \
+    ../../../src/am/common/account_file.c \
     ../../../src/am/server/server_account.c
 
 win32 {
@@ -39,6 +39,6 @@ HEADERS += \
     ../../../src/common/utility_wrap.h \
     ../../../src/am/client/client_account.h \
     ../../../src/am/common/account.h \
-    ../../../src/am/common/account_config.h \
+    ../../../src/am/common/account_file.h \
     ../../../src/am/common/account_macros.h \
     ../../../src/am/server/server_account.h

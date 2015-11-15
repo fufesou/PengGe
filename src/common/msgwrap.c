@@ -33,7 +33,7 @@ int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int
     if (cs_memcpy(&msghdr->addr, sizeof(msghdr->addr), addr, addrlen) != 0) {
         return 1;
     }
-    msghdr->addrlen = htonl(addrlen);
+    msghdr->addrlen = addrlen;
     return 0;
 }
 

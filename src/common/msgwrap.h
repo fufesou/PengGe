@@ -19,11 +19,30 @@ extern "C" {
 #pragma pack(4)
 /**
  * @brief  csmsg_header describe the header in pool item. csmsg_header is followed by the actual message data.
+ *
+ * @todo This message header shoud be devided into two parts: 1. used in this host 2. transmit between client and server.
+ * 'addr' and 'addrlen' belong to the first part, 'header' and 'numbytes' belong to the second part.
  */
 struct csmsg_header {
+    /**
+     * @brief addr addr is only used in current host. It will be updated inmmediately after receiving.
+     */
     struct sockaddr addr;
+
+    /**
+     * @brief addrlen addrlen is only used in current host. It will be updated inmmediately after receiving.
+     */
     uint32_t addrlen;
+
+    /**
+     * @brief header 'header' will be transmit between client and server.
+     * But as the server does not change this data, it is not necessary to change the data between host and net endian.
+     */
     struct hdr header;
+
+    /**
+     * @brief numbytes numbytes will be transmit between client and server. Thus the conversion between host and net should be apply to it.
+     */
     uint32_t numbytes;
 };
 #pragma pack()

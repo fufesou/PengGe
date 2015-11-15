@@ -13,7 +13,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Sat 2015-11-14 17:29:02 (+0800)
+ * @modified  Sun 2015-11-15 15:59:36 (+0800)
  */
 
 #ifndef _CLIENT_ACCOUNT_H
@@ -32,7 +32,6 @@ extern "C"
  * | struct csmsg_header | (*) user id(uint32_t) | (*) process id(int32_t) | tel(char*) | ... |
  * --------------------------------------------------------------------------------------------
  *
- * @param inmsglen The length of income message.
  * @param userid This useris can be any value.
  * @param outmsg The format of outmsg here is: 
  * -------------------------------------------------------------------------------------
@@ -45,7 +44,7 @@ extern "C"
  *
  * @note We support only telephone account creation for now.
  */
-int am_account_create_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, uint32_t outmsglen);
+int am_account_create_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen);
 
 /**
  * @brief  am_account_login_request 
@@ -55,7 +54,6 @@ int am_account_create_request(const char* inmsg, uint32_t inmsglen, uint32_t use
  * | struct csmsg_header | (*) user id(uint32_t) | (*) process id(int32_t) | tel or username(char*) | passwd(char*) | ... |
  * ------------------------------------------------------------------------------------------------------------------------
  *
- * @param inmsglen
  * @param userid
  * @param outmsg The format of outmsg here is: 
  * --------------------------------------------------------------------------------------------------------------------
@@ -66,7 +64,7 @@ int am_account_create_request(const char* inmsg, uint32_t inmsglen, uint32_t use
  *
  * @return   
  */
-int am_account_login_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, uint32_t outmsglen);
+int am_account_login_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen);
 
 /**
  * @brief  am_account_changeusername_request
@@ -76,7 +74,6 @@ int am_account_login_request(const char* inmsg, uint32_t inmsglen, uint32_t user
  * | struct csmsg_header | (*) user id(uint32_t) | (*) process id(int32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |
  * -------------------------------------------------------------------------------------------------------------------------------------------
  *
- * @param inmsglen
  * @param userid
  * @param outmsg The format of outmsg is
  * -----------------------------------------------------------------------------------------------------------------------------------
@@ -87,33 +84,47 @@ int am_account_login_request(const char* inmsg, uint32_t inmsglen, uint32_t user
  *
  * @return   
  */
-int am_account_changeusername_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, uint32_t outmsglen);
+int am_account_changeusername_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen);
 
 /**
  * @brief  am_account_changepasswd_request 
  *
- * @param inmsg
- * @param inmsglen
+ * @param inmsg inmsg The format of inmsg here is: 
+ * -----------------------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | (*) user id(uint32_t) | (*) process id(int32_t) | username(char*) | old passwd(char*) | new passwd(char*) | ... |
+ * -----------------------------------------------------------------------------------------------------------------------------------------
+ *
  * @param userid
- * @param outmsg
+ * @param outmsg The format of outmsg is
+ * ---------------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | username(char*) | old passwd(char*) | new passwd(char*) | ... |
+ * ---------------------------------------------------------------------------------------------------------------------------------
+ *
  * @param outmsglen
  *
  * @return   
  */
-int am_account_changepasswd_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, uint32_t outmsglen);
+int am_account_changepasswd_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen);
 
 /**
  * @brief  am_account_changegrade_request 
  *
- * @param inmsg
- * @param inmsglen
+ * @param inmsg inmsg The format of inmsg here is: 
+ * ----------------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | (*) user id(uint32_t) | (*) process id(int32_t) | username(char*) | passwd(char*) | grde(uint32_t) | ... |
+ * ----------------------------------------------------------------------------------------------------------------------------------
+ *
  * @param userid
- * @param outmsg
+ * @param outmsg The format of outmsg is
+ * ---------------------------------------------------------------------------------------------------------------------------
+ * | struct csmsg_header | user id(uint32_t) | process id(int32_t) | username(char*) | passwd(char*) | grade(uint32_t) | ... |
+ * ---------------------------------------------------------------------------------------------------------------------------
+ *
  * @param outmsglen
  *
  * @return   
  */
-int am_account_changegrade_request(const char* inmsg, uint32_t inmsglen, uint32_t userid, char* outmsg, uint32_t outmsglen);
+int am_account_changegrade_request(const char* inmsg, uint32_t userid, char* outmsg, uint32_t outmsglen);
 
 /**
  * @brief  am_account_inquire_request 

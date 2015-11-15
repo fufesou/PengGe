@@ -119,7 +119,7 @@ void csserver_send(cssock_t handle, void* sendbuf)
     }
 #endif
 
-    sendbytes = sendto(handle, sendbuf, sizeof(struct csmsg_header) + msgdatalen, 0, &msghdr->addr, ntohl(msghdr->addrlen));
+    sendbytes = sendto(handle, sendbuf, sizeof(struct csmsg_header) + msgdatalen, 0, &msghdr->addr, msghdr->addrlen);
     if (sendbytes < 0) {
         fprintf(stderr, "server: sendto() fail, error code: %d.\n", cssock_get_last_error());
     } else if (sendbytes != (ssize_t)(sizeof(struct csmsg_header) + msgdatalen)) {

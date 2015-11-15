@@ -1,14 +1,14 @@
 /**
- * @file account_config.h
+ * @file account_file.h
  * @brief  This file process account writing and finding operations. A crude mutex protection is used here to promise atomic file operation.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Sat 2015-11-14 11:17:57 (+0800)
+ * @modified  Sun 2015-11-15 11:29:32 (+0800)
  */
 
-#ifndef _ACCOUNT_CONFIG_H
-#define _ACCOUNT_CONFIG_H
+#ifndef _ACCOUNT_FILE_H
+#define _ACCOUNT_FILE_H
 
 struct account_data_t {
     uint8_t		grade;
@@ -67,7 +67,6 @@ int am_account_find_username(const char* username, struct account_data_t* accoun
  */
 int am_account_find_tel(const char* tel, struct account_data_t* account);
 
-
 /**
  * @brief  am_account_find_tel_username This function find the account whose tel or username is equal to tel_username.
  *
@@ -78,9 +77,19 @@ int am_account_find_tel(const char* tel, struct account_data_t* account);
  */
 int am_account_find_tel_username(const char* tel_username, struct account_data_t* account);
 
+/**
+ * @brief  am_account_update If account exist already, the data will be updated, otherwise new account will be appended. 
+ * The only way to find the corresponding account is to match the id.
+ *
+ * @param account
+ *
+ * @return   
+ */
+int am_account_update(const struct account_data_t* account);
+
 #ifdef __cplusplus
 }
 #endif
 
 
-#endif //ACCOUNT_CONFIG_H
+#endif //ACCOUNT_FILE_H
