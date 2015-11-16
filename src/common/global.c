@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  周五 2015-11-13 20:07:12 中国标准时间
+ * @modified  Mon 2015-11-16 23:45:01 (+0800)
  */
 
 #include  <stdint.h>
@@ -26,6 +26,7 @@ char g_succeed = '0';
 char g_fail = '1';
 
 uint32_t g_curmaxid = 0;
+uint32_t g_timeout_verification = 120;
 
 int g_len_randomcode = 4;
 

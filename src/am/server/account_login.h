@@ -4,7 +4,7 @@
  * @author cxl, <shuanlgongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Mon 2015-11-16 19:43:54 (+0800)
+ * @modified  Mon 2015-11-16 23:29:25 (+0800)
  */
 
 #ifndef _ACCOUNT_LOGIN_H
@@ -20,7 +20,7 @@ struct account_login_t {
 
 struct list_login_t {
     struct list_head listnode;
-    struct account_login_t* account_sock;
+    struct account_login_t account_sock;
 };
 
 #pragma pack()

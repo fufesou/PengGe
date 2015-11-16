@@ -13,7 +13,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Mon 2015-11-16 01:51:34 (+0800)
+ * @modified  Mon 2015-11-16 22:58:01 (+0800)
  */
 
 #ifndef _CLIENT_ACCOUNT_H
@@ -30,7 +30,7 @@ extern "C"
  * @param tel The telphone number.
  * @param outmsg The format of outmsg here is: 
  * ------------------------------------------------------------------
- * | (*) user id(uint32_t) | process id(int32_t) | tel(char*) | ... |
+ * | process id(int32_t) | tel(char*) | ... |
  * ------------------------------------------------------------------
  *
  * @param outmsglen The buffer size of outmsg.
@@ -48,7 +48,7 @@ int am_account_create_request(const char* tel, char* outmsg, uint32_t* outmsglen
  * @param passwd
  * @param outmsg The format of outmsg here is: 
  * ----------------------------------------------------------------------------------------------
- * | (*) user id(uint32_t) | process id(int32_t) | tel or username(char*) | passwd(char*) | ... |
+ * | process id(int32_t) | tel or username(char*) | passwd(char*) | ... |
  * ----------------------------------------------------------------------------------------------
  *
  * @param outmsglen
@@ -65,7 +65,7 @@ int am_account_login_request(const char* username_tel, const char* passwd, char*
  * @param username_new
  * @param outmsg The format of outmsg is
  * -------------------------------------------------------------------------------------------------------------
- * | user id(uint32_t) | process id(int32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |
+ * | process id(int32_t) | user id(uint32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |
  * -------------------------------------------------------------------------------------------------------------
  *
  * @param outmsglen
@@ -87,7 +87,7 @@ int am_account_changeusername_request(
  * @param passwd_new
  * @param outmsg The format of outmsg is
  * -----------------------------------------------------------------------------------------------------------
- * | user id(uint32_t) | process id(int32_t) | username(char*) | old passwd(char*) | new passwd(char*) | ... |
+ * | process id(int32_t) | user id(uint32_t) | username(char*) | old passwd(char*) | new passwd(char*) | ... |
  * -----------------------------------------------------------------------------------------------------------
  *
  * @param outmsglen
@@ -108,9 +108,9 @@ int am_account_changepasswd_request(
  * @param passwd
  * @param grade
  * @param outmsg The format of outmsg is
- * -----------------------------------------------------------------------------------------------------
- * | user id(uint32_t) | process id(int32_t) | username(char*) | passwd(char*) | grade(uint32_t) | ... |
- * -----------------------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------------------------------------------
+ * | process id(int32_t) | user id(uint32_t) | username(char*) | passwd(char*) | grade(uint8_t) | ... |
+ * ----------------------------------------------------------------------------------------------------
  *
  * @param outmsglen
  *
@@ -119,7 +119,7 @@ int am_account_changepasswd_request(
 int am_account_changegrade_request(
 			const char* username,
 			const char* passwd,
-			uint32_t grade,
+			uint8_t grade,
 			char* outmsg,
             uint32_t* outmsglen);
 
