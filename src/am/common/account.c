@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sat 2015-11-14 17:24:28 (+0800)
+ * @modified  Mon 2015-11-16 18:45:23 (+0800)
  */
 
 #include  <stdint.h>
@@ -56,13 +56,13 @@ static uint32_t s_findmethod_unsorted(const char* methodname);
 }
 #endif
 
-void am_method_sort()
+void am_method_sort(void)
 {
     qsort(s_methodarr, s_sizeof_method, sizeof(s_methodarr[0]), s_comp_method);
     s_method_sorted = 1;
 }
 
-const struct account_method_t* am_method_getname(uint32_t methodid)
+const struct account_method_t* am_method_get(uint32_t methodid)
 {
     if ((int)methodid < s_sizeof_method) {
         return &s_methodarr[methodid];
@@ -82,9 +82,13 @@ uint32_t am_method_getid(const char* methodname)
 
 uint32_t s_findmethod_sorted(const char* methodname)
 {
-    int low = 0;
-    int mid = s_sizeof_method >> 1;
-    int high = s_sizeof_method - 1;
+	int low = 0;
+	int mid = s_sizeof_method >> 1;
+	int high = s_sizeof_method - 1;
+
+	if (!s_method_sorted) {
+		am_method_sort();
+	}
 
     while (low < high) {
         while ((strcmp(methodname, s_methodarr[mid].methodname) < 0) && (low < high)) {

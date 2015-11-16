@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Sun 2015-11-15 11:28:31 (+0800)
+ * @modified  Mon 2015-11-16 19:55:30 (+0800)
  */
 
 #ifdef WIN32
@@ -41,7 +41,7 @@ extern "C" {
 
 static const char* s_cfgfile = "account.txt";
 static FILE* s_fpcfg = NULL;
-static csmutex_t s_filemutex;
+static csmutex_t s_mutex_file;
 
 static int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account);
 
@@ -51,16 +51,20 @@ static int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset,
 
 int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account)
 {
+	csmutex_lock(s_mutex_file);
     fseek(s_fpcfg, 0, SEEK_SET);
     while (!feof(s_fpcfg)) {
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
             if (memcmp((char*)account + dataoffset, keydata, cmpcount) == 0) {
+				csmutex_unlock(s_mutex_file);
                 return 0;
             }
         } else if (ferror(s_fpcfg)) {
             fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
         }
     }
+	csmutex_unlock(s_mutex_file);
+
     return 1;
 }
 
@@ -103,21 +107,21 @@ int am_account_find_tel_username(const char* tel_username, struct account_data_t
         return am_account_find_username(tel_username, account);
     }
 
-    csmutex_lock(s_filemutex);
+    csmutex_lock(s_mutex_file);
     fseek(s_fpcfg, 0, SEEK_SET);
     while (!feof(s_fpcfg)) {
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
             if (
                     memcmp((char*)account + offset_tel, tel_username, keylen) == 0 ||
                     memcmp((char*)account + offset_username, tel_username, keylen) == 0 ) {
-                csmutex_unlock(s_filemutex);
+                csmutex_unlock(s_mutex_file);
                 return 0;
             }
         } else if (ferror(s_fpcfg)) {
             fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
         }
     }
-    csmutex_unlock(s_filemutex);
+    csmutex_unlock(s_mutex_file);
     return 1;
 }
 
@@ -129,7 +133,7 @@ void am_account_config_init(void)
         csfatal_ext(&errcode, cserr_exit, "open file error.\n");
     }
 
-    s_filemutex = csmutex_create();
+    s_mutex_file = csmutex_create();
 }
 
 void am_account_config_clear(void)
@@ -140,7 +144,7 @@ void am_account_config_clear(void)
         }
     }
 
-    csmutex_destroy(s_filemutex);
+    csmutex_destroy(s_mutex_file);
 }
 
 int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic)
@@ -161,22 +165,22 @@ int am_account_print(FILE* streamptr, const struct account_data_t* account)
 
 int am_account_write(const struct account_data_t* account)
 {
-    csmutex_lock(s_filemutex);
+    csmutex_lock(s_mutex_file);
     if (fseek(s_fpcfg, 0, SEEK_END) != 0) {
         fprintf(stderr, "write new account error, call fseek fail.\n");
-        csmutex_unlock(s_filemutex);
+        csmutex_unlock(s_mutex_file);
         return 1;
     }
     if (fwrite((void*)account, sizeof(struct account_data_t), 1, s_fpcfg) != 1) {
         fprintf(stderr, "write new account error, fwrite fail.\n");
-        csmutex_unlock(s_filemutex);
+        csmutex_unlock(s_mutex_file);
         return 1;
     }
 
     if (fflush(s_fpcfg)) {
         fprintf(stderr, "file - %s, line - %d: fflush error.", __FILE__, __LINE__);
     }
-    csmutex_unlock(s_filemutex);
+    csmutex_unlock(s_mutex_file);
 
     return 0;
 }
@@ -190,7 +194,7 @@ int am_account_update(const struct account_data_t* account)
 
 	cs_fopen(&fptmp, tmpname, "ab+");
 
-    csmutex_lock(s_filemutex);
+    csmutex_lock(s_mutex_file);
     rewind(s_fpcfg);
     while (!feof(s_fpcfg)) {
         if (fread(&account_tmp, sizeof(account_tmp), 1, s_fpcfg) == 1) {
@@ -230,7 +234,7 @@ int am_account_update(const struct account_data_t* account)
         csfatal_ext(&errcode, cserr_exit, "update file fatal error, open file error.\n");
     }
 
-    csmutex_unlock(s_filemutex);
+    csmutex_unlock(s_mutex_file);
 
 	return 0;
 }

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Sat 2015-11-14 17:24:07 (+0800)
+ * @modified  Mon 2015-11-16 18:45:46 (+0800)
  */
 
 #ifndef _ACCOUNT_H
@@ -35,15 +35,16 @@ DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
 
-typedef int (*procptr)(char*, char*, __inout uint32_t*);
+typedef int (*pfunc_react)(char*, char*, __inout uint32_t*);
+typedef int (*pfunc_reply)(char*, const void*, uint32_t, char*, __inout uint32_t*);
 
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.
  */
 struct account_method_t { 
     const char* methodname;
-    procptr reply;
-    procptr react;
+    pfunc_reply reply;
+    pfunc_react react;
 };
 
 /**
@@ -52,13 +53,13 @@ struct account_method_t {
 void am_method_sort(void);
 
 /**
- * @brief  am_method_getname  This function returns the method name that registered in REGISTER_ACCOUNT_PROCESS(proc).
+ * @brief  am_method_get  This function returns the method name that registered in REGISTER_ACCOUNT_PROCESS(proc).
  *
  * @param methodid
  *
  * @return   NULL if methodid is invalid, the pointer to the method struct otherwise.
  */
-const struct account_method_t* am_method_getname(uint32_t methodid);
+const struct account_method_t* am_method_get(uint32_t methodid);
 
 /**
  * @brief am_method_getid  This function returns the 
