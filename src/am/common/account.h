@@ -29,6 +29,7 @@ extern "C"
 
 
 DECLARE_ACCOUNT_METHOD(account_create)
+DECLARE_ACCOUNT_METHOD(account_verify)
 DECLARE_ACCOUNT_METHOD(account_login)
 DECLARE_ACCOUNT_METHOD(account_changeusername)
 DECLARE_ACCOUNT_METHOD(account_changepasswd)
@@ -46,6 +47,13 @@ struct account_method_t {
     pfunc_reply reply;
     pfunc_react react;
 };
+
+/**
+ * @brief am_send_randcode
+ * @param tel
+ * @param randcode
+ */
+void am_send_randcode(const char* tel, const char* randcode);
 
 /**
  * @brief  am_method_sort  This function sort s_methodarr, making the performance much better.

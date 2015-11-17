@@ -13,7 +13,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Mon 2015-11-16 23:05:10 (+0800)
+ * @modified  Tue 2015-11-17 20:06:02 (+0800)
  */
 
 #ifdef WIN32
@@ -58,18 +58,47 @@ int am_account_create_request(const char* tel, char* outmsg, uint32_t* outmsglen
 	uint32_t len_tel = 0;
 	uint32_t msglen = 0;
 
-	if (*outmsglen < sizeof(uint32_t)) {
+    if (*outmsglen < sizeof(uint32_t)) {
 		return 1;
 	}
-	*(uint32_t)outmsg = htonl(am_method_getid("account_create"));
+    *(uint32_t*)outmsg = htonl(am_method_getid("account_create"));
 
 	len_tel = strlen(tel);
-	msglen = sizeof(uint32_t) + len_tel + 1;
+    msglen = sizeof(uint32_t) + len_tel + 1;
 
 	if (*outmsglen > msglen) {
 		return 1;
 	}
-	if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
+		return 1;
+	}
+
+	*outmsglen = msglen;
+	return 0;
+}
+
+int am_account_verify_request(const char* tel, const char* randcode, char* outmsg, uint32_t* outmsglen)
+{
+	uint32_t len_tel = 0;
+	uint32_t len_randcode = 0;
+	uint32_t msglen = 0;
+
+    if (*outmsglen < sizeof(uint32_t)) {
+		return 1;
+	}
+    *(uint32_t*)outmsg = htonl(am_method_getid("account_verify"));
+
+	len_tel = strlen(tel);
+	len_randcode = strlen(randcode);
+    msglen = sizeof(uint32_t) + len_tel + len_randcode + 2;
+
+	if (*outmsglen > msglen) {
+		return 1;
+	}
+    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
+		return 1;
+	}
+    if (cs_memcpy(outmsg + sizeof(uint32_t) + len_tel + 1, *outmsglen - sizeof(uint32_t) - len_randcode - 1, randcode, len_randcode + 1) != 0) {
 		return 1;
 	}
 
@@ -83,23 +112,23 @@ int am_account_login_request(const char* username_tel, const char* passwd, char*
 	uint32_t len_passwd = 0;
 	uint32_t msglen = 0;
 
-	if (*outmsglen < sizeof(uint32_t)) {
+    if (*outmsglen < sizeof(uint32_t)) {
 		return 1;
 	}
-	*(uint32_t)outmsg = htonl(am_method_getid("account_login"));
+    *(uint32_t*)outmsg = htonl(am_method_getid("account_login"));
 
 	len_username_tel = strlen(username_tel);
 	len_passwd = strlen(passwd);
-	msglen = sizeof(uint32_t) + len_username_tel + len_passwd + 2;
+    msglen = sizeof(uint32_t) + len_username_tel + len_passwd + 2;
 
 	if (*outmsglen < msglen) {
 		return 1;
 	}
 
-	if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), username_tel, len_username_tel + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), username_tel, len_username_tel + 1) != 0) {
 		return 1;
 	}
-	if (cs_memcpy(outmsg + sizeof(uint32_t) + len_username_tel + 1, *outmsglen - sizeof(uint32_t) - len_username_tel - 1, passwd, len_passwd + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t) + len_username_tel + 1, *outmsglen - sizeof(uint32_t) - len_username_tel - 1, passwd, len_passwd + 1) != 0) {
 		return 1;
 	}
 	*outmsglen = msglen;
@@ -120,28 +149,28 @@ int am_account_changeusername_request(
 	uint32_t len_passwd = 0;
 	uint32_t msglen = 0;
 
-	if (*outmsglen < (sizeof(uint32_t) * 2)) {
+    if (*outmsglen < (sizeof(uint32_t) * 2)) {
 		return 1;
 	}
-	*(uint32_t)outmsg = htonl(am_method_getid("account_changeusername"));
-	*(uint32_t)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
+    *(uint32_t*)outmsg = htonl(am_method_getid("account_changeusername"));
+    *(uint32_t*)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
 
 	len_username_old = strlen(username_old);
 	len_username_new = strlen(username_new);
 	len_passwd = strlen(passwd);
-	msglen = sizeof(uint32_t) * 2 + len_username_old + len_passwd + len_username_new + 3;
+    msglen = sizeof(uint32_t) * 2 + len_username_old + len_passwd + len_username_new + 3;
 
 	if (*outmsglen < msglen) {
 		return 1;
 	}
 
-	if (cs_memcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - s_idlen, username_old, len_username_old + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, username_old, len_username_old + 1) != 0) {
 		return 1;
 	}
-	if (cs_memcpy(outmsg + sizeof(uint32_t) * 2 + len_username_old + 1, *outmsglen - s_idlen - len_username_old - 1, passwd, len_passwd + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2 + len_username_old + 1, *outmsglen - sizeof(uint32_t) * 2 - len_username_old - 1, passwd, len_passwd + 1) != 0) {
 		return 1;
 	}
-	if (cs_memcpy(outmsg + sizeof(uint32_t) * 2 + len_username_old + len_passwd + 2, *outmsglen - s_idlen - len_username_old - len_passwd - 2, username_new, len_username_new + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2 + len_username_old + len_passwd + 2, *outmsglen - sizeof(uint32_t) * 2 - len_username_old - len_passwd - 2, username_new, len_username_new + 1) != 0) {
 		return 1;
 	}
 	*outmsglen = msglen;
@@ -163,38 +192,38 @@ int am_account_changepasswd_request(
 	uint32_t len_passwd_new = 0;
 	uint32_t msglen = 0;
 
-	if (*outmsglen < sizeof(uint32_t)) {
+    if (*outmsglen < sizeof(uint32_t)) {
 		return 1;
 	}
-	*(uint32_t)outmsg = htonl(am_method_getid("account_changepasswd"));
-	*(uint32_t)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
+    *(uint32_t*)outmsg = htonl(am_method_getid("account_changepasswd"));
+    *(uint32_t*)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
 
 	len_username = strlen(username);
 	len_passwd_old = strlen(passwd_old);
 	len_passwd_new = strlen(passwd_new);
-	msglen = sizeof(uint32_t) * 2 + len_username + len_passwd_old + len_passwd_new + 3;
+    msglen = sizeof(uint32_t) * 2 + len_username + len_passwd_old + len_passwd_new + 3;
 
 	if (*outmsglen < msglen) {
 		return 1;
 	}
 
 	if (cs_memcpy(
-					outmsg + sizeof(uint32_t) * 2,
-					*outmsglen - sizeof(uint32_t) * 2,
+                    outmsg + sizeof(uint32_t) * 2,
+                    *outmsglen - sizeof(uint32_t) * 2,
 					username,
 					len_username + 1) != 0) {
 		return 1;
 	}
 	if (cs_memcpy(
-					outmsg + sizeof(uint32_t) * 2 + len_username + 1,
-					*outmsglen - sizeof(uint32_t) * 2 - len_username - 1,
+                    outmsg + sizeof(uint32_t) * 2 + len_username + 1,
+                    *outmsglen - sizeof(uint32_t) * 2 - len_username - 1,
 					passwd_old,
 					len_passwd_old + 1) != 0) {
 		return 1;
 	}
 	if (cs_memcpy(
-					outmsg + sizeof(uint32_t) * 2 + len_username + len_passwd_old + 2,
-					*outmsglen - sizeof(uint32_t) * 2 - len_username - len_passwd_old - 2,
+                    outmsg + sizeof(uint32_t) * 2 + len_username + len_passwd_old + 2,
+                    *outmsglen - sizeof(uint32_t) * 2 - len_username - len_passwd_old - 2,
 					passwd_old,
 					len_passwd_new + 1) != 0) {
 		return 1;
@@ -217,26 +246,26 @@ int am_account_changegrade_request(
 	uint32_t len_passwd = 0;
 	uint32_t msglen = 0;
 
-	if (*outmsglen < sizeof(uint32_t)) {
+    if (*outmsglen < sizeof(uint32_t)) {
 		return 1;
 	}
-	*(uint32_t)outmsg = htonl(am_method_getid("account_changepasswd"));
-	*(uint32_t)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
+    *(uint32_t*)outmsg = htonl(am_method_getid("account_changepasswd"));
+    *(uint32_t*)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
 
 	len_username = strlen(username);
 	len_passwd = strlen(passwd);
-	msglen = sizeof(uint32_t) * 2 + len_username + len_passwd + 2 + sizeof(grade);
+    msglen = sizeof(uint32_t) * 2 + len_username + len_passwd + 2 + sizeof(grade);
 	if (*outmsglen < msglen) {
 		return 1;
 	}
 
-	if (cs_memcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, username, len_username + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, username, len_username + 1) != 0) {
 		return 1;
 	}
-	if (cs_memcpy(outmsg + sizeof(uint32_t) * 2 + len_username + 1, *outmsglen - sizeof(uint32_t) * 2 - len_username - 1, passwd, len_passwd + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2 + len_username + 1, *outmsglen - sizeof(uint32_t) * 2 - len_username - 1, passwd, len_passwd + 1) != 0) {
 		return 1;
 	}
-	*(uint8_t*)(outmsg + sizeof(uint32_t) * 2 + len_username + len_passwd + 2) = grade;
+    *(uint8_t*)(outmsg + sizeof(uint32_t) * 2 + len_username + len_passwd + 2) = grade;
 	*outmsglen = msglen;
 
 	s_account_tmp.account_basic.grade = grade;
@@ -277,6 +306,48 @@ int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
     }
 
     return 0;
+}
+
+/**
+ * @brief  am_account_verify_react 
+ *
+ * @param inmsg The format of outmsg here is:
+ * ---------------------------------------------------------
+ * | succeed(char) | account(struct account_basic_t) | ... | 
+ * ---------------------------------------------------------
+ *  or
+ * ------------------------------------
+ * | fail(char) | error message | ... |
+ * ------------------------------------
+ *
+ * @param outmsg
+ * @param outmsglen
+ *
+ * @return   
+ */
+int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+{
+    int ret = 1;
+
+    (void)outmsg;
+    (void)outmsglen;
+
+    if (inmsg[0] == g_succeed) {
+        if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
+			fprintf(stderr, "client: verify suceed, but client cannot update account data.\n");
+			return ret;
+		}
+
+		fprintf(stdout, "client: verify succeed.\n");
+
+		if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
+			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
+		}
+    } else {
+		fprintf(stderr, "client: verify fail.\n");
+	}
+
+    return ret;
 }
 
 /**

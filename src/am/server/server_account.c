@@ -15,7 +15,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Tue 2015-11-17 00:23:40 (+0800)
+ * @modified  Tue 2015-11-17 20:09:33 (+0800)
  */
 
 #ifdef WIN32
@@ -71,6 +71,8 @@ extern uint32_t g_timeout_verification;
 extern uint32_t g_max_account_tmp;
 
 
+static int s_thread_exit = 0;
+static csthread_t s_handle_thread;
 static csmutex_t s_mutex_login;
 static csmutex_t s_mutex_tmp;
 static LIST_HEAD(s_list_login);
@@ -78,14 +80,17 @@ static LIST_HEAD(s_list_tmp);
 
 
 static void s_gen_randcode(int len, char* code, char low, char high);
-static void s_send_randcode(const char* tel, const char* randcode);
 
 
 #ifdef WIN32
-	static unsigned int __stdcall s_account_tmp_clear(void*);
+    static unsigned int __stdcall s_thread_clear_tmp(void*);
 #else
-	static void* s_account_tmp_clear(void*);
+    static void* s_thread_clear_tmp(void*);
 #endif
+
+/**
+ * @warning These operations may be thread unsafe.
+ */
 
 static void s_account_tmp_add(const char* tel, const char* randcode);
 static void s_account_tmp_clear(void);
@@ -106,25 +111,56 @@ static int s_account_tmp_timeout(struct list_account_tmp_t* list_tmp);
 static int s_account_find(uint32_t id, struct account_data_t** account_find, struct account_data_t* account_database, const char** errmsg);
 
 /**
- * @brief s_create_account
+ * @brief s_account_create
  * @param tel
  * @param randcode
  * @param account
  * @return
  */
-static int s_create_account(const char* tel, const char* randcode, struct account_data_t* account);
+static int s_account_create(const char* tel, const char* randcode, struct account_data_t* account);
 
 
 #ifdef __cplusplus
 }
 #endif
 
+
+/**
+ * @brief  s_thread_clear_tmp This function clear the temporary account list every 10 minites.
+ *
+ * @param unused
+ *
+ * @return  unused. 
+ */
 #ifdef WIN32
-	unsigned int __stdcall s_account_tmp_clear(void* unused)
+    unsigned int __stdcall s_thread_clear_tmp(void* unused)
 #else
-	void* s_account_tmp_clear(void* unused)
+    void* s_thread_clear_tmp(void* unused)
 #endif
 {
+    struct list_account_tmp_t* node_tmp = NULL;
+    struct list_head* delnode = NULL;
+
+    (void)unused;
+
+	while (!s_thread_exit) {
+		delnode = s_list_tmp.next;
+		while (delnode != (&s_list_tmp)) {
+
+			csmutex_lock(s_mutex_tmp);
+            node_tmp = container_of(delnode, struct list_account_tmp_t, listnode);
+			delnode = delnode->next;
+
+			if (s_account_tmp_timeout(node_tmp)) {
+				s_account_tmp_remove(node_tmp);
+			}
+			csmutex_unlock(s_mutex_tmp);
+		}
+
+		cssleep(10 * 60 * 1000);
+	}
+
+	return 0;
 }
 
 void s_account_tmp_add(const char* tel, const char* randcode)
@@ -139,7 +175,7 @@ void s_account_tmp_add(const char* tel, const char* randcode)
 
 	cstimelong_cur(&tmp_new->account_tmp.time_created);
 
-	list_add(&tmp_new.listnode, s_list_tmp);
+    list_add(&tmp_new->listnode, &s_list_tmp);
 }
 
 void s_account_tmp_clear(void)
@@ -147,8 +183,9 @@ void s_account_tmp_clear(void)
     struct list_account_tmp_t* node_tmp = NULL;
     struct list_head* delnode = s_list_tmp.next;
 
+	csmutex_lock(s_mutex_tmp);
     while (delnode != (&s_list_tmp)) {
-        node_tmp = container_of(delnode, struct list_login_t, listnode);
+        node_tmp = container_of(delnode, struct list_account_tmp_t, listnode);
         free(node_tmp->account_tmp.randcode);
         free(delnode);
         delnode = delnode->next;
@@ -156,6 +193,7 @@ void s_account_tmp_clear(void)
 
     s_list_tmp.prev = &s_list_tmp;
     s_list_tmp.next = &s_list_tmp;
+	csmutex_unlock(s_mutex_tmp);
 }
 
 void s_account_tmp_remove(struct list_account_tmp_t* list_tmp)
@@ -196,7 +234,7 @@ void s_gen_randcode(int len, char* code, char low, char high)
     }
 }
 
-int s_create_account(const char* tel, const char* randcode, struct account_data_t* account)
+int s_account_create(const char* tel, const char* randcode, struct account_data_t* account)
 {
     account->grade = 0;
     account->id = (g_curmaxid++);
@@ -247,8 +285,8 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
  * | fail(char) | ... |
  * --------------------
  *
- * @param data_verification
- * @param len_verification
+ * @param data_verification unused.
+ * @param len_verification unused.
  * @param outmsglen
  *
  * @return  0 if succeed, 1 if fail. 
@@ -256,27 +294,98 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
 int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
     char* randcode = NULL;
-    struct account_data_t account;
+
+	(void)data_verification;
+	(void)len_verification;
 
     randcode = (char*)malloc(sizeof(char) * g_len_randomcode);
     s_gen_randcode(g_len_randomcode, randcode, '0', '9');
 
-    if (s_create_account(inmsg, randcode, &account) != 0) {
-        outmsg[0] = g_fail;
-        *outmsglen = 1;
-        return 1;
-    }
-
-	csmutex_lock(s_mutex_login);
-    am_login_add(&s_list_login, &account, data_verification, len_verification);
-	csmutex_unlock(s_mutex_login);
-
-    am_account_write(&account);
+	s_account_tmp_add(inmsg, randcode);
 
     outmsg[0] = g_succeed;
     *outmsglen = 1;
 
     return 0;
+}
+
+/**
+ * @brief  am_account_verify_reply 
+ *
+ * @param inmsg The format of inmsg here is: 
+ * --------------------------------------
+ * | tel(char*) | randcode(char*) | ... |
+ * --------------------------------------
+ *
+ * @param data_verification
+ * @param len_verification
+ * @param outmsg The format of outmsg here is:
+ * ---------------------------------------------------------
+ * | succeed(char) | account(struct account_basic_t) | ... | 
+ * ---------------------------------------------------------
+ *  or
+ * ------------------------------------
+ * | fail(char) | error message | ... |
+ * ------------------------------------
+ *
+ * @param outmsglen
+ *
+ * @return   
+ */
+int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+{
+    char* randcode = NULL;
+    struct account_data_t account;
+    struct account_basic_t account_basic;
+    struct list_account_tmp_t* node_tmp = NULL;
+	const char* msg_err_tel = "telephone number is wrong.";
+	const char* msg_err_randcode = "random code is wrong.";
+	const char* msg_err_timeout = "timeout, please register again.";
+	const char* msg_err_create = "create account fail with unkown error.";
+	const char* msg_err = NULL;
+	int ret_stat = 0;
+
+	csmutex_lock(s_mutex_tmp);
+    if ((node_tmp = s_account_tmp_find(inmsg)) == NULL) {
+		msg_err = msg_err_tel;
+		ret_stat = 1;
+		goto err;
+	}
+	
+    if (s_account_tmp_timeout(node_tmp)) {
+		msg_err = msg_err_timeout;
+		ret_stat = 2;
+		goto err;
+	}
+
+    if (memcmp(inmsg + strlen(inmsg) + 1, node_tmp->account_tmp.randcode, strlen(node_tmp->account_tmp.randcode) + 1) != 0) {
+		msg_err = msg_err_randcode;
+		ret_stat = 3;
+		goto err;
+	}
+
+    if (s_account_create(inmsg, randcode, &account) != 0) {
+		msg_err = msg_err_create;
+		ret_stat = 4;
+		goto err;
+    }
+	csmutex_unlock(s_mutex_tmp);
+
+    am_account_data2basic(&account, &account_basic);
+    outmsg[0] = g_succeed;
+    cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
+
+	csmutex_lock(s_mutex_login);
+    am_login_add(&s_list_login, &account, data_verification, len_verification);
+	csmutex_unlock(s_mutex_login);
+	*outmsglen = sizeof(account_basic) + 1;
+	return 0;
+
+err:
+	outmsg[0] = g_fail;
+	cs_memcpy(outmsg + 1, *outmsglen - 1, msg_err, strlen(msg_err) + 1);
+	*outmsg = 1 + strlen(msg_err) + 1;
+	return ret_stat;
 }
 
 /**
@@ -295,9 +404,9 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
  * | succeed(char) | account(struct account_basic_t) | ... | 
  * -------------------------------------------------------------------------------
  *  or
- * ----------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------------------
  * | succeed(char) | account(struct account_basic_t) | additional message | ... |
- * ----------------------------------------------------------------------------------------------------
+ * ------------------------------------------------------------------------------
  *  or
  * ----------------------------------------------------------
  * | fail(char) | error message | ... |
@@ -550,6 +659,14 @@ int am_server_account_init(void)
 {
     s_mutex_login = csmutex_create();
 	s_mutex_tmp = csmutex_create();
+
+    if (csthread_create(s_thread_clear_tmp, NULL, &s_handle_thread) != 0) {
+		fprintf(stderr, "am_server: create tmp account cleaner thread error.\n");
+        csmutex_destroy(s_mutex_login);
+        csmutex_destroy(s_mutex_tmp);
+		return 1;
+	}
+
     return 0;
 }
 
@@ -564,8 +681,12 @@ int am_server_account_clear(void)
 	am_login_clear(&s_list_login);
 	csmutex_unlock(s_mutex_login);
 
-	csmutex_destory(s_mutex_login);
-	csmutex_destory(s_mutex_tmp);
+    s_account_tmp_clear();
+	s_thread_exit = 1;
+    csthread_wait_terminate(s_handle_thread);
+
+    csmutex_destroy(s_mutex_login);
+    csmutex_destroy(s_mutex_tmp);
 
     return ret;
 }

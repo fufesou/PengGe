@@ -15,7 +15,7 @@ struct account_login_t {
 	struct account_data_t account;
 
 	void* data_verification;
-    uint32_t len_verification;
+    uint32_t size_verification;
 };
 
 struct list_login_t {

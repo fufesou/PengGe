@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Mon 2015-11-16 18:45:23 (+0800)
+ * @modified  Tue 2015-11-17 19:43:34 (+0800)
  */
 
 #include  <stdint.h>
@@ -35,6 +35,7 @@ extern "C"
 
 REGISTER_ACCOUNT_PROCESS_BEGIN
     REGISTER_ACCOUNT_PROCESS(account_create)
+    REGISTER_ACCOUNT_PROCESS(account_verify)
     REGISTER_ACCOUNT_PROCESS(account_login)
     REGISTER_ACCOUNT_PROCESS(account_changeusername)
     REGISTER_ACCOUNT_PROCESS(account_changepasswd)
