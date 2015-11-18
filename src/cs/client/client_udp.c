@@ -1,11 +1,12 @@
 /**
  * @file client_udp.c
  * @brief  This file prcess client udp message sendrecv.
+ *
  * For now a lot config data is hard coded, reimplementation must be done when config parser complete.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Sat 2015-11-07 15:57:32 (+0800)
+ * @modified  Wed 2015-11-18 23:16:44 (+0800)
  */
 
 #ifdef WIN32
@@ -36,7 +37,7 @@
 #include    "msgwrap.h"
 #include    "msgpool_dispatch.h"
 #include    "client.h"
-#include    "client_msgdispatch.h"
+#include    "account.h"
 
 
 #ifdef __cplusplus
@@ -46,11 +47,10 @@ extern "C"
 
 extern const char* g_exit;
 
-/**
- * @brief s_msgpool_dispatch This variable is used to manage client send and recv pool.
- */
+/** s_msgpool_dispatch This variable is used to manage client send and recv pool. */
 static struct csmsgpool_dispatch s_msgpool_dispatch;
 
+static void s_dispatch_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
 static void s_init_msgpool_dispatch(struct csclient* cli);
 static void s_clear_msgpool_dispatch(void);
 static void s_msgpool_append(char* data, ssize_t numbytes);
@@ -62,7 +62,7 @@ static void s_msgpool_append(char* data, ssize_t numbytes);
 void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     csclient_connect(cli, servaddr, addrlen);
-	s_init_msgpool_dispatch(cli);
+    s_init_msgpool_dispatch(cli);
 
     printf("%s enter login session.\n", cli->prompt);
 
@@ -88,6 +88,24 @@ void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cs
 	}
 }
 
+
+/**
+ * @brief  s_dispatch_react The income message from server 
+ * will be handle by the coressponding 'react' method in this function.
+ *
+ * @param inmsg The format of inmsg is:
+ * ----------------------------------------------------------------------------------------------
+ * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ... |
+ * ----------------------------------------------------------------------------------------------
+ * @param outmsg
+ * @param outmsglen
+ */
+void s_dispatch_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+{
+    uint32_t id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
+	am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header), outmsg, outmsglen);
+}
+
 void s_init_msgpool_dispatch(struct csclient* cli)
 {	
 	const int threadnum = 1; 
@@ -95,9 +113,8 @@ void s_init_msgpool_dispatch(struct csclient* cli)
 	csmsgpool_dispatch_init(&s_msgpool_dispatch);
 
     s_msgpool_dispatch.prompt = "client msgpool_dispatch:";
-	s_msgpool_dispatch.process_msg = csclient_process_msg;
+	s_msgpool_dispatch.process_msg = s_dispatch_react;
 	s_msgpool_dispatch.process_af_msg = 0;
-	s_msgpool_dispatch.process_pargs = (void*)cli;
 
     cspool_init(
                 &s_msgpool_dispatch.pool_unprocessed,		/** struct csmsgpool* pool 	*/

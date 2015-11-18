@@ -1,13 +1,20 @@
 /**
  * @file msgpool_dispatch.h
- * @brief  This file is the process register module. It simply process message in unprocessed pool(message that received from peer port) and processed pool(message prcessed).
- * 1. When prcess recieved message. It firstly pull message from the unprocessed pool, then process message by calling designated process function, and at last push the message to processed pool.
- * 2. When prcess processed message. It firstly pull message from the processed pool, then call process_af(if this function pointer is not NULL).
+ * @brief  This file is the process register module. 
+ *
+ * It simply process message in unprocessed pool(message that received from peer port) 
+ * and processed pool(message prcessed).
+ *
+ * 1. When prcess recieved message. 
+ * It firstly pull message from the unprocessed pool, then process message by calling designated process function,
+ * and at last push the message to processed pool.
+ * 2. When prcess processed message. It firstly pull message from the processed pool,
+ * then call process_af(if this function pointer is not NULL).
  *
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Sat 2015-11-07 15:30:01 (+0800)
+ * @modified  Wed 2015-11-18 22:43:56 (+0800)
  */
 
 #ifndef _MSGPOOL_DISPATCH
@@ -18,7 +25,7 @@ extern "C"
 {
 #endif
 
-typedef void csmsg_process_t(char* inmsg, char* outmsg, uint32_t* outmsglen, void* pargs);
+typedef void csmsg_process_t(char* inmsg, char* outmsg, uint32_t* outmsglen);
 typedef void csmsg_process_af_t(cssock_t handle, void* outmsg);
 
 struct csmsgpool_dispatch
@@ -27,24 +34,18 @@ struct csmsgpool_dispatch
 
     struct csmsgpool pool_unprocessed;
 
-	/**
-	 * @brief  This pool can be ignored if immediately sending data is not required after process.
+	/** This pool can be ignored if immediately sending data is not required after process.
 	 * 
 	 * @sa semd_msg
 	 */
 	struct csmsgpool pool_processed;
 
-	/**
-	 * @brief  process_msg This variable must be set to point a function.
-	 */
+	/** process_msg This variable must be set to point a function. */
 	csmsg_process_t* process_msg;
 
-	/**
-	 * @brief process_af_msg If send message is not required after process, set process_af_msg to 0;
+	/** process_af_msg If send message is not required after process, set process_af_msg to 0;
 	 */
 	csmsg_process_af_t* process_af_msg;
-
-	void* process_pargs;
 };
 
 /**

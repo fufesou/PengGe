@@ -50,7 +50,6 @@ void csclient_init(struct csclient* cli, int tcpudp)
 	int error;
 	int nonblocking = 1;
 
-	cli->loggedin = 0;
     cli->prompt = s_cli_prompt;
 
     /*

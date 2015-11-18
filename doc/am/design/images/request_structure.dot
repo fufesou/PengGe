@@ -8,8 +8,8 @@ digraph request_structure {
 			<TD COLSPAN="8" BORDER = "0" ALIGN="LEFT">8</TD>
 			<TD BORDER="0" ALIGN="LEFT">N</TD>
 		</TR>
-		<TR><TD COLSPAN="4">user id</TD>
-			<TD COLSPAN="4">process id</TD>
+		<TR><TD COLSPAN="4">process id</TD>
+			<TD COLSPAN="4">user id</TD>
 			<TD COLSPAN="8" BGCOLOR="cyan" PORT="TheData">request data</TD>
 		</TR>
 		</TABLE>>];

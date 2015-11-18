@@ -3,7 +3,12 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-INCLUDEPATH += ../../../src/common ../../../src/cs/common ../../../src/cs/client
+INCLUDEPATH += 	../../../src/common \
+                ../../../src/cs/common \
+                ../../../src/cs/client \
+                ../../../src/am/common \
+                ../../../src/am/client \
+                ../../../src/am/server
 
 HEADERS += \
     ../../../src/common/bufarray.h \
@@ -18,10 +23,15 @@ HEADERS += \
     ../../../src/common/timespan.h \
     ../../../src/common/utility_wrap.h \
     ../../../src/cs/client/client.h \
-    ../../../src/cs/client/client_msgdispatch.h \
     ../../../src/cs/common/msgpool.h \
     ../../../src/cs/common/msgpool_dispatch.h \
-    ../../../src/cs/common/unprtt.h
+    ../../../src/cs/common/unprtt.h \
+    ../../../src/am/common/account.h \
+    ../../../src/am/common/account_file.h \
+    ../../../src/am/common/account_macros.h \
+    ../../../src/am/client/client_account.h \
+    ../../../src/am/server/account_login.h \
+    ../../../src/am/server/server_account.h
 
 
 SOURCES += \
@@ -37,13 +47,17 @@ SOURCES += \
     ../../../src/common/timespan.c \
     ../../../src/common/utility_wrap.c \
     ../../../src/cs/client/client.c \
-    ../../../src/cs/client/client_msgdispatch.c \
     ../../../src/cs/client/client_udp.c \
     ../../../src/cs/client/unix_client_sendrecv.c \
     ../../../src/cs/client/win_client_sendrecv.c \
     ../../../src/cs/common/msgpool.c \
     ../../../src/cs/common/msgpool_dispatch.c \
-    ../../../src/cs/common/rtt.c
+    ../../../src/cs/common/rtt.c \
+    ../../../src/am/common/account.c \
+    ../../../src/am/common/account_file.c \
+    ../../../src/am/client/client_account.c \
+    ../../../src/am/server/account_login.c \
+    ../../../src/am/server/server_account.c
 
 
 win32 {

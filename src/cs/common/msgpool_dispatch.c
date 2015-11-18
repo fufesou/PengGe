@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Sat 2015-11-07 15:30:56 (+0800)
+ * @modified  Wed 2015-11-18 22:41:57 (+0800)
  */
 
 #ifdef WIN32
@@ -43,7 +43,6 @@ void csmsgpool_dispatch_init(struct csmsgpool_dispatch* pool_dispath)
 	pool_dispath->prompt = "csmsgpool_dispatch:";
 	pool_dispath->process_msg = 0;
 	pool_dispath->process_af_msg = 0;
-	pool_dispath->process_pargs = 0;
 }
 
 #ifdef WIN32
@@ -84,7 +83,7 @@ void* csmsgpool_process(void* pool_dispath)
         printf("recv- thread id: %d, process message: %s.\n", csthread_getpid(), msgbuf + sizeof(struct csmsg_header));
 
         outmsglen = pool_proced->len_item;
-        msgpool_dispatch->process_msg(msgbuf, outmsg, &outmsglen, msgpool_dispatch->process_pargs);
+        msgpool_dispatch->process_msg(msgbuf, outmsg, &outmsglen);
 
         cspool_pushitem(pool_unproc, &pool_unproc->empty_buf, msgbuf);
 

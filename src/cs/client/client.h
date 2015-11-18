@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Sat 2015-11-07 15:59:14 (+0800)
+ * @modified  Wed 2015-11-18 22:36:33 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -17,38 +17,34 @@ extern "C" {
 #endif
 
 /**
- * @brief struct csclient contains necessary members and functions for client operations.
+ * csclient contains necessary members and functions for client operations.
  * This struct object must be initialized (by calling csclient_init) before any operations applied to it.
+ *
  * @sa csclient_init
  */
 struct csclient
 {
-	int loggedin;
-
     cssock_t hsock;
 
-    /**
-     * @brief sockaddr_in is the server socket address.
-     */
+    /** sockaddr_in is the server socket address. */
     struct sockaddr_in sa_in;
 
-    /**
-     * @brief msgheader is the string that print before message.
+    /** msgheader is the string that print before message.
+	 *
      * For client, the msgheader is "client", the output of client look like "clinet: xxx".
      */
     char* prompt;
 
-    /**
-     * @brief sendbuf is the buffer to hold out message.
+    /** sendbuf is the buffer to hold out message.
 	 *
 	 * @todo make sendbuf a pointer, and configure the length of sendbuf by user.
      */
     char sendbuf[MAX_MSG_LEN];
 	int len_senbuf;
 
-    /**
-     * @brief sendbuf is the buffer to hold the message from server.
-     * If size of message from server is greater than 1024 bytes, the client will cut off the tail contents and puts worning.
+    /** sendbuf is the buffer to hold the message from server.
+	 *
+     * If size of message from server is greater than 1024 bytes, the client will cut off the tail contents and puts warning.
 	 *
 	 * @todo make recvbuf a pointer, and configure the length of recvbuf by user.
      */
