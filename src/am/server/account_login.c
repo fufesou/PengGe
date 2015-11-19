@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Tue 2015-11-17 00:12:34 (+0800)
+ * @modified  Fri 2015-11-20 00:14:16 (+0800)
  */
 
 #include  <malloc.h>
@@ -151,7 +151,7 @@ void am_login_clear(struct list_head* node_head)
     while (delnode != node_head) {
         node_login = container_of(delnode, struct list_login_t, listnode);
         free(node_login->account_sock.data_verification);
-        free(delnode);
+        free(node_login);
         delnode = delnode->next;
     }
 

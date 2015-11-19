@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-24
- * @modified  Tue 2015-11-03 19:30:14 (+0800)
+ * @modified  Fri 2015-11-20 00:24:58 (+0800)
  */
 
 #ifdef WIN32
@@ -19,8 +19,10 @@
 #include  <stdlib.h>
 #include  <stdint.h>
 #include    "error.h"
+#include    "list.h"
 #include    "sock_types.h"
 #include    "sock_wrap.h"
+#include    "clearlist.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -40,7 +42,7 @@ void csfatal(const char* format, ...)
     vfprintf(stderr, format, args);
     va_end(args);
 
-    cssock_envclear();
+    csclearlist_clear();
     exit(0);
 }
 
@@ -59,7 +61,7 @@ void s_cserr_operation(void* data, enum cserr_op errop)
     int willexit = errop & cserr_exit;
 
     if (errop == cserr_exit) {
-        cssock_envclear();
+        csclearlist_clear();
         exit((int)*(cserr_t*)data);
     }
 
@@ -73,7 +75,7 @@ void s_cserr_operation(void* data, enum cserr_op errop)
             break;
     }
     if (willexit) {
-        cssock_envclear();
+        csclearlist_clear();
         exit(0);
     }
 }

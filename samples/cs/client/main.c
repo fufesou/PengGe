@@ -23,21 +23,18 @@
 #include  <stdint.h>
 #include    "config_macros.h"
 #include    "macros.h"
+#include    "list.h"
 #include    "sock_types.h"
 #include    "sock_wrap.h"
 #include    "utility_wrap.h"
+#include    "clearlist.h"
 #include    "client.h"
 
-
-void client_udp_init(struct csclient* cli);
-void client_udp_clear(void);
-int conv_cmd_msg(char* cmd, char* msg, uint32_t size_msg);
 
 int main(int argc, char* argv[])
 {
     struct csclient udpclient;
     struct sockaddr_in serveraddr;
-	char data_input[1024];
 	FILE* fp_input = NULL;
 
     if (argc < 3) {
@@ -51,7 +48,6 @@ int main(int argc, char* argv[])
 	}
 
 	cssock_envinit();
-
     csclient_init(&udpclient, SOCK_DGRAM);
 
     serveraddr.sin_family = AF_INET;
@@ -62,21 +58,17 @@ int main(int argc, char* argv[])
 #define TEST_FILE_INPUT
 
 #ifdef TEST_FILE_INPUT
-    client_udp_init(&udpclient);
 	while (!feof(fp_input)) {
-		fgets(data_input, sizeof(data_input), fp_input);
-		if (conv_cmd_msg(data_input, udpclient.sendbuf, sizeof(udpclient.sendbuf)) != 0) {
-            csclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
-		}
+        fgets(udpclient.sendbuf, sizeof(udpclient.sendbuf), fp_input);
+        csclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 	}
-    client_udp_clear();
 #else
     csclient_udp(&udpclient, stdin, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 #endif
 
 #undef TEST_FILE_INPUT
 
-	cssock_envclear();
+    csclearlist_clear();
 
     return 0;
 }

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
- * @modified  周五 2015-11-13 18:09:06 中国标准时间
+ * @modified  Fri 2015-11-20 00:16:14 (+0800)
  */
 
 #ifndef  SOCK_WRAP_H
@@ -26,9 +26,12 @@ extern "C" {
 int cssock_envinit(void);
 
 /**
- * @brief  cssock_envclear 
+ * @brief  cssock_envclear will do basic clear works for sock environment.
+ *
+ * The parameter is just used for common prototype.
+ *
  */
-void cssock_envclear(void);
+void cssock_envclear(void* unused);
 
 /**
  * @brief  cssock_get_last_error will return last error number.

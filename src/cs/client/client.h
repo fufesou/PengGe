@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Wed 2015-11-18 22:36:33 (+0800)
+ * @modified  Thu 2015-11-19 23:25:31 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -18,7 +18,8 @@ extern "C" {
 
 /**
  * csclient contains necessary members and functions for client operations.
- * This struct object must be initialized (by calling csclient_init) before any operations applied to it.
+ * This struct object must be initialized (by calling csclient_init)
+ *  before any operations applied to it.
  *
  * @sa csclient_init
  */
@@ -44,12 +45,15 @@ struct csclient
 
     /** sendbuf is the buffer to hold the message from server.
 	 *
-     * If size of message from server is greater than 1024 bytes, the client will cut off the tail contents and puts warning.
+     * If size of message from server is greater than 1024 bytes,
+     *  the client will cut off the tail contents and puts warning.
 	 *
 	 * @todo make recvbuf a pointer, and configure the length of recvbuf by user.
      */
     char recvbuf[MAX_MSG_LEN];
 	int len_recvbuf;
+
+	void (*pfunc_process_react)(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
  };
 
 
@@ -57,24 +61,41 @@ struct csclient
  * @brief  csclient_init 
  *
  * @param cli
- * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set, upd socket will be created if SOCK_DGRAM is set.
+ * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set,
+ *  upd socket will be created if SOCK_DGRAM is set.
  *
  * @note 
  * 1. This function must be called after init_sock_environment being called. 
- * 2. Socket is set to be non-blocking socket by default. Call cssock_block explicitly if you need the socket to be blocking.
+ * 2. Socket is set to be non-blocking socket by default.
+ *  Call cssock_block explicitly if you need the socket to be blocking.
  *
  * @sa cssock_block cssock_open
  */
 void csclient_init(struct csclient* cli, int tcpudp);
 
 /**
- * @brief  csclient_clear  There may be some clear works after communication, such as free the memory.
+ * @brief  csclient_clear  There may be some clear works after communication,
+ *  such as free the memory.
  *
  * @param cli
  */
-void csclient_clear(struct csclient* cli);
+void csclient_clear(void* cli);
 
 void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
+
+/**
+ * @brief  csclient_react_dispatch The income message from server 
+ * will be handle by the coressponding 'react' method in this function.
+ *
+ * @param inmsg The format of inmsg is:
+ * ----------------------------------------------------------------------------------------------
+ * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ... |
+ * ----------------------------------------------------------------------------------------------
+ * @param outmsg
+ * @param outmsglen
+ */
+void csclient_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+
 
 /**
  * @brief  csclient_print csclient_print will test and print client socket information.

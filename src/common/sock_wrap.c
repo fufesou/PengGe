@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
- * @modified  周五 2015-11-13 18:19:12 中国标准时间
+ * @modified  Fri 2015-11-20 00:16:53 (+0800)
  */
 
 #ifdef WIN32
@@ -31,9 +31,11 @@
 #include  <string.h>
 #include  <fcntl.h>
 #include    "macros.h"
+#include    "list.h"
 #include    "error.h"
 #include    "sock_types.h"
 #include    "sock_wrap.h"
+#include    "clearlist.h"
 
 int cssock_envinit()
 {
@@ -64,13 +66,16 @@ int cssock_envinit()
          printf("The highest version this dll can support is %u.%u\n",
                    LOBYTE(wsadata.wHighVersion), HIBYTE(wsadata.wHighVersion));
     }
+
+    csclearlist_add(cssock_envclear, NULL);
 #endif
 
     return 0;
 }
 
-void cssock_envclear()
+void cssock_envclear(void* unused)
 {
+	(void)unused;
 #ifdef WIN32
     if(WSACleanup() != 0) {
          printf("WSACleanup() failed! Error code: %d\n", WSAGetLastError());

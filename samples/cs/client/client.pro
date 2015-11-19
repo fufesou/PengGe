@@ -31,12 +31,12 @@ HEADERS += \
     ../../../src/am/common/account_macros.h \
     ../../../src/am/client/client_account.h \
     ../../../src/am/server/account_login.h \
-    ../../../src/am/server/server_account.h
+    ../../../src/am/server/server_account.h \
+    ../../../src/common/clearlist.h
 
 
 SOURCES += \
     main.c \
-    testinput.c \
     ../../../src/common/bufarray.c \
     ../../../src/common/buflist.c \
     ../../../src/common/error.c \
@@ -48,7 +48,6 @@ SOURCES += \
     ../../../src/common/timespan.c \
     ../../../src/common/utility_wrap.c \
     ../../../src/cs/client/client.c \
-    ../../../src/cs/client/client_udp.c \
     ../../../src/cs/client/unix_client_sendrecv.c \
     ../../../src/cs/client/win_client_sendrecv.c \
     ../../../src/cs/common/msgpool.c \
@@ -58,7 +57,8 @@ SOURCES += \
     ../../../src/am/common/account_file.c \
     ../../../src/am/client/client_account.c \
     ../../../src/am/server/account_login.c \
-    ../../../src/am/server/server_account.c
+    ../../../src/am/server/server_account.c \
+    ../../../src/common/clearlist.c
 
 
 win32 {
