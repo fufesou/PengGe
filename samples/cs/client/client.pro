@@ -36,6 +36,7 @@ HEADERS += \
 
 SOURCES += \
     main.c \
+    testinput.c \
     ../../../src/common/bufarray.c \
     ../../../src/common/buflist.c \
     ../../../src/common/error.c \
@@ -67,3 +68,6 @@ win32 {
 unix {
     LIBS += -pthread
 }
+
+RESOURCES += \
+    data.qrc

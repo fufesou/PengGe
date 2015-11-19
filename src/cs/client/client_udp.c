@@ -55,17 +55,39 @@ static void s_init_msgpool_dispatch(struct csclient* cli);
 static void s_clear_msgpool_dispatch(void);
 static void s_msgpool_append(char* data, ssize_t numbytes);
 
+void client_udp_init(struct csclient* cli);
+void client_udp_clear(void);
+
+static int s_inited = 0;
+static int s_cleared = 0;
+
 #ifdef __cplusplus
 }
 #endif
 
+void client_udp_init(struct csclient* cli)
+{
+    if (!s_inited) {
+        s_inited = 1;
+
+        s_init_msgpool_dispatch(cli);
+        printf("%s enter login session.\n", cli->prompt);
+    }
+}
+
+void client_udp_clear()
+{
+    if (!s_cleared) {
+        s_cleared = 1;
+        s_clear_msgpool_dispatch();
+    }
+}
+
 void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
+    client_udp_init(cli);
+
     csclient_connect(cli, servaddr, addrlen);
-    s_init_msgpool_dispatch(cli);
-
-    printf("%s enter login session.\n", cli->prompt);
-
     while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
         cli->sendbuf[strlen(cli->sendbuf) - 1] = '\0';
 
@@ -77,7 +99,7 @@ void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servadd
 		csclient_udp_once(cli, servaddr, addrlen);
     }
 
-    s_clear_msgpool_dispatch();
+    client_udp_clear();
 }
 
 void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)

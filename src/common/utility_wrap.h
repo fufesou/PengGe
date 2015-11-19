@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-29
- * @modified  Sat 2015-11-14 11:57:02 (+0800)
+ * @modified  Thu 2015-11-19 19:22:20 (+0800)
  */
 
 #ifndef _UTILITY_WRAP_H
@@ -44,7 +44,7 @@ int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count);
  * @param streamptr
  * @param filename
  * @param mode
- * @return
+ * @return 0 if succeed, 1 if fail.
  *
  * @todo move this function to common lib.
  */

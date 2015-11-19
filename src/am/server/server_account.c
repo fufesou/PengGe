@@ -15,7 +15,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Tue 2015-11-17 20:09:33 (+0800)
+ * @modified  Wed 2015-11-18 17:58:16 (+0800)
  */
 
 #ifdef WIN32
@@ -80,6 +80,7 @@ static LIST_HEAD(s_list_tmp);
 
 
 static void s_gen_randcode(int len, char* code, char low, char high);
+static void s_gen_randcode_test(int len, char* code, char low, char high);
 
 
 #ifdef WIN32
@@ -234,6 +235,18 @@ void s_gen_randcode(int len, char* code, char low, char high)
     }
 }
 
+void s_gen_randcode_test(int len, char* code, char low, char high)
+{
+    int i = 0;
+
+	(void)low;
+	(void)high;
+
+    while (i < len) {
+        code[i++] = '1';
+    }
+}
+
 int s_account_create(const char* tel, const char* randcode, struct account_data_t* account)
 {
     account->grade = 0;
@@ -299,7 +312,12 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
 	(void)len_verification;
 
     randcode = (char*)malloc(sizeof(char) * g_len_randomcode);
+
+#ifdef _DEBUG
+    s_gen_randcode_test(g_len_randomcode, randcode, '0', '9');
+#else
     s_gen_randcode(g_len_randomcode, randcode, '0', '9');
+#endif
 
 	s_account_tmp_add(inmsg, randcode);
 

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-18
- * @modified  Sat 2015-11-07 15:33:38 (+0800)
+ * @modified  Wed 2015-11-18 18:02:09 (+0800)
  */
 
 #ifdef WIN32
@@ -64,18 +64,14 @@ void csserver_udp(struct csserver* serv)
     printf("%s: I\'m ready to receive a datagram...\n", serv->prompt);
     while (1) {
 
-		/*
-		 * @brief block untile one buffer avaliable.
-		 */
+		/** @brief block untile one buffer avaliable. */
 		while ((buf = cspool_pullitem(recvpool, &recvpool->empty_buf)) == NULL)
 					;
 
         numbytes = csserver_recv(serv->hsock, buf, recvpool->len_item);
         if (numbytes > 0) {
 
-			/*
-			 * @brief Push to pool will succeed in normal case. There is no need to test the return value.
-			 */
+			/** Push to pool will succeed in normal case. There is no need to test the return value. */
 			cspool_pushitem(recvpool, &recvpool->filled_buf, buf);
             cssem_post(&recvpool->hsem_filled);
         }
