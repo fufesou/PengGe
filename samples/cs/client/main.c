@@ -59,9 +59,11 @@ int main(int argc, char* argv[])
     serveraddr.sin_addr.s_addr = inet_addr(argv[1]);
 
 
-#define TEST_FILE_INPUT
+    csclient_msgpool_dispatch_init(&udpclient);
+// #define TEST_FILE_INPUT
 
 #ifdef TEST_FILE_INPUT
+    csclient_connect(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 	while (!feof(fp_input)) {
 		uint32_t size_sendbuf = sizeof(udpclient.sendbuf);
         fgets(data_input, sizeof(data_input), fp_input);

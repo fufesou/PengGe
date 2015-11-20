@@ -56,8 +56,7 @@ static char* s_cli_prompt = "client:";
 static struct csmsgpool_dispatch s_msgpool_dispatch;
 
 static void s_msgpool_append(char* data, ssize_t numbytes);
-static void s_init_msgpool_dispatch(struct csclient* cli);
-static void s_clear_msgpool_dispatch(void);
+void s_clear_msgpool_dispatch(void* unused);
 
 #ifdef __cplusplus
 }
@@ -87,9 +86,7 @@ void csclient_init(struct csclient* cli, int tcpudp)
         csfatal_ext(&error, cserr_exit, "%s: set socket to non-blocking mode failed, error code: %d\n", cli->prompt, cssock_get_last_error());
 	}
 
-	s_init_msgpool_dispatch(cli);
     csclearlist_add(csclient_clear, cli);
-
     printf("%s: socket() is OK!\n", cli->prompt);
 }
 
@@ -112,8 +109,6 @@ void csclient_clear(void* cli)
 	 * @endcode
 	 *
 	 */
-
-	s_clear_msgpool_dispatch();
 }
 
 int csclient_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
@@ -145,7 +140,7 @@ void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, css
 	}
 }
 
-void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
+void csclient_udp(struct csclient* cli, FILE* fp, struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     csclient_connect(cli, servaddr, addrlen);
     while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
@@ -160,7 +155,7 @@ void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servadd
     }
 }
 
-void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
+void csclient_udp_once(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     ssize_t numbytes = csclient_sendrecv(cli, servaddr, addrlen);
 	if (numbytes > 0) {
@@ -190,7 +185,7 @@ void s_msgpool_append(char* data, ssize_t numbytes)
 	}
 }
 
-void s_init_msgpool_dispatch(struct csclient* cli)
+void csclient_msgpool_dispatch_init(struct csclient* cli)
 {	
 	const int threadnum = 1; 
 
@@ -208,10 +203,13 @@ void s_init_msgpool_dispatch(struct csclient* cli)
                 cli->hsock,									/** cssock_t socket 		*/
                 csmsgpool_process,							/** csthread_proc_t proc 	*/
                 (void*)&s_msgpool_dispatch);				/** void* pargs 			*/
+
+    csclearlist_add(s_clear_msgpool_dispatch, NULL);
 }
 
-void s_clear_msgpool_dispatch(void)
+void s_clear_msgpool_dispatch(void* unused)
 {
+    (void)unused;
     cspool_clear(&s_msgpool_dispatch.pool_unprocessed);
 }
 

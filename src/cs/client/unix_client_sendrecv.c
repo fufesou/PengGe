@@ -57,7 +57,7 @@ static void s_register_alrm(void);
 }
 #endif
 
-ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
+ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;

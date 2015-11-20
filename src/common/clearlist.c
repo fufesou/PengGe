@@ -8,6 +8,7 @@
  */
 
 #include  <malloc.h>
+#include  <stdlib.h>
 
 #include    "macros.h"
 #include    "list.h"

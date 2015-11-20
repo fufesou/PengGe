@@ -71,7 +71,7 @@ void csthread_wait_terminate(csthread_t handle)
 {
     DWORD waitStat = WaitForSingleObject(handle, INFINITE);
     if (waitStat != WAIT_OBJECT_0) {
-        fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
+        fprintf(stderr, "wait thread terminate failed, return state: %ld.", waitStat);
         if (waitStat == WAIT_FAILED) {
             fprintf(stderr, ", error code: %ld\n.", GetLastError());
         } else {
@@ -86,7 +86,7 @@ void csthreadN_wait_terminate(csthread_t* handle, int count)
 {
     DWORD waitStat = WaitForMultipleObjects(count, handle, 1, INFINITE);
     if (waitStat != WAIT_OBJECT_0) {
-        fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
+        fprintf(stderr, "wait thread terminate failed, return state: %ld.", waitStat);
         if (waitStat == WAIT_FAILED) {
             fprintf(stderr, ", error code: %ld\n.", GetLastError());
         } else {
@@ -198,11 +198,11 @@ int cssem_destroy(cssem_t* handle)
 {
 	DWORD waitStat = WaitForSingleObject(handle, INFINITE);
 	if (waitStat != WAIT_OBJECT_0) {
-		fprintf(stderr, "wait thread terminate failed, return state: %ld", waitStat);
+        fprintf(stderr, "wait thread terminate failed, return state: %ld.", waitStat);
 		if (waitStat == WAIT_FAILED) {
-            fprintf(stderr, "error code: %ld\n.", GetLastError());
+            fprintf(stderr, "error code: %ld.\n", GetLastError());
 		} else {
-            fprintf(stderr, "\n.");
+            fprintf(stderr, "\n");
 		}
         return -1;
 	}

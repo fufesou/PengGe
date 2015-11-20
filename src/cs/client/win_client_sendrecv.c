@@ -16,9 +16,12 @@
 #include  <stdio.h>
 #include  <stdint.h>
 #include  <string.h>
+#include    "config_macros.h"
 #include    "macros.h"
 #include    "timespan.h"
 #include    "unprtt.h"
+#include    "list.h"
+#include    "clearlist.h"
 #include    "sock_types.h"
 #include    "lightthread.h"
 #include    "sock_wrap.h"
@@ -53,13 +56,17 @@ static int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes);
 static void s_reset_recvtimer(void);
 static int s_recv_elapsed(void);
 
+void s_sendrecv_init(void);
+void s_sendrecv_clear(void* unused);
+
+
 #ifdef __cplusplus
 }
 #endif
 
-ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
+ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen)
 {
-	char outbuf[MAX_MSG_LEN];
+    char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
     cssocklen_t sendlen;
 
@@ -72,18 +79,19 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
     }
 
     if (!s_mutex) {
-        cssendrecv_init();
+        s_sendrecv_init();
     }
 
     ++s_sendhdr.header.seq;
     rtt_newpack(&s_rttinfo);
+    sendlen = sizeof(s_sendhdr.addr);
     cssock_getsockname(cli->hsock, &s_sendhdr.addr, &sendlen);
     s_sendhdr.addrlen = htonl(sendlen);
 
     s_recv_stat = RECV_RESEND;
     while (RECV_RESEND == s_recv_stat) {
         s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
-        s_sendhdr.numbytes = strlen(cli->sendbuf) + 1;
+        s_sendhdr.numbytes = htonl(strlen(cli->sendbuf) + 1);
         csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
         if (SOCKET_ERROR == sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + s_sendhdr.numbytes, 0, servaddr, addrlen)) {
             fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->prompt, cssock_get_last_error());
@@ -153,15 +161,18 @@ int s_recv_elapsed(void)
     return (s_recvtimer <= 0);
 }
 
-void cssendrecv_init(void)
+void s_sendrecv_init(void)
 {
     if (s_mutex == 0) {
         s_mutex = csmutex_create();
     }
+
+    csclearlist_add(s_sendrecv_clear, NULL);
 }
 
-void cssendrecv_clear(void)
+void s_sendrecv_clear(void* unused)
 {
+    (void)unused;
     if (s_mutex != 0) {
         csmutex_destroy(s_mutex);
         s_mutex = 0;

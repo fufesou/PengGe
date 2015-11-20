@@ -262,7 +262,7 @@ int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addr
 {
 	int res = 0;
 	if ((res = getpeername(handle, addr, addrlen)) != 0) {
-		fprintf(stdout, "getsockname() fail, error code: %d.\n", cssock_get_last_error());
+        fprintf(stdout, "getpeername() fail, error code: %d.\n", cssock_get_last_error());
 	}
 	return res;
 }

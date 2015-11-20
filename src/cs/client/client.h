@@ -122,7 +122,7 @@ int csclient_print(const struct csclient* cli);
  *
  * @sa csclient_udp_once
  */
-void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
+void csclient_udp(struct csclient* cli, FILE* fp, struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_udp_once This function process udp send&recv one time.
@@ -131,7 +131,7 @@ void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servadd
  * @param servaddr
  * @param addrlen
  */
-void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
+void csclient_udp_once(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_sendrecv 
@@ -148,17 +148,9 @@ void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cs
  *
  * @sa cssendrecv_init cssendrecv_clear
  */
-ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
+ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen);
 
-/**
- * @brief cssendrecv_init This function shoud better be called before the first call of csclient_sendrecv.
- */
-void cssendrecv_init(void);
-
-/**
- * @brief cssendrecv_clear This function must be called after client communication done.
- */
-void cssendrecv_clear(void);
+void csclient_msgpool_dispatch_init(struct csclient* cli);
 
 #ifdef __cplusplus
 }
