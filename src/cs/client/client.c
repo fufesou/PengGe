@@ -116,10 +116,10 @@ void csclient_clear(void* cli)
 	s_clear_msgpool_dispatch();
 }
 
-void csclient_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int csclient_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     uint32_t id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
-	am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header), outmsg, outmsglen);
+    return am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header), outmsg, outmsglen);
 }
 
 int csclient_print(const struct csclient *cli)

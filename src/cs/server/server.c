@@ -4,13 +4,14 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-28
- * @modified  Sat 2015-11-07 11:50:02 (+0800)
+ * @modified  Fri 2015-11-20 20:35:28 (+0800)
  */
 
 #ifdef WIN32
 #include  <ws2tcpip.h>
 #include  <winsock2.h>
 #include  <windows.h>
+#include  <process.h>
 #else
 #include  <setjmp.h>
 #include  <signal.h>
@@ -18,20 +19,29 @@
 #include  <sys/socket.h>
 #include  <netinet/in.h>
 #include  <arpa/inet.h>
+#include  <unistd.h>
 #endif
 
+#include  <assert.h>
 #include  <stdlib.h>
 #include  <stdio.h>
 #include  <stdint.h>
 #include  <semaphore.h>
+#include    "config_macros.h"
+#include    "macros.h"
+#include    "utility_wrap.h"
 #include    "error.h"
 #include    "bufarray.h"
+#include    "list.h"
+#include    "clearlist.h"
 #include    "sock_types.h"
 #include    "lightthread.h"
 #include    "sock_wrap.h"
 #include    "msgpool.h"
+#include    "msgpool_dispatch.h"
 #include    "msgwrap.h"
 #include 	"server.h"
+#include    "account.h"
 
 
 #ifdef __cplusplus
@@ -39,6 +49,17 @@ extern "C" {
 #endif
 
 static char* s_serv_prompt = "server:";
+
+/**
+ * @brief s_msgpool_dispatch This variable is used to manage server send and recv pool.
+ */
+static struct csmsgpool_dispatch s_msgpool_dispatch;
+
+void s_csserver_clear(void* serv);
+static void s_init_msgpool_dispatch(struct csserver* serv);
+static void s_clear_msgpool_dispatch(void* unused);
+
+static int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
 
 #ifdef __cplusplus
 }
@@ -66,6 +87,16 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 
 	cssock_bind(serv->hsock, (struct sockaddr*)&serv->sa_in, sizeof(struct sockaddr_in));
 	printf("%s bind() is OK\n", serv->prompt);
+
+    s_init_msgpool_dispatch(serv);
+
+	csclearlist_add(s_clear_msgpool_dispatch, NULL);
+	csclearlist_add(s_csserver_clear, serv);
+}
+
+void s_csserver_clear(void* serv)
+{
+    cssock_close(((struct csserver*)serv)->hsock);
 }
 
 ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
@@ -102,7 +133,7 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
     return recvbytes - sizeof(struct csmsg_header);
 }
 
-void csserver_send(cssock_t handle, void* sendbuf)
+int csserver_send(cssock_t handle, void* sendbuf)
 {
     ssize_t sendbytes;
 	struct csmsg_header* msghdr = NULL;
@@ -122,8 +153,115 @@ void csserver_send(cssock_t handle, void* sendbuf)
     sendbytes = sendto(handle, sendbuf, sizeof(struct csmsg_header) + msgdatalen, 0, &msghdr->addr, msghdr->addrlen);
     if (sendbytes < 0) {
         fprintf(stderr, "server: sendto() fail, error code: %d.\n", cssock_get_last_error());
+        return 1;
     } else if (sendbytes != (ssize_t)(sizeof(struct csmsg_header) + msgdatalen)) {
         printf("server: sendto() does not send right number of data.\n");
+        return 1;
     }
+
+    return 0;
 }
 
+void csserver_udp(struct csserver* serv)
+{
+    char* buf = NULL;
+	int numbytes = 0;
+    struct csmsgpool* recvpool = &s_msgpool_dispatch.pool_unprocessed;
+
+    printf("%s: I\'m ready to receive a datagram...\n", serv->prompt);
+    while (1) {
+
+		/** @brief block untile one buffer avaliable. */
+		while ((buf = cspool_pullitem(recvpool, &recvpool->empty_buf)) == NULL)
+					;
+
+        numbytes = csserver_recv(serv->hsock, buf, recvpool->len_item);
+        if (numbytes > 0) {
+
+			/** Push to pool will succeed in normal case. There is no need to test the return value. */
+			cspool_pushitem(recvpool, &recvpool->filled_buf, buf);
+            cssem_post(&recvpool->hsem_filled);
+        }
+        else if (numbytes <= 0) {
+            printf("%s: connection closed with error code: %d\n", serv->prompt, cssock_get_last_error());
+            break;
+        }
+        else {
+            printf("%s: recvfrom() failed with error code: %d\n", serv->prompt, cssock_get_last_error());
+            break;
+        }
+    }
+
+    printf("%s: finish receiving. closing the listening socket...\n", serv->prompt);
+}
+
+void s_init_msgpool_dispatch(struct csserver* serv)
+{	
+	csmsgpool_dispatch_init(&s_msgpool_dispatch);
+
+    s_msgpool_dispatch.prompt = "server msgpool_dispatch:";
+	s_msgpool_dispatch.process_msg = s_msg_dispatch;
+    s_msgpool_dispatch.process_af_msg = csserver_send;
+
+    cspool_init(
+                &s_msgpool_dispatch.pool_unprocessed,			/**> struct csmsgpool* pool	*/
+                MAX_MSG_LEN + sizeof(struct csmsg_header),		/**> int itemlen 			*/
+                SERVER_POOL_NUM_ITEM,							/**> int itemnum 			*/
+                NUM_THREAD,										/**> int threadnum			*/
+                serv->hsock,									/**> cssock_t socket 		*/
+                csmsgpool_process,								/**> csthread_proc_t proc 	*/
+                (void*)&s_msgpool_dispatch);					/**> void* pargs 			*/
+
+    cspool_init(
+                &s_msgpool_dispatch.pool_processed,
+                MAX_MSG_LEN + sizeof(struct csmsg_header),
+                SERVER_POOL_NUM_ITEM,
+                NUM_THREAD,
+                serv->hsock,
+                csmsgpool_process_af,
+                (void*)&s_msgpool_dispatch);
+}
+
+void s_clear_msgpool_dispatch(void* unused)
+{
+	(void)unused;
+    cspool_clear(&s_msgpool_dispatch.pool_unprocessed);
+    cspool_clear(&s_msgpool_dispatch.pool_processed);
+}
+
+/**
+ * @brief  s_msg_dispatch message will be dispatched to account operations.
+ *
+ * @param inmsg The format of inmsg is
+ * ------------------------------------------------------------------
+ * | struct csmsg_header | process id(uint32_t) | data(char*) | ... |
+ * ------------------------------------------------------------------
+ *
+ * @outmsg
+ * @outmsglen
+ *
+ * @return   
+ */
+int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+{
+	int ret = 0;
+	uint32_t id_process = -1;
+	static uint32_t s_fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t);
+	if (*outmsglen < s_fixedlen)
+	{
+		return 1;
+	}
+
+	cs_memcpy(outmsg, *outmsglen, inmsg, s_fixedlen);
+	*outmsglen -= s_fixedlen;
+
+	id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
+	ret = am_method_get(id_process)->reply(
+				inmsg + s_fixedlen,
+				&((struct csmsg_header*)inmsg)->addr,
+				((struct csmsg_header*)inmsg)->addrlen,
+				outmsg + s_fixedlen,
+				outmsglen);
+    ((struct csmsg_header*)outmsg)->numbytes = htonl(s_fixedlen + *outmsglen);
+    return ret;
+}

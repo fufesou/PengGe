@@ -5,7 +5,13 @@ CONFIG -= qt
 
 CONFIG(debug, release|debug):DEFINES +=  _DEBUG
 
-INCLUDEPATH += ../../../src/common ../../../src/cs/common ../../../src/cs/server
+INCLUDEPATH += 	../../../src/common \
+                ../../../src/cs/common \
+                ../../../src/cs/server \
+                ../../../src/am/common \
+                ../../../src/am/client \
+                ../../../src/am/server
+
 
 HEADERS += \
     ../../../src/common/bufarray.h \
@@ -20,10 +26,16 @@ HEADERS += \
     ../../../src/common/timespan.h \
     ../../../src/common/utility_wrap.h \
     ../../../src/cs/server/server.h \
-    ../../../src/cs/server/server_msgdispatch.h \
     ../../../src/cs/common/msgpool.h \
     ../../../src/cs/common/msgpool_dispatch.h \
-    ../../../src/cs/common/unprtt.h
+    ../../../src/cs/common/unprtt.h \
+    ../../../src/common/clearlist.h \
+    ../../../src/am/common/account.h \
+    ../../../src/am/common/account_file.h \
+    ../../../src/am/common/account_macros.h \
+    ../../../src/am/client/client_account.h \
+    ../../../src/am/server/account_login.h \
+    ../../../src/am/server/server_account.h
 
 
 SOURCES += \
@@ -39,11 +51,15 @@ SOURCES += \
     ../../../src/common/timespan.c \
     ../../../src/common/utility_wrap.c \
     ../../../src/cs/server/server.c \
-    ../../../src/cs/server/server_msgdispatch.c \
-    ../../../src/cs/server/server_udp.c \
     ../../../src/cs/common/msgpool.c \
     ../../../src/cs/common/msgpool_dispatch.c \
-    ../../../src/cs/common/rtt.c
+    ../../../src/cs/common/rtt.c \
+    ../../../src/common/clearlist.c \
+    ../../../src/am/common/account.c \
+    ../../../src/am/common/account_file.c \
+    ../../../src/am/client/client_account.c \
+    ../../../src/am/server/account_login.c \
+    ../../../src/am/server/server_account.c
 
 
 

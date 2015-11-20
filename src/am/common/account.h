@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Mon 2015-11-16 18:45:46 (+0800)
+ * @modified  Fri 2015-11-20 18:30:39 (+0800)
  */
 
 #ifndef _ACCOUNT_H
@@ -31,6 +31,7 @@ extern "C"
 DECLARE_ACCOUNT_METHOD(account_create)
 DECLARE_ACCOUNT_METHOD(account_verify)
 DECLARE_ACCOUNT_METHOD(account_login)
+DECLARE_ACCOUNT_METHOD(account_logout)
 DECLARE_ACCOUNT_METHOD(account_changeusername)
 DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)

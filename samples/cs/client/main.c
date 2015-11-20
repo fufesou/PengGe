@@ -6,7 +6,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-01
- * @modified  Thu 2015-11-19 19:29:42 (+0800)
+ * @modified  Fri 2015-11-20 17:53:10 (+0800)
  */
 
 #ifdef WIN32
@@ -21,6 +21,7 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <stdint.h>
+#include  <string.h>
 #include    "config_macros.h"
 #include    "macros.h"
 #include    "list.h"
@@ -29,13 +30,16 @@
 #include    "utility_wrap.h"
 #include    "clearlist.h"
 #include    "client.h"
+#include    "client_account.h"
 
+int msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen);
 
 int main(int argc, char* argv[])
 {
     struct csclient udpclient;
     struct sockaddr_in serveraddr;
 	FILE* fp_input = NULL;
+	char data_input[1024];
 
     if (argc < 3) {
         printf("usage: client <server ip> <port>.");
@@ -59,8 +63,13 @@ int main(int argc, char* argv[])
 
 #ifdef TEST_FILE_INPUT
 	while (!feof(fp_input)) {
-        fgets(udpclient.sendbuf, sizeof(udpclient.sendbuf), fp_input);
-        csclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+		uint32_t size_sendbuf = sizeof(udpclient.sendbuf);
+        fgets(data_input, sizeof(data_input), fp_input);
+		if (msgdispatch(data_input, udpclient.sendbuf, &size_sendbuf) != 0) {
+			fprintf(stderr, "dispatch message error.\n");
+		} else {
+			csclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+		}
 	}
 #else
     csclient_udp(&udpclient, stdin, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
@@ -73,3 +82,25 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+
+int msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
+{
+	switch (*inmsg) {
+		case '0':
+			return am_account_create_request(inmsg + 1, outmsg, outmsglen);
+
+		case '1':
+			return am_account_verify_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, outmsg, outmsglen);
+
+		case '2':
+			return am_account_login_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, outmsg, outmsglen);
+
+		case '3':
+			return am_account_changeusername_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, strchr(strchr(inmsg+1, '\0') + 1, '\0') + 1, outmsg, outmsglen);
+
+		case '4':
+			return am_account_changepasswd_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, strchr(strchr(inmsg+1, '\0') + 1, '\0') + 1, outmsg, outmsglen);
+	}
+
+	return 1;
+}

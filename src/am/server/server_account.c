@@ -1,6 +1,7 @@
 /**
  * @file server_account.c
  * @brief  This file defines some basic account process functions for server. 
+ *
  * Some message formats are described in the document:
  * -----------------------------------------------
  * | data name(type) | (*) data name(type) | ... |
@@ -15,7 +16,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Wed 2015-11-18 17:58:16 (+0800)
+ * @modified  Fri 2015-11-20 19:20:22 (+0800)
  */
 
 #ifdef WIN32
@@ -37,6 +38,7 @@
 #include    "../../common/list.h"
 #include    "../../common/timespan.h"
 #include    "../../common/lightthread.h"
+#include    "../../common/clearlist.h"
 #include    "../../common/utility_wrap.h"
 #include    "../common/account_macros.h"
 #include    "../common/account.h"
@@ -82,6 +84,7 @@ static LIST_HEAD(s_list_tmp);
 static void s_gen_randcode(int len, char* code, char low, char high);
 static void s_gen_randcode_test(int len, char* code, char low, char high);
 
+static void s_am_server_account_clear(void*);
 
 #ifdef WIN32
     static unsigned int __stdcall s_thread_clear_tmp(void*);
@@ -387,6 +390,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 		ret_stat = 4;
 		goto err;
     }
+	s_account_tmp_remove(node_tmp);
 	csmutex_unlock(s_mutex_tmp);
 
     am_account_data2basic(&account, &account_basic);
@@ -418,17 +422,17 @@ err:
  * @param len_verification
  *
  * @param outmsg
- * -------------------------------------------------------------------------------
+ * ---------------------------------------------------------
  * | succeed(char) | account(struct account_basic_t) | ... | 
- * -------------------------------------------------------------------------------
+ * ---------------------------------------------------------
  *  or
  * ------------------------------------------------------------------------------
  * | succeed(char) | account(struct account_basic_t) | additional message | ... |
  * ------------------------------------------------------------------------------
  *  or
- * ----------------------------------------------------------
+ * ------------------------------------
  * | fail(char) | error message | ... |
- * ----------------------------------------------------------
+ * ------------------------------------
  *
  * @param outmsglen
  *
@@ -477,28 +481,104 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
 }
 
 /**
+ * @brief  am_account_logout_reply 
+ *
+ * @param inmsg The format of inmsg is
+ * ---------------------------
+ * | user id(uint32_t) | ... |
+ * ---------------------------
+ *
+ * @param data_verification
+ * @param len_verification
+ * @param outmsg The format of outmsg is
+ * -------------------------------------------
+ * | user id(uint32_t) | succeed(char) | ... | 
+ * -------------------------------------------
+ *  or
+ * ----------------------------------------------------------------
+ * | user id(uint32_t) | succeed(char) | additional message | ... |
+ * ----------------------------------------------------------------
+ *  or
+ * --------------------------------------------------------
+ * | user id(uint32_t) | fail(char) | error message | ... |
+ * --------------------------------------------------------
+ *
+ * @param outmsglen
+ *
+ * @return   
+ */
+int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+{
+    int ret_stat = 0;
+	const char* errmsg = NULL;
+    const char* msg_account_not_found = "account is not loged in.";
+    const char* msg_outmsg = "invalid outmsg argument.";
+    const char* msg_verification = "account not valid host.";
+    const char* msg_write_account = "cannot update current account to database.";
+    struct account_login_t* account_login = NULL;
+    uint32_t id = ntohl(*(uint32_t*)(inmsg));
+
+    if (*outmsglen <= 2 || outmsg == NULL) {
+        ret_stat = 3;
+        errmsg = msg_outmsg;
+        goto error;
+    }
+
+    if ((account_login = am_login_find(&s_list_login, id)) == NULL) {
+        errmsg = msg_account_not_found;
+        ret_stat = 1;
+        goto error;
+    }
+    if (memcmp(data_verification, account_login->data_verification, len_verification) != 0) {
+        errmsg = msg_verification;
+        ret_stat = 2;
+        goto error;
+    }
+	
+	csmutex_lock(s_mutex_login);
+    if (am_login_remove_account(account_login) != 0) {
+        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_write_account, strlen(msg_write_account) + 1);
+        *outmsglen = 1 + strlen(msg_write_account) + 1;
+    } else {
+        *(outmsg + 1) = 0;
+        *outmsglen = 1;
+    }
+	csmutex_unlock(s_mutex_login);
+
+    *outmsg = g_succeed;
+    return 0;
+
+error:
+    *outmsg = g_fail;
+    cs_memcpy(outmsg + 1, *outmsglen - 1, errmsg, strlen(errmsg) + 1);
+    *outmsglen = 1 + strlen(errmsg) + 1;
+    return ret_stat;
+}
+
+/**
  * @brief  am_account_changeusername_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
  * @param inmsg The format of inmsg is
- * -------------------------------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------
  * | user id(uint32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |
- * -------------------------------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------------
  *
  * @param data_verification
  * @param len_verification
  *
  * @param outmsg The format of outmsg is
- * -----------------------------------------------------------------
+ *
+ * -------------------------------------------
  * | user id(uint32_t) | succeed(char) | ... | 
- * -----------------------------------------------------------------
+ * -------------------------------------------
  *  or
- * --------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------
  * | user id(uint32_t) | succeed(char) | additional message | ... |
- * --------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------
  *  or
- * ------------------------------------------------------------------------------
+ * --------------------------------------------------------
  * | user id(uint32_t) | fail(char) | error message | ... |
- * ------------------------------------------------------------------------------
+ * --------------------------------------------------------
  *
  * @param outmsglen
  *
@@ -510,11 +590,11 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
 	const char* passwd = NULL;
 	const char* username_old = NULL;
 	const char* username_new = NULL;
-	struct account_data_t* account_login = NULL;
+	struct account_data_t* account_data = NULL;
 	struct account_data_t account_database;
 	uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
-	if (s_account_find(id, &account_login, &account_database, &errmsg) != 0) {
+	if (s_account_find(id, &account_data, &account_database, &errmsg) != 0) {
 		csprintf(inmsg, *outmsglen, "%c%s wiht id: %d.\n", g_fail, errmsg, id);
 		*outmsglen = strlen(outmsg);
 		return 1;
@@ -524,13 +604,13 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
     passwd = strchr(username_old, '\0') + 1;
     username_new = strchr(passwd, '\0') + 1;
 
-	if ((strncmp(username_old, account_login->username, strlen(account_login->username) + 1) == 0) && 
-				(strncmp(passwd, account_login->passwd, strlen(account_login->passwd) + 1) == 0)) {
-        cs_memcpy(account_login->username, sizeof(account_login->username), username_new, strlen(username_new) + 1);
+	if ((strncmp(username_old, account_data->username, strlen(account_data->username) + 1) == 0) && 
+				(strncmp(passwd, account_data->passwd, strlen(account_data->passwd) + 1) == 0)) {
+        cs_memcpy(account_data->username, sizeof(account_data->username), username_new, strlen(username_new) + 1);
 
-		if (account_login == (&account_database)) {
+		if (account_data == (&account_database)) {
 			csmutex_lock(s_mutex_login);
-            am_login_add(&s_list_login, account_login, data_verification, len_verification);
+            am_login_add(&s_list_login, account_data, data_verification, len_verification);
 			csmutex_unlock(s_mutex_login);
             csprintf(outmsg, *outmsglen, "%c%s.\n", g_succeed, errmsg);
 		} else {
@@ -546,25 +626,25 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
  * @brief  am_account_changepasswd_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
  * @param inmsg The format of inmsg is
- * -----------------------------------------------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------
  * | user id(uint32_t) | username(char*) | passwd(char*) | new passwd(char*) | ... |
- * -----------------------------------------------------------------------------------------------------------------------------
+ * ---------------------------------------------------------------------------------
  *
  * @param data_verification
  * @param len_verification
  *
  * @param outmsg The format of outmsg is
- * ---------------------------------------------------------------------------------------
+ * -------------------------------------------
  * | user id(uint32_t) | succeed(char) | ... | 
- * ---------------------------------------------------------------------------------------
+ * -------------------------------------------
  *  or
- * ------------------------------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------
  * | user id(uint32_t) | succeed(char) | additional message | ... |
- * ------------------------------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------
  *  or
- * ----------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------
  * | user id(uint32_t) | fail(char) | error message | ... |
- * ----------------------------------------------------------------------------------------------------
+ * --------------------------------------------------------
  *
  * @param outmsglen
  *
@@ -612,22 +692,22 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
  * @brief  am_account_changegrade_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
  * @param inmsg The format of inmsg is
- * -----------------------------------------------------------------------------------------------------
+ * -------------------------------------------------------------------------------
  * | user id(uint32_t) | username(char*) | passwd(char*) | grade(uint32_t) | ... |
- * -----------------------------------------------------------------------------------------------------
+ * -------------------------------------------------------------------------------
  *
  * @param outmsg The format of outmsg is
- * -----------------------------------------------------------------
+ * -------------------------------------------
  * | user id(uint32_t) | succeed(char) | ... | 
- * -----------------------------------------------------------------
+ * -------------------------------------------
  *  or
- * --------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------
  * | user id(uint32_t) | succeed(char) | additional message | ... |
- * --------------------------------------------------------------------------------------
+ * ----------------------------------------------------------------
  *  or
- * ------------------------------------------------------------------------------
+ * --------------------------------------------------------
  * | user id(uint32_t) | fail(char) | error message | ... |
- * ------------------------------------------------------------------------------
+ * --------------------------------------------------------
  *
  * @param data_verification
  * @param len_verification
@@ -685,15 +765,17 @@ int am_server_account_init(void)
 		return 1;
 	}
 
+	csclearlist_add(s_am_server_account_clear, NULL);
+
     return 0;
 }
 
-int am_server_account_clear(void)
+void s_am_server_account_clear(void* unused)
 {
-	int ret = 1;
+	(void)unused;
 
 	csmutex_lock(s_mutex_login);
-    if ((ret = am_login_write(&s_list_login)) != 0) {
+    if (am_login_write(&s_list_login) != 0) {
 		fprintf(stderr, "fatal error, current account data cannot be update to the database!\n");
 	}
 	am_login_clear(&s_list_login);
@@ -705,6 +787,4 @@ int am_server_account_clear(void)
 
     csmutex_destroy(s_mutex_login);
     csmutex_destroy(s_mutex_tmp);
-
-    return ret;
 }

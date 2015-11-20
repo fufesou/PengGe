@@ -13,7 +13,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Tue 2015-11-17 20:06:02 (+0800)
+ * @modified  Fri 2015-11-20 18:27:31 (+0800)
  */
 
 #ifdef WIN32
@@ -134,6 +134,17 @@ int am_account_login_request(const char* username_tel, const char* passwd, char*
 	*outmsglen = msglen;
     cs_memcpy(s_account_client.passwd, sizeof(s_account_client.passwd), passwd, len_passwd + 1);
 
+	return 0;
+}
+
+int am_account_logout_request(char* outmsg, uint32_t* outmsglen)
+{
+    if (*outmsglen < (sizeof(uint32_t) * 2)) {
+		return 1;
+	}
+    *(uint32_t*)outmsg = htonl(am_method_getid("account_logout"));
+    *(uint32_t*)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
+	*outmsglen= sizeof(uint32_t) * 2;
 	return 0;
 }
 
@@ -398,6 +409,47 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
 }
 
 /**
+ * @brief  am_account_logout_react 
+ *
+ * @param inmsg The format of inmsg is
+ * -----------------------
+ * | succeed(char) | ... | 
+ * -----------------------
+ *  or
+ * --------------------------------------------
+ * | succeed(char) | additional message | ... |
+ * --------------------------------------------
+ *  or
+ * ------------------------------------
+ * | fail(char) | error message | ... |
+ * ------------------------------------
+ *
+ * @param outmsg
+ * @param outmsglen
+ *
+ * @return   
+ */
+int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+{
+    int ret = 1;
+
+    (void)outmsg;
+	(void)outmsglen;
+
+    if (inmsg[0] == g_succeed) {
+		fprintf(stdout, "client: logout succeed.\n");
+		if (inmsg[1] != 0) {
+			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
+		}
+    }
+	else {
+		fprintf(stderr, "client: logout fail. message: %s.\n", inmsg + 1);
+		return 1;
+	}
+    return ret;
+}
+
+/**
  * @brief  am_account_changeusername_react The message from server is to tell client whether or not update new username.
  *
  * @param inmsg The format of inmsg is
@@ -442,7 +494,7 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
 		}
     }
 	else {
-		fprintf(stderr, "client: change username fail. message: %s.\n", inmsg);
+		fprintf(stderr, "client: change username fail. message: %s.\n", inmsg + 1);
 		return 1;
 	}
     return ret;
@@ -493,7 +545,7 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
 		}
     }
 	else {
-		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg);
+		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg + 1);
 		return 1;
 	}
     return ret;
@@ -534,7 +586,7 @@ int am_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* ou
 		}
     }
 	else {
-		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg);
+		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg + 1);
 		return 1;
 	}
     return 0;

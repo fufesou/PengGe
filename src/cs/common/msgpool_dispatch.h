@@ -25,8 +25,8 @@ extern "C"
 {
 #endif
 
-typedef void csmsg_process_t(char* inmsg, char* outmsg, uint32_t* outmsglen);
-typedef void csmsg_process_af_t(cssock_t handle, void* outmsg);
+typedef int (*pfunc_msgprocess_t)(char* inmsg, char* outmsg, uint32_t* outmsglen);
+typedef int (*pfunc_msgprocess_af_t)(cssock_t handle, void* outmsg);
 
 struct csmsgpool_dispatch
 {
@@ -41,11 +41,11 @@ struct csmsgpool_dispatch
 	struct csmsgpool pool_processed;
 
 	/** process_msg This variable must be set to point a function. */
-	csmsg_process_t* process_msg;
+    pfunc_msgprocess_t process_msg;
 
 	/** process_af_msg If send message is not required after process, set process_af_msg to 0;
 	 */
-	csmsg_process_af_t* process_af_msg;
+    pfunc_msgprocess_af_t process_af_msg;
 };
 
 /**

@@ -53,7 +53,7 @@ struct csclient
     char recvbuf[MAX_MSG_LEN];
 	int len_recvbuf;
 
-	void (*pfunc_process_react)(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+    int (*pfunc_process_react)(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
  };
 
 
@@ -94,7 +94,7 @@ void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, css
  * @param outmsg
  * @param outmsglen
  */
-void csclient_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+int csclient_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
 
 
 /**

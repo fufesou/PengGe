@@ -4,17 +4,18 @@
  * @author cxl, <shuanlgongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Mon 2015-11-16 23:29:25 (+0800)
+ * @modified  Fri 2015-11-20 19:16:41 (+0800)
  */
 
 #ifndef _ACCOUNT_LOGIN_H
 #define _ACCOUNT_LOGIN_H
 
+
 #pragma pack(4)
 struct account_login_t {
-	struct account_data_t account;
+    struct account_data_t account;
 
-	void* data_verification;
+    void* data_verification;
     uint32_t size_verification;
 };
 
@@ -22,7 +23,6 @@ struct list_login_t {
     struct list_head listnode;
     struct account_login_t account_sock;
 };
-
 #pragma pack()
 
 
@@ -42,11 +42,23 @@ void am_login_add(struct list_head* node_head, const struct account_data_t* acco
  * @param len_verification
  *
  * @return   
- * 1. 0 if account exists and is removed.
- * 2. 1 if account not exists.
- * 3. 2 if verification fail.
+ * - 0 if account exists and is removed.
+ * - 1 if account not exists.
+ * - 2 if verification fail.
+ * - 3 if write account data fail.
  */
 int am_login_remove(struct list_head* node_head, uint32_t id_account, const void* data_verification, uint32_t len_verification);
+
+/**
+ * @brief  am_login_remove_account 
+ *
+ * @param account_data
+ *
+ * @return   
+ * - 0 if write account succeed.
+ * - 1 if write account fail.
+ */
+int am_login_remove_account(struct account_login_t* account_login);
 
 /**
  * @brief  am_login_tryadd This function will add new login account to login account list if previous same login have not happened.
@@ -57,9 +69,9 @@ int am_login_remove(struct list_head* node_head, uint32_t id_account, const void
  * @param len_verification
  *
  * @return
- * 1. 0 if no login of this account happened.
- * 2. 1 if login of the account happened on other socket.
- * 3. 2 if login  happened on the same socket.
+ * - 0 if no login of this account happened.
+ * - 1 if login of the account happened on other socket.
+ * - 2 if login  happened on the same socket.
  */
 int am_login_tryadd(struct list_head* node_head, const struct account_data_t* account, const void* data_verification, uint32_t len_verification);
 

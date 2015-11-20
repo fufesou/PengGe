@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Sun 2015-11-15 11:29:32 (+0800)
+ * @modified  Fri 2015-11-20 18:54:47 (+0800)
  */
 
 #ifndef _ACCOUNT_FILE_H
@@ -31,9 +31,7 @@ int am_account_data2basic(const struct account_data_t* data, struct account_basi
 /**
  * @brief am_account_write
  * @param account
- * @return
- *
- * @todo atomic write should be guaranteed here.
+ * @return 0 if succeed, 1 if fail.
  */
 int am_account_write(const struct account_data_t* account);
 

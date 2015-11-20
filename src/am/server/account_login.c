@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Fri 2015-11-20 00:14:16 (+0800)
+ * @modified  Fri 2015-11-20 19:13:44 (+0800)
  */
 
 #include  <malloc.h>
@@ -18,17 +18,6 @@
 #include    "../common/account.h"
 #include    "../common/account_file.h"
 #include    "account_login.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-
-
-#ifdef __cplusplus
-}
-#endif
 
 
 void am_login_add(
@@ -67,6 +56,27 @@ int am_login_remove(
 	}
 
     node_login = container_of(account_login, struct list_login_t, account_sock);
+	if (am_account_write(&node_login->account_sock.account) != 0) {
+		fprintf(stderr, "server: write account - %s fail.\n", node_login->account_sock.account.tel);
+		return 3;
+	}
+
+    list_del(&node_login->listnode);
+	free(account_login->data_verification);
+	free(node_login);
+
+	return 0;
+}
+
+int am_login_remove_account(struct account_login_t* account_login)
+{
+	struct list_login_t* node_login = NULL;
+
+    node_login = container_of(account_login, struct list_login_t, account_sock);
+	if (am_account_write(&node_login->account_sock.account) != 0) {
+		fprintf(stderr, "server: write account - %s fail.\n", node_login->account_sock.account.tel);
+		return 1;
+	}
 
     list_del(&node_login->listnode);
 	free(account_login->data_verification);

@@ -21,6 +21,9 @@
 #include  <stdint.h>
 #include    "sock_types.h"
 #include    "sock_wrap.h"
+#include    "macros.h"
+#include    "list.h"
+#include    "clearlist.h"
 #include    "server.h"
 
 
@@ -38,7 +41,7 @@ int main(int argc, char* argv[])
     cssock_print(udpserver.hsock, udpserver.prompt);
     csserver_udp(&udpserver);
 
-    cssock_envclear();
+    csclearlist_clear();
 
     return 0;
 }
