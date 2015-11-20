@@ -1,19 +1,20 @@
 /**
  * @file client_account.c
  * @brief  This file defines some basic account process functions for client. 
- * Some message formats are described in the document:
- * -----------------------------------------------
- * | data name(type) | (*) data name(type) | ... |
- * -----------------------------------------------
- * 1. The data name is the name of this segment, such as 'username'.
- * 2. The type describe the segement's type, such as 'int8'.
- * 3. (*) means this segement is not filled with data by now.
- * 4. ... means unused remainder place.
+ *
+ * Some message formats are described in the document:\n
+ * ---------------------------------------------------------------------------\n
+ * | data name(type) | (*) data name(type) | ... |                            \n
+ * ---------------------------------------------------------------------------\n
+ * - The data name is the name of this segment, such as 'username'.
+ * - The type describe the segement's type, such as 'int8'.
+ * - (*) means this segement is not filled with data by now.
+ * - ... means unused remainder place.
  *  
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Fri 2015-11-20 18:27:31 (+0800)
+ * @modified  Fri 2015-11-20 23:45:49 (+0800)
  */
 
 #ifdef WIN32
@@ -66,7 +67,7 @@ int am_account_create_request(const char* tel, char* outmsg, uint32_t* outmsglen
 	len_tel = strlen(tel);
     msglen = sizeof(uint32_t) + len_tel + 1;
 
-	if (*outmsglen > msglen) {
+    if (*outmsglen < msglen) {
 		return 1;
 	}
     if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
@@ -92,7 +93,7 @@ int am_account_verify_request(const char* tel, const char* randcode, char* outms
 	len_randcode = strlen(randcode);
     msglen = sizeof(uint32_t) + len_tel + len_randcode + 2;
 
-	if (*outmsglen > msglen) {
+    if (*outmsglen < msglen) {
 		return 1;
 	}
     if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
@@ -291,14 +292,14 @@ int am_account_changegrade_request(
 /**
  * @brief  am_account_create_react This is the first message returned from server. And this message is just a notification message.
  *
- * @param inmsg The format of inmsg is:
- * -----------------------
- * | succeed(char) | ... |
- * -----------------------
- *  or
- * --------------------
- * | fail(char) | ... |
- * --------------------
+ * @param inmsg The format of inmsg is: \n
+ * ---------------------------------------------------\n
+ * | succeed(char) | ... |                            \n
+ * ---------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------\n
+ * | fail(char) | ... |                            \n
+ * ------------------------------------------------\n
  *
  * @param outmsg unused.
  * @param outmsglen unused.
@@ -322,14 +323,14 @@ int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 /**
  * @brief  am_account_verify_react 
  *
- * @param inmsg The format of outmsg here is:
- * ---------------------------------------------------------
- * | succeed(char) | account(struct account_basic_t) | ... | 
- * ---------------------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param inmsg The format of outmsg here is: \n
+ * -------------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | ... |                            \n
+ * -------------------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param outmsg
  * @param outmsglen
@@ -364,18 +365,18 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 /**
  * @brief  am_account_login_react This function estimate whether the login succeed. 
  *
- * @param inmsg The format of inmsg is:
- * ---------------------------------------------------------
- * | succeed(char) | account(struct account_basic_t) | ... | 
- * ---------------------------------------------------------
- *  or
- * ------------------------------------------------------------------------------
- * | succeed(char) | account(struct account_basic_t) | additional message | ... |
- * ------------------------------------------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param inmsg The format of inmsg is: \n
+ * ---------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | ... |                        \n
+ * ---------------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | additional message | ... |                            \n
+ * ----------------------------------------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param inmsglen
  * @param outmsg 
@@ -411,18 +412,18 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
 /**
  * @brief  am_account_logout_react 
  *
- * @param inmsg The format of inmsg is
- * -----------------------
- * | succeed(char) | ... | 
- * -----------------------
- *  or
- * --------------------------------------------
- * | succeed(char) | additional message | ... |
- * --------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * ---------------------------------------------------\n
+ * | succeed(char) | ... |                            \n
+ * ---------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------\n
+ * | succeed(char) | additional message | ... |                            \n
+ * ------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param outmsg
  * @param outmsglen
@@ -452,18 +453,18 @@ int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 /**
  * @brief  am_account_changeusername_react The message from server is to tell client whether or not update new username.
  *
- * @param inmsg The format of inmsg is
- * -----------------------
- * | succeed(char) | ... | 
- * -----------------------
- *  or
- * --------------------------------------------
- * | succeed(char) | additional message | ... |
- * --------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * ---------------------------------------------------\n
+ * | succeed(char) | ... |                            \n
+ * ---------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------\n
+ * | succeed(char) | additional message | ... |                            \n
+ * ------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param outmsg Not used.
  * @param outmsglen Not used.
@@ -503,18 +504,18 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
 /**
  * @brief  am_account_changepasswd_react The message from server is to tell client whether or not update new passwd.
  *
- * @param inmsg The format of inmsg is
- * -----------------------
- * | succeed(char) | ... | 
- * -----------------------
- *  or
- * --------------------------------------------
- * | succeed(char) | additional message | ... |
- * --------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * ---------------------------------------------------\n
+ * | succeed(char) | ... |                            \n
+ * ---------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------\n
+ * | succeed(char) | additional message | ... |                            \n
+ * ------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param outmsg Not used.
  * @param outmsglen Not used.
@@ -554,18 +555,18 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
 /**
  * @brief  am_account_changegrade_react The message from server is to tell client whether or not update new grade.
  *
- * @param inmsg The format of inmsg is
- * -----------------------
- * | succeed(char) | ... | 
- * -----------------------
- *  or
- * --------------------------------------------
- * | succeed(char) | additional message | ... |
- * --------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * ---------------------------------------------------\n
+ * | succeed(char) | ... |                            \n
+ * ---------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------\n
+ * | succeed(char) | additional message | ... |                            \n
+ * ------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param outmsg Not used.
  * @param outmsglen Not used.

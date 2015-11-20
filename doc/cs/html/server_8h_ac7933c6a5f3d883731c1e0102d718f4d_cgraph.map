@@ -1,7 +1,0 @@
-<map id="csserver_udp" name="csserver_udp">
-<area shape="rect" id="node2" href="$msgpool_8c.html#a14439a45efe508d7c98e10cef3737104" title="cspool_pullitem " alt="" coords="171,56,283,83"/>
-<area shape="rect" id="node5" href="$msgpool_8c.html#a83f09a2407be63d0ce25eb505f7a04c4" title="cspool_pushitem " alt="" coords="167,5,287,32"/>
-<area shape="rect" id="node6" href="$sock__wrap_8c.html#a41b2b1f3f488bea3c83fc844813d305b" title="cssock_get_last_error will return last error number. " alt="" coords="152,107,303,133"/>
-<area shape="rect" id="node3" href="$lightthread_8c.html#a78561b071805b213f88d0757b381aa92" title="csmutex_lock " alt="" coords="358,5,461,32"/>
-<area shape="rect" id="node4" href="$lightthread_8c.html#abe0d10d1918d0b3fc8a9966e9710b632" title="csmutex_unlock This function unlock the numtex. " alt="" coords="351,56,468,83"/>
-</map>

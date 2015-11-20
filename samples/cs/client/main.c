@@ -95,10 +95,13 @@ int msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
 		case '2':
 			return am_account_login_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, outmsg, outmsglen);
 
-		case '3':
+        case '3':
+            return am_account_logout_request(outmsg, outmsglen);
+
+        case '4':
 			return am_account_changeusername_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, strchr(strchr(inmsg+1, '\0') + 1, '\0') + 1, outmsg, outmsglen);
 
-		case '4':
+        case '5':
 			return am_account_changepasswd_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, strchr(strchr(inmsg+1, '\0') + 1, '\0') + 1, outmsg, outmsglen);
 	}
 

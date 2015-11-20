@@ -232,10 +232,10 @@ void s_clear_msgpool_dispatch(void* unused)
 /**
  * @brief  s_msg_dispatch message will be dispatched to account operations.
  *
- * @param inmsg The format of inmsg is
- * ------------------------------------------------------------------
- * | struct csmsg_header | process id(uint32_t) | data(char*) | ... |
- * ------------------------------------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * -----------------------------------------------------------------------------------------\n
+ * | struct csmsg_header | process id(uint32_t) | data(char*) | ... |                       \n
+ * -----------------------------------------------------------------------------------------\n
  *
  * @outmsg
  * @outmsglen
@@ -260,8 +260,8 @@ int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 				inmsg + s_fixedlen,
 				&((struct csmsg_header*)inmsg)->addr,
 				((struct csmsg_header*)inmsg)->addrlen,
-				outmsg + s_fixedlen,
+                outmsg + s_fixedlen,
 				outmsglen);
-    ((struct csmsg_header*)outmsg)->numbytes = htonl(s_fixedlen + *outmsglen);
+    ((struct csmsg_header*)outmsg)->numbytes = htonl(*outmsglen);
     return ret;
 }

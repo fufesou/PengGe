@@ -1,8 +1,0 @@
-<map id="csmsg_pull_from_pool" name="csmsg_pull_from_pool">
-<area shape="rect" id="node2" href="$msgpool_8c.html#a14439a45efe508d7c98e10cef3737104" title="cspool_pullitem " alt="" coords="219,56,331,83"/>
-<area shape="rect" id="node5" href="$msgwrap_8c.html#adbe79a0a1bb14bb4cf053f7bbadb78a7" title="csmsg_extract_copy " alt="" coords="204,107,347,133"/>
-<area shape="rect" id="node7" href="$msgpool_8c.html#a83f09a2407be63d0ce25eb505f7a04c4" title="cspool_pushitem " alt="" coords="215,5,335,32"/>
-<area shape="rect" id="node3" href="$lightthread_8c.html#a78561b071805b213f88d0757b381aa92" title="csmutex_lock " alt="" coords="402,56,505,83"/>
-<area shape="rect" id="node4" href="$lightthread_8c.html#abe0d10d1918d0b3fc8a9966e9710b632" title="csmutex_unlock This function unlock the numtex. " alt="" coords="395,5,512,32"/>
-<area shape="rect" id="node6" href="$utility__wrap_8c.html#a897ef25d7e2a22733169e38eaf1c4294" title="cs_memecpy cs_memcpy is a simple wrapper of memcpy_s(windows) or memcpy(unix). " alt="" coords="407,107,500,133"/>
-</map>

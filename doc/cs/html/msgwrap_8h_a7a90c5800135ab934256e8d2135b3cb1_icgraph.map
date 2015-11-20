@@ -1,6 +1,0 @@
-<map id="csmsg_merge" name="csmsg_merge">
-<area shape="rect" id="node2" href="$unix__client__sendrecv_8c.html#aeecc65b7dbf1e0ac8f806ba8f518dab9" title="csclient_sendrecv " alt="" coords="158,5,283,32"/>
-<area shape="rect" id="node5" href="$msgwrap_8h.html#ad813358703a8d2859cc883e8ee15c286" title="csmsg_push2pool will firstly copy message data and the unit header to single char array..." alt="" coords="157,56,284,83"/>
-<area shape="rect" id="node3" href="$client__udp_8c.html#a571252c127c68c849fdf766d6cef63e2" title="csclient_udp_once This function process udp send&amp;recv one time. " alt="" coords="332,5,463,32"/>
-<area shape="rect" id="node4" href="$client__udp_8c.html#a8be5e8ba05fdac392536b4bb22d8914b" title="csclient_udp This function process udp communication with server. This function call csclient_udp_onc..." alt="" coords="511,5,605,32"/>
-</map>

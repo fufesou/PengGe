@@ -1,6 +1,0 @@
-<map id="csclient_udp_once" name="csclient_udp_once">
-<area shape="rect" id="node2" href="$client_8h.html#aeecc65b7dbf1e0ac8f806ba8f518dab9" title="csclient_sendrecv " alt="" coords="184,31,309,57"/>
-<area shape="rect" id="node3" href="$msgwrap_8c.html#a4af2e50286de90e21dec452fa67d9268" title="csmsg_merge " alt="" coords="366,5,470,32"/>
-<area shape="rect" id="node5" href="$msgwrap_8c.html#a992091194e59740446257e10c0d7864d" title="csmsg_copyaddr This function set the value of address information. " alt="" coords="357,56,479,83"/>
-<area shape="rect" id="node4" href="$utility__wrap_8c.html#a897ef25d7e2a22733169e38eaf1c4294" title="cs_memecpy cs_memcpy is a simple wrapper of memcpy_s(windows) or memcpy(unix). " alt="" coords="527,31,620,57"/>
-</map>

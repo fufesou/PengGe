@@ -1,5 +1,0 @@
-<map id="cssignal_ext" name="cssignal_ext">
-<area shape="rect" id="node2" href="$utility__wrap_8c.html#adb7c1d4474e5370174a3f78fd6064acb" title="cssignal cssignal works the same as signal. " alt="" coords="148,5,219,32"/>
-<area shape="rect" id="node3" href="$error_8c.html#a641ea5f626d774c1ae2eee06e8403e2a" title="csfatal Print csfatal error message and exit(0) " alt="" coords="153,56,213,83"/>
-<area shape="rect" id="node4" href="$sock__wrap_8c.html#ac839f08c2ad8afafceb7a931529a1a7f" title="cssock_envclear " alt="" coords="267,56,385,83"/>
-</map>

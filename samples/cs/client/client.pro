@@ -3,6 +3,10 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
+CONFIG(debug, release|debug):
+DEFINES +=  _DEBUG
+
+
 INCLUDEPATH += 	../../../src/common \
                 ../../../src/cs/common \
                 ../../../src/cs/client \

@@ -1,7 +1,0 @@
-<map id="cspool_pushitem" name="cspool_pushitem">
-<area shape="rect" id="node2" href="$msgpool__dispatch_8h.html#a45b7e54d8d8abaa2042d2835dea4c39a" title="csmsgpool_process This is the thread function of send pool. " alt="" coords="181,5,320,32"/>
-<area shape="rect" id="node3" href="$msgpool__dispatch_8h.html#af38f74003b2a41b9b56599b5a87a5cbd" title="csmsgpool_process_af This is the thread function of recv pool. " alt="" coords="173,56,328,83"/>
-<area shape="rect" id="node4" href="$msgwrap_8h.html#ad813358703a8d2859cc883e8ee15c286" title="csmsg_push2pool will firstly copy message data and the unit header to single char array..." alt="" coords="187,107,314,133"/>
-<area shape="rect" id="node5" href="$msgwrap_8h.html#a116afb019547278f14bc11309ba7c387" title="csmsg_pull_from_pool works the opposite as csmsg_push2pool does. The procedure can be splitted into t..." alt="" coords="175,157,326,184"/>
-<area shape="rect" id="node6" href="$server_8h.html#ac7933c6a5f3d883731c1e0102d718f4d" title="csserver_udp This function process communication for udp socket. " alt="" coords="201,208,300,235"/>
-</map>

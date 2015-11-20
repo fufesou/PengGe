@@ -2,21 +2,21 @@
  * @file server_account.c
  * @brief  This file defines some basic account process functions for server. 
  *
- * Some message formats are described in the document:
- * -----------------------------------------------
- * | data name(type) | (*) data name(type) | ... |
- * -----------------------------------------------
- * 1. The data name is the name of this segment, such as 'username'.
- * 2. The type describe the segement's type, such as 'int8'.
- * 3. (*) means this segement is not filled with data by now.
- * 4. ... means unused remainder place.
+ * Some message formats are described in the document: \n
+ * ---------------------------------------------------------------------------\n
+ * | data name(type) | (*) data name(type) | ... |                            \n
+ * ---------------------------------------------------------------------------\n
+ * - The data name is the name of this segment, such as 'username'.
+ * - The type describe the segement's type, such as 'int8'.
+ * - (*) means this segement is not filled with data by now.
+ * - ... means unused remainder place.
  *
  * Server maintains a list of loged user account, and the verification of these accounts is the 'struct sockaddr'.
  *
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Fri 2015-11-20 19:20:22 (+0800)
+ * @modified  Fri 2015-11-20 23:53:19 (+0800)
  */
 
 #ifdef WIN32
@@ -287,19 +287,19 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
 /**
  * @brief  am_account_create_reply This function handle the request of creating a new account
  *
- * @param inmsg The format of inmsg here is: 
- * --------------------
- * | tel(char*) | ... |
- * --------------------
+ * @param inmsg The format of inmsg here is: \n
+ * ------------------------------------------------\n
+ * | tel(char*) | ... |                            \n
+ * ------------------------------------------------\n
  *
- * @param outmsg The format of outmsg here is:
- * -----------------------
- * | succeed(char) | ... |
- * -----------------------
- *  or
- * --------------------
- * | fail(char) | ... |
- * --------------------
+ * @param outmsg The format of outmsg here is: \n
+ * ---------------------------------------------------\n
+ * | succeed(char) | ... |                            \n
+ * ---------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------\n
+ * | fail(char) | ... |                            \n
+ * ------------------------------------------------\n
  *
  * @param data_verification unused.
  * @param len_verification unused.
@@ -333,21 +333,21 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
 /**
  * @brief  am_account_verify_reply 
  *
- * @param inmsg The format of inmsg here is: 
- * --------------------------------------
- * | tel(char*) | randcode(char*) | ... |
- * --------------------------------------
+ * @param inmsg The format of inmsg here is: \n
+ * ------------------------------------------------------------------\n
+ * | tel(char*) | randcode(char*) | ... |                            \n
+ * ------------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
- * @param outmsg The format of outmsg here is:
- * ---------------------------------------------------------
- * | succeed(char) | account(struct account_basic_t) | ... | 
- * ---------------------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param outmsg The format of outmsg here is: \n
+ * -------------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | ... |                            \n 
+ * -------------------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param outmsglen
  *
@@ -413,26 +413,26 @@ err:
 /**
  * @brief  am_account_login_reply 
  *
- * @param inmsg The format of inmsg here is: 
- * ------------------------------------------------
- * | tel or username(char*) | passwd(char*) | ... |
- * ------------------------------------------------
+ * @param inmsg The format of inmsg here is:  \n
+ * ----------------------------------------------------------------------------\n
+ * | tel or username(char*) | passwd(char*) | ... |                            \n
+ * ----------------------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
  *
- * @param outmsg
- * ---------------------------------------------------------
- * | succeed(char) | account(struct account_basic_t) | ... | 
- * ---------------------------------------------------------
- *  or
- * ------------------------------------------------------------------------------
- * | succeed(char) | account(struct account_basic_t) | additional message | ... |
- * ------------------------------------------------------------------------------
- *  or
- * ------------------------------------
- * | fail(char) | error message | ... |
- * ------------------------------------
+ * @param outmsg The format of outmsg is \n
+ * -------------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | ... |                            \n 
+ * -------------------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | additional message | ... |                            \n
+ * ----------------------------------------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param outmsglen
  *
@@ -483,25 +483,25 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
 /**
  * @brief  am_account_logout_reply 
  *
- * @param inmsg The format of inmsg is
- * ---------------------------
- * | user id(uint32_t) | ... |
- * ---------------------------
+ * @param inmsg The format of inmsg is \n
+ * -------------------------------------------------------\n
+ * | user id(uint32_t) | ... |                            \n
+ * -------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
- * @param outmsg The format of outmsg is
- * -------------------------------------------
- * | user id(uint32_t) | succeed(char) | ... | 
- * -------------------------------------------
- *  or
- * ----------------------------------------------------------------
- * | user id(uint32_t) | succeed(char) | additional message | ... |
- * ----------------------------------------------------------------
- *  or
- * --------------------------------------------------------
- * | user id(uint32_t) | fail(char) | error message | ... |
- * --------------------------------------------------------
+ * @param outmsg The format of outmsg is \n
+ * -----------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | ... |                            \n 
+ * -----------------------------------------------------------------------\n
+ *  or \n
+ * --------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | additional message | ... |                            \n
+ * --------------------------------------------------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | fail(char) | error message | ... |                            \n
+ * ------------------------------------------------------------------------------------\n
  *
  * @param outmsglen
  *
@@ -558,27 +558,26 @@ error:
 /**
  * @brief  am_account_changeusername_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
- * @param inmsg The format of inmsg is
- * ---------------------------------------------------------------------------------------
- * | user id(uint32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |
- * ---------------------------------------------------------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * ---------------------------------------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |                                    \n
+ * ---------------------------------------------------------------------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
  *
- * @param outmsg The format of outmsg is
- *
- * -------------------------------------------
- * | user id(uint32_t) | succeed(char) | ... | 
- * -------------------------------------------
- *  or
- * ----------------------------------------------------------------
- * | user id(uint32_t) | succeed(char) | additional message | ... |
- * ----------------------------------------------------------------
- *  or
- * --------------------------------------------------------
- * | user id(uint32_t) | fail(char) | error message | ... |
- * --------------------------------------------------------
+ * @param outmsg The format of outmsg is \n
+ * -----------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | ... |                            \n 
+ * -----------------------------------------------------------------------\n
+ *  or \n
+ * --------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | additional message | ... |                            \n
+ * --------------------------------------------------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | fail(char) | error message | ... |                            \n
+ * ------------------------------------------------------------------------------------\n
  *
  * @param outmsglen
  *
@@ -625,26 +624,26 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
 /**
  * @brief  am_account_changepasswd_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
- * @param inmsg The format of inmsg is
- * ---------------------------------------------------------------------------------
- * | user id(uint32_t) | username(char*) | passwd(char*) | new passwd(char*) | ... |
- * ---------------------------------------------------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * ---------------------------------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | username(char*) | passwd(char*) | new passwd(char*) | ... |                                    \n
+ * ---------------------------------------------------------------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
  *
- * @param outmsg The format of outmsg is
- * -------------------------------------------
- * | user id(uint32_t) | succeed(char) | ... | 
- * -------------------------------------------
- *  or
- * ----------------------------------------------------------------
- * | user id(uint32_t) | succeed(char) | additional message | ... |
- * ----------------------------------------------------------------
- *  or
- * --------------------------------------------------------
- * | user id(uint32_t) | fail(char) | error message | ... |
- * --------------------------------------------------------
+ * @param outmsg The format of outmsg is \n
+ * -----------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | ... |                            \n 
+ * -----------------------------------------------------------------------\n
+ *  or \n
+ * --------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | additional message | ... |                            \n
+ * --------------------------------------------------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | fail(char) | error message | ... |                            \n
+ * ------------------------------------------------------------------------------------\n
  *
  * @param outmsglen
  *
@@ -691,23 +690,23 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
 /**
  * @brief  am_account_changegrade_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
- * @param inmsg The format of inmsg is
- * -------------------------------------------------------------------------------
- * | user id(uint32_t) | username(char*) | passwd(char*) | grade(uint32_t) | ... |
- * -------------------------------------------------------------------------------
+ * @param inmsg The format of inmsg is \n
+ * -----------------------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | username(char*) | passwd(char*) | grade(uint32_t) | ... |                            \n
+ * -----------------------------------------------------------------------------------------------------------\n
  *
- * @param outmsg The format of outmsg is
- * -------------------------------------------
- * | user id(uint32_t) | succeed(char) | ... | 
- * -------------------------------------------
- *  or
- * ----------------------------------------------------------------
- * | user id(uint32_t) | succeed(char) | additional message | ... |
- * ----------------------------------------------------------------
- *  or
- * --------------------------------------------------------
- * | user id(uint32_t) | fail(char) | error message | ... |
- * --------------------------------------------------------
+ * @param outmsg The format of outmsg is \n
+ * -----------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | ... |                            \n 
+ * -----------------------------------------------------------------------\n
+ *  or \n
+ * --------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | succeed(char) | additional message | ... |                            \n
+ * --------------------------------------------------------------------------------------------\n
+ *  or \n
+ * ------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | fail(char) | error message | ... |                            \n
+ * ------------------------------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification

@@ -3,7 +3,8 @@ CONFIG += console
 CONFIG -= app_bundle
 CONFIG -= qt
 
-CONFIG(debug, release|debug):DEFINES +=  _DEBUG
+CONFIG(debug, release|debug):
+DEFINES +=  _DEBUG
 
 INCLUDEPATH += 	../../../src/common \
                 ../../../src/cs/common \

@@ -1,9 +1,0 @@
-<map id="D:/project/PengGe/client_server/src/common/msgwrap.h" name="D:/project/PengGe/client_server/src/common/msgwrap.h">
-<area shape="rect" id="node2" href="$client__msgdispatch_8c.html" title="D:/project/PengGe/client\l_server/src/client/client\l_msgdispatch.c" alt="" coords="5,95,169,151"/>
-<area shape="rect" id="node3" href="$client__udp_8c.html" title="This file prcess client udp message sendrecv. For now a lot config data is hard coded, reimplementation must be done when config parser complete. " alt="" coords="194,102,389,143"/>
-<area shape="rect" id="node4" href="$unix__client__sendrecv_8c.html" title="This file provide the linux version of client sendrecv. " alt="" coords="413,95,577,151"/>
-<area shape="rect" id="node5" href="$msgpool__dispatch_8c.html" title="D:/project/PengGe/client\l_server/src/common/msgpool\l_dispatch.c" alt="" coords="602,95,794,151"/>
-<area shape="rect" id="node6" href="$msgwrap_8c.html" title="length check is required for memcpy in this file. " alt="" coords="819,102,1025,143"/>
-<area shape="rect" id="node7" href="$server_8c.html" title="The functions prefexed with &quot;s_&quot; are static functions. " alt="" coords="1049,102,1221,143"/>
-<area shape="rect" id="node8" href="$server__msgdispatch_8c.html" title="D:/project/PengGe/client\l_server/src/server/server\l_msgdispatch.c" alt="" coords="1245,95,1409,151"/>
-</map>

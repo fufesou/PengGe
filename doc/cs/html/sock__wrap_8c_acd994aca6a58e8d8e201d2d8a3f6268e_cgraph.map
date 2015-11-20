@@ -1,4 +1,0 @@
-<map id="cssock_close" name="cssock_close">
-<area shape="rect" id="node2" href="$sock__wrap_8c.html#a41b2b1f3f488bea3c83fc844813d305b" title="cssock_get_last_error will return last error number. " alt="" coords="156,5,307,32"/>
-<area shape="rect" id="node3" href="$error_8c.html#a6c106dc092c3356060fb1d64ac07a50d" title="csfatal_ext This function will print error message, clear socket environment and exit. If errop is cserr_exit, exit(*(cserr_t*)data) will be called. if errop is cserr_clear, ((cserr_clear_func)data)() will be called. " alt="" coords="189,56,274,83"/>
-</map>
