@@ -32,7 +32,6 @@ void am_login_add(
 	cs_memcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
 
     node_login->account_sock.data_verification = malloc(len_verification);
-    printf("-----------------%p\n", node_login->account_sock.data_verification);
     cs_memcpy(node_login->account_sock.data_verification, len_verification, data_verification, len_verification);
     node_login->account_sock.size_verification = len_verification;
 

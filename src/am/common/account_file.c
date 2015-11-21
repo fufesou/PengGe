@@ -179,7 +179,9 @@ int am_account_print(FILE* streamptr, const struct account_data_t* account)
 
 int am_account_write(const struct account_data_t* account)
 {
-    csmutex_lock(s_mutex_file);
+    if (csmutex_lock(s_mutex_file) != 0) {
+        fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
+    }
     if (fseek(s_fpcfg, 0, SEEK_END) != 0) {
         fprintf(stderr, "write new account error, call fseek fail.\n");
         csmutex_unlock(s_mutex_file);

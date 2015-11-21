@@ -531,7 +531,7 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: chagneusername fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: change username fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_changeusername - unkown message.\n");
@@ -591,7 +591,7 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: changepasswd fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: change passwd fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_changepasswd - unkown message.\n");

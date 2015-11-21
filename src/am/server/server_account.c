@@ -377,40 +377,42 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 	}
 	
     if (s_account_tmp_timeout(node_tmp)) {
-		msg_err = msg_err_timeout;
+        msg_err = msg_err_timeout;
 		ret_stat = 2;
 		goto err;
 	}
 
     if (memcmp(inmsg + strlen(inmsg) + 1, node_tmp->account_tmp.randcode, strlen(node_tmp->account_tmp.randcode) + 1) != 0) {
-		msg_err = msg_err_randcode;
+        msg_err = msg_err_randcode;
 		ret_stat = 3;
 		goto err;
 	}
 
     if (s_account_create(inmsg, node_tmp->account_tmp.randcode, &account) != 0) {
-		msg_err = msg_err_create;
+        msg_err = msg_err_create;
 		ret_stat = 4;
 		goto err;
     }
 	s_account_tmp_remove(node_tmp);
 	csmutex_unlock(s_mutex_tmp);
 
+    csmutex_lock(s_mutex_login);
     am_account_data2basic(&account, &account_basic);
     outmsg[0] = g_succeed;
     cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
-
-	csmutex_lock(s_mutex_login);
     am_login_add(&s_list_login, &account, data_verification, len_verification);
-	csmutex_unlock(s_mutex_login);
 	*outmsglen = sizeof(account_basic) + 1;
-	return 0;
+    csmutex_unlock(s_mutex_login);
+
+    return 0;
 
 err:
 	outmsg[0] = g_fail;
 	cs_memcpy(outmsg + 1, *outmsglen - 1, msg_err, strlen(msg_err) + 1);
     *outmsglen = 1 + strlen(msg_err) + 1;
-	return ret_stat;
+    csmutex_unlock(s_mutex_tmp);
+
+    return ret_stat;
 }
 
 /**
@@ -527,7 +529,9 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
         goto error;
     }
 
-    csmutex_lock(s_mutex_login);
+    if (csmutex_lock(s_mutex_login) != 0) {
+        fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
+    }
     if ((account_login = am_login_find(&s_list_login, id)) == NULL) {
         errmsg = msg_account_not_found;
         ret_stat = 1;
@@ -546,15 +550,16 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
         *(outmsg + 1) = 0;
         *outmsglen = 1;
     }
-	csmutex_unlock(s_mutex_login);
-
+    csmutex_unlock(s_mutex_login);
     *outmsg = g_succeed;
+
     return 0;
 
 error:
     *outmsg = g_fail;
     cs_memcpy(outmsg + 1, *outmsglen - 1, errmsg, strlen(errmsg) + 1);
     *outmsglen = 1 + strlen(errmsg) + 1;
+    csmutex_unlock(s_mutex_login);
     return ret_stat;
 }
 
@@ -597,30 +602,32 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
 	uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
 	if (s_account_find(id, &account_data, &account_database, &errmsg) != 0) {
-		csprintf(inmsg, *outmsglen, "%c%s wiht id: %d.\n", g_fail, errmsg, id);
+        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, errmsg, id);
 		*outmsglen = strlen(outmsg);
 		return 1;
 	}
 
-	username_old = inmsg;
+    username_old = inmsg + sizeof(uint32_t);
     passwd = strchr(username_old, '\0') + 1;
     username_new = strchr(passwd, '\0') + 1;
 
-	if ((strncmp(username_old, account_data->username, strlen(account_data->username) + 1) == 0) && 
-				(strncmp(passwd, account_data->passwd, strlen(account_data->passwd) + 1) == 0)) {
-        cs_memcpy(account_data->username, sizeof(account_data->username), username_new, strlen(username_new) + 1);
+    if ((strncmp(username_old, account_data->username, strlen(account_data->username)) == 0) &&
+                (strncmp(passwd, account_data->passwd, strlen(account_data->passwd)) == 0)) {
+        cs_memcpy(account_data->username, sizeof(account_data->username), username_new, strlen(username_new));
 
 		if (account_data == (&account_database)) {
 			csmutex_lock(s_mutex_login);
             am_login_add(&s_list_login, account_data, data_verification, len_verification);
 			csmutex_unlock(s_mutex_login);
-            csprintf(outmsg, *outmsglen, "%c%s.\n", g_succeed, errmsg);
+            csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
 		} else {
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
 		}
-        *outmsglen = strlen(outmsg) + 1;
+    } else {
+        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "username or passwd error.");
     }
 
+    *outmsglen = strlen(outmsg) + 1;
     return 0;
 }
 
@@ -668,25 +675,27 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
 		return 1;
 	}
 
-	username = inmsg;
+    username = inmsg + sizeof(uint32_t);
     passwd_old = strchr(username, '\0') + 1;
     passwd_new = strchr(passwd_old, '\0') + 1;
 
-	if ((strncmp(username, account_login->username, strlen(account_login->username) + 1) == 0) && 
-				(strncmp(passwd_old, account_login->passwd, strlen(account_login->passwd) + 1) == 0)) {
-        cs_memcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new) + 1);
+    if ((strncmp(username, account_login->username, strlen(account_login->username)) == 0) &&
+                (strncmp(passwd_old, account_login->passwd, strlen(account_login->passwd)) == 0)) {
+        cs_memcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new));
 
 		if (account_login == (&account_database)) {
 			csmutex_lock(s_mutex_login);
             am_login_add(&s_list_login, account_login, data_verification, len_verification);
 			csmutex_unlock(s_mutex_login);
-            csprintf(outmsg, *outmsglen, "%c%s.\n", g_succeed, errmsg);
+            csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
 		} else {
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
 		}
-        *outmsglen = strlen(outmsg);
+    }  else {
+        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "username or passwd error.");
     }
 
+    *outmsglen = strlen(outmsg) + 1;
     return 0;
 }
 
@@ -729,29 +738,31 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
 	uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
 	if (s_account_find(id, &account_login, &account_database, &errmsg) != 0) {
-		csprintf(inmsg, *outmsglen, "%c%s wiht id: %d.\n", g_fail, errmsg, id);
+        csprintf(inmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, errmsg, id);
 		*outmsglen = strlen(outmsg);
 		return 1;
 	}
 
-	username = inmsg;
+    username = inmsg + sizeof(uint32_t);
     passwd = strchr(username, '\0') + 1;
 
-	if ((strncmp(username, account_login->username, strlen(account_login->username) + 1) == 0) && 
-				(strncmp(passwd, account_login->passwd, strlen(account_login->passwd) + 1) == 0)) {
+    if ((strncmp(username, account_login->username, strlen(account_login->username)) == 0) &&
+                (strncmp(passwd, account_login->passwd, strlen(account_login->passwd)) == 0)) {
         account_login->grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
 
 		if (account_login == (&account_database)) {
 			csmutex_lock(s_mutex_login);
             am_login_add(&s_list_login, account_login, data_verification, len_verification);
 			csmutex_unlock(s_mutex_login);
-            csprintf(outmsg, *outmsglen, "%c%s.\n", g_succeed, errmsg);
+            csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
 		} else {
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
 		}
-        *outmsglen = strlen(outmsg);
+    } else {
+        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "username or passwd error.");
     }
 
+    *outmsglen = strlen(outmsg) + 1;
     return 0;
 }
 
