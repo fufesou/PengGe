@@ -28,7 +28,7 @@ char g_fail = '1';
 uint32_t g_curmaxid = 0;
 uint32_t g_timeout_verification = 120;
 
-int g_len_randomcode = 4;
+uint32_t g_len_randomcode = 4;
 
 #ifdef __cplusplus
 }

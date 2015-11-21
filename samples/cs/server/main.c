@@ -25,6 +25,7 @@
 #include    "list.h"
 #include    "clearlist.h"
 #include    "server.h"
+#include    "server_account.h"
 
 
 void s_check_args(int argc, char* argv[]);
@@ -36,6 +37,11 @@ int main(int argc, char* argv[])
     s_check_args(argc, argv);
 
     cssock_envinit();
+    if (am_server_account_init() != 0) {
+        fprintf(stderr, "server: init account fail.\n");
+        csclearlist_clear();
+        return 1;
+    }
 
     csserver_init(&udpserver, SOCK_DGRAM, atoi(argv[1]), htonl(INADDR_ANY));
     cssock_print(udpserver.hsock, udpserver.prompt);

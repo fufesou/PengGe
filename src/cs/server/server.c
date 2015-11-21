@@ -262,6 +262,14 @@ int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 				((struct csmsg_header*)inmsg)->addrlen,
                 outmsg + s_fixedlen,
 				outmsglen);
+
+    /** The length of variables.
+     *
+     * - s_fixedlen is only used here as a help variable, and stands for nothing.
+     * - *outmsglen is the same as length of total message(without struct csmsg_header).
+     * - 'numbytes' in 'struct csmsg_header' is the same as *outmsglen.
+     */
+    *outmsglen += sizeof(uint32_t);
     ((struct csmsg_header*)outmsg)->numbytes = htonl(*outmsglen);
     return ret;
 }

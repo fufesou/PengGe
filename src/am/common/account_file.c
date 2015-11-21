@@ -24,6 +24,8 @@
 #include  <string.h>
 #include  <semaphore.h>
 #include    "config_macros.h"
+#include    "list.h"
+#include    "clearlist.h"
 #include    "error.h"
 #include    "lightthread.h"
 #include    "utility_wrap.h"
@@ -44,6 +46,8 @@ static FILE* s_fpcfg = NULL;
 static csmutex_t s_mutex_file;
 
 static int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account);
+
+static void s_am_account_config_clear(void* unused);
 
 #ifdef __cplusplus
 }
@@ -128,16 +132,26 @@ int am_account_find_tel_username(const char* tel_username, struct account_data_t
 void am_account_config_init(void)
 {
     int errcode = 0;
+    static int s_inited = 0;
+
+    if (s_inited) {
+        return;
+    }
+
     if (cs_fopen(&s_fpcfg, s_cfgfile, "ab+") != 0) {
         errcode = 1;
         csfatal_ext(&errcode, cserr_exit, "open file error.\n");
     }
 
     s_mutex_file = csmutex_create();
+
+    csclearlist_add(s_am_account_config_clear, NULL);
+    s_inited = 1;
 }
 
-void am_account_config_clear(void)
+void s_am_account_config_clear(void* unused)
 {
+    (void)unused;
     if (s_fpcfg != NULL) {
         if (fclose(s_fpcfg) != 0) {
             fprintf(stderr, "close file error.\n");
@@ -177,9 +191,18 @@ int am_account_write(const struct account_data_t* account)
         return 1;
     }
 
+    /** oops, i cannot find a way to synchronize file IO.
+     *
+     * The fclose() and fopen() operations are very clumsy.
+     *
+     */
+    /*
     if (fflush(s_fpcfg)) {
         fprintf(stderr, "file - %s, line - %d: fflush error.", __FILE__, __LINE__);
     }
+    */
+    fclose(s_fpcfg);
+    cs_fopen(&s_fpcfg, s_cfgfile, "ab+");
     csmutex_unlock(s_mutex_file);
 
     return 0;

@@ -24,7 +24,6 @@ extern "C" {
 
 
 void am_account_config_init(void);
-void am_account_config_clear(void);
 int am_account_print(FILE* streamptr, const struct account_data_t* account);
 int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic);
 

@@ -65,9 +65,9 @@ extern "C"
 {
 #endif
 
-extern int g_len_randomcode;
 extern char g_succeed;
 extern char g_fail;
+extern uint32_t g_len_randomcode;
 extern uint32_t g_curmaxid;
 extern uint32_t g_timeout_verification;
 extern uint32_t g_max_account_tmp;
@@ -169,13 +169,15 @@ static int s_account_create(const char* tel, const char* randcode, struct accoun
 
 void s_account_tmp_add(const char* tel, const char* randcode)
 {
+    uint32_t randcodelen = strlen(randcode);
 	struct list_account_tmp_t* tmp_new = (struct list_account_tmp_t*)malloc(sizeof(struct list_account_tmp_t));
 
 	cs_memcpy(tmp_new->account_tmp.tel, sizeof(tmp_new->account_tmp.tel), tel, strlen(tel) + 1);
 
-	tmp_new->account_tmp.randcode = (char*)malloc(strlen(randcode) + 1);
-	cs_memcpy(tmp_new->account_tmp.randcode, strlen(randcode) + 1, randcode, sizeof(randcode) + 1);
-	tmp_new->account_tmp.size_randcode = strlen(randcode) + 1;
+    tmp_new->account_tmp.randcode = (char*)malloc(randcodelen + 1);
+    cs_memcpy(tmp_new->account_tmp.randcode, randcodelen + 1, randcode, randcodelen);
+    tmp_new->account_tmp.randcode[randcodelen] = '\0';
+    tmp_new->account_tmp.size_randcode = randcodelen + 1;
 
 	cstimelong_cur(&tmp_new->account_tmp.time_created);
 
@@ -236,6 +238,7 @@ void s_gen_randcode(int len, char* code, char low, char high)
     while (i < len) {
         code[i++] = (rand() % range) + low;
     }
+    code[len] = '\0';
 }
 
 void s_gen_randcode_test(int len, char* code, char low, char high)
@@ -248,6 +251,7 @@ void s_gen_randcode_test(int len, char* code, char low, char high)
     while (i < len) {
         code[i++] = '1';
     }
+    code[len] = '\0';
 }
 
 int s_account_create(const char* tel, const char* randcode, struct account_data_t* account)
@@ -314,7 +318,7 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
 	(void)data_verification;
 	(void)len_verification;
 
-    randcode = (char*)malloc(sizeof(char) * g_len_randomcode);
+    randcode = (char*)malloc(g_len_randomcode + 1);
 
 #ifdef _DEBUG
     s_gen_randcode_test(g_len_randomcode, randcode, '0', '9');
@@ -322,7 +326,7 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
     s_gen_randcode(g_len_randomcode, randcode, '0', '9');
 #endif
 
-	s_account_tmp_add(inmsg, randcode);
+    s_account_tmp_add(inmsg, randcode);
 
     outmsg[0] = g_succeed;
     *outmsglen = 1;
@@ -355,7 +359,6 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
  */
 int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
-    char* randcode = NULL;
     struct account_data_t account;
     struct account_basic_t account_basic;
     struct list_account_tmp_t* node_tmp = NULL;
@@ -385,7 +388,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 		goto err;
 	}
 
-    if (s_account_create(inmsg, randcode, &account) != 0) {
+    if (s_account_create(inmsg, node_tmp->account_tmp.randcode, &account) != 0) {
 		msg_err = msg_err_create;
 		ret_stat = 4;
 		goto err;
@@ -406,7 +409,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 err:
 	outmsg[0] = g_fail;
 	cs_memcpy(outmsg + 1, *outmsglen - 1, msg_err, strlen(msg_err) + 1);
-	*outmsg = 1 + strlen(msg_err) + 1;
+    *outmsglen = 1 + strlen(msg_err) + 1;
 	return ret_stat;
 }
 
@@ -524,6 +527,7 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
         goto error;
     }
 
+    csmutex_lock(s_mutex_login);
     if ((account_login = am_login_find(&s_list_login, id)) == NULL) {
         errmsg = msg_account_not_found;
         ret_stat = 1;
@@ -535,7 +539,6 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
         goto error;
     }
 	
-	csmutex_lock(s_mutex_login);
     if (am_login_remove_account(account_login) != 0) {
         cs_memcpy(outmsg + 1, *outmsglen - 1, msg_write_account, strlen(msg_write_account) + 1);
         *outmsglen = 1 + strlen(msg_write_account) + 1;
@@ -754,6 +757,11 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
 
 int am_server_account_init(void)
 {
+    static int s_inited = 0;
+    if (s_inited) {
+        return 0;
+    }
+
     s_mutex_login = csmutex_create();
 	s_mutex_tmp = csmutex_create();
 
@@ -764,7 +772,9 @@ int am_server_account_init(void)
 		return 1;
 	}
 
-	csclearlist_add(s_am_server_account_clear, NULL);
+    am_account_config_init();
+    csclearlist_add(s_am_server_account_clear, NULL);
+    s_inited = 1;
 
     return 0;
 }

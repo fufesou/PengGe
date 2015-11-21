@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Fri 2015-11-20 19:13:44 (+0800)
+ * @modified  Sat 2015-11-21 15:20:30 (+0800)
  */
 
 #include  <malloc.h>
@@ -32,6 +32,7 @@ void am_login_add(
 	cs_memcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
 
     node_login->account_sock.data_verification = malloc(len_verification);
+    printf("-----------------%p\n", node_login->account_sock.data_verification);
     cs_memcpy(node_login->account_sock.data_verification, len_verification, data_verification, len_verification);
     node_login->account_sock.size_verification = len_verification;
 
