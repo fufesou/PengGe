@@ -457,7 +457,7 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
         *outmsglen = 1 + strlen(msg_account_not_exist);
         return 1;
     }
-    if (strncmp(strchr(inmsg, '\0'), account.passwd, strlen(account.passwd) + 1) != 0) {
+    if (strncmp(strchr(inmsg, '\0') + 1, account.passwd, strlen(account.passwd)) != 0) {
         csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_login_fail);
         *outmsglen = 1 + strlen(msg_account_login_fail) + 1;
         return 1;
@@ -514,8 +514,6 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
  */
 int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
-    int ret_stat = 0;
-	const char* errmsg = NULL;
     const char* msg_account_not_found = "account is not loged in.";
     const char* msg_outmsg = "invalid outmsg argument.";
     const char* msg_verification = "account not valid host.";
@@ -524,23 +522,31 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
     uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
     if (*outmsglen <= 2 || outmsg == NULL) {
-        ret_stat = 3;
-        errmsg = msg_outmsg;
-        goto error;
+        *outmsg = g_fail;
+        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_outmsg, strlen(msg_outmsg) + 1);
+        *outmsglen = 1 + strlen(msg_outmsg) + 1;
+        return 3;
     }
 
     if (csmutex_lock(s_mutex_login) != 0) {
         fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
     }
+#ifdef _DEBUG
+    fprintf(stdout, "threadid---------------------------------%d.\n", csthread_getpid());
+#endif
     if ((account_login = am_login_find(&s_list_login, id)) == NULL) {
-        errmsg = msg_account_not_found;
-        ret_stat = 1;
-        goto error;
+        *outmsg = g_fail;
+        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_account_not_found, strlen(msg_account_not_found) + 1);
+        *outmsglen = 1 + strlen(msg_account_not_found) + 1;
+        csmutex_unlock(s_mutex_login);
+        return 1;
     }
     if (memcmp(data_verification, account_login->data_verification, len_verification) != 0) {
-        errmsg = msg_verification;
-        ret_stat = 2;
-        goto error;
+        *outmsg = g_fail;
+        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_verification, strlen(msg_verification) + 1);
+        *outmsglen = 1 + strlen(msg_verification) + 1;
+        csmutex_unlock(s_mutex_login);
+        return 2;
     }
 	
     if (am_login_remove_account(account_login) != 0) {
@@ -554,13 +560,6 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
     *outmsg = g_succeed;
 
     return 0;
-
-error:
-    *outmsg = g_fail;
-    cs_memcpy(outmsg + 1, *outmsglen - 1, errmsg, strlen(errmsg) + 1);
-    *outmsglen = 1 + strlen(errmsg) + 1;
-    csmutex_unlock(s_mutex_login);
-    return ret_stat;
 }
 
 /**

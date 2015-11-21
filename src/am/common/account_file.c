@@ -99,16 +99,12 @@ int am_account_find_tel_username(const char* tel_username, struct account_data_t
 {
     static int offset_tel = offsetof(struct account_data_t, tel);
     static int offset_username = offsetof(struct account_data_t, username);
-    size_t keylen = strlen(tel_username) + 1;
 
-    if ((keylen - 1) >= sizeof(account->username) && (keylen - 1) >= sizeof(account->tel)) {
-        return 1;
+    if (am_account_find_tel(tel_username, account) == 0) {
+        return 0;
     }
-    if (strlen(tel_username) > sizeof(account->username)) {
-        return am_account_find_tel(tel_username, account);
-    }
-    if (strlen(tel_username) > sizeof(account->tel)) {
-        return am_account_find_username(tel_username, account);
+    if (am_account_find_username(tel_username, account) == 0) {
+        return 0;
     }
 
     csmutex_lock(s_mutex_file);
@@ -116,8 +112,8 @@ int am_account_find_tel_username(const char* tel_username, struct account_data_t
     while (!feof(s_fpcfg)) {
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
             if (
-                    memcmp((char*)account + offset_tel, tel_username, keylen) == 0 ||
-                    memcmp((char*)account + offset_username, tel_username, keylen) == 0 ) {
+                    memcmp((char*)account + offset_tel, tel_username, strlen(account->tel)) == 0 ||
+                    memcmp((char*)account + offset_username, tel_username, strlen(account->username)) == 0 ) {
                 csmutex_unlock(s_mutex_file);
                 return 0;
             }
