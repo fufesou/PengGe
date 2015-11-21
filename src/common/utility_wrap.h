@@ -31,9 +31,8 @@ extern "C"
  * @param count
  *
  * @return   
- * -1 if dstsize < count.
- *  1 if (src == NULL || dst == NULL).
- *  0 if success.
+ *  - 0 if succeed.
+ *  - -1 if argument is invalid, (dstsize < count) || (src == NULL) || (dst == NULL).
  *
  *  @note c11 has introduced memcpy_s.
  */

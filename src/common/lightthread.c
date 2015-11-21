@@ -178,7 +178,7 @@ int cssem_wait(cssem_t* handle)
 		if (waitStat == WAIT_FAILED) {
             fprintf(stderr, ", error code: %ld\n.", GetLastError());
 		} else {
-            fprintf(stderr, "\n.");
+            fprintf(stderr, ".\n");
 		}
 		return -1;
 	}
@@ -188,7 +188,7 @@ int cssem_wait(cssem_t* handle)
 int cssem_post(cssem_t* handle)
 {
 	if (ReleaseSemaphore(*handle, 1, NULL) == 0) {
-        fprintf(stderr, "post semaphoer falied, error code: %ld.\n", GetLastError());
+        fprintf(stderr, "post semaphore falied, error code: %ld.\n", GetLastError());
 		return -1;
 	}
 	return 0;
@@ -196,17 +196,11 @@ int cssem_post(cssem_t* handle)
 
 int cssem_destroy(cssem_t* handle)
 {
-	DWORD waitStat = WaitForSingleObject(handle, INFINITE);
-	if (waitStat != WAIT_OBJECT_0) {
-        fprintf(stderr, "wait thread terminate failed, return state: %ld.", waitStat);
-		if (waitStat == WAIT_FAILED) {
-            fprintf(stderr, "error code: %ld.\n", GetLastError());
-		} else {
-            fprintf(stderr, "\n");
-		}
-        return -1;
+    BOOL stat = CloseHandle(*handle);
+    if (stat == 0) {
+        fprintf(stderr, "close semaphore handle failed, error code: %ld.\n", GetLastError());
+        return 1;
 	}
-    CloseHandle(*handle);
     return 0;
 }
 

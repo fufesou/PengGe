@@ -41,7 +41,8 @@ struct csclient
 	 * @todo make sendbuf a pointer, and configure the length of sendbuf by user.
      */
     char sendbuf[MAX_MSG_LEN];
-	int len_senbuf;
+    uint32_t len_senddata;      /**< len_senddata gives the length of data to send. */
+    uint32_t size_senbuf;       /**< size_sendbuf is used for mallocing sendbuf. */
 
     /** sendbuf is the buffer to hold the message from server.
 	 *
@@ -51,7 +52,8 @@ struct csclient
 	 * @todo make recvbuf a pointer, and configure the length of recvbuf by user.
      */
     char recvbuf[MAX_MSG_LEN];
-	int len_recvbuf;
+    uint32_t len_recvdata;      /**< len_recvdata gives the length of data received. */
+    uint32_t size_recvbuf;      /**< size_recvbuf is used for mallocing recvbuf. */
 
     int (*pfunc_process_react)(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
  };
@@ -87,10 +89,17 @@ void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, css
  * @brief  csclient_react_dispatch The income message from server 
  * will be handle by the coressponding 'react' method in this function.
  *
- * @param inmsg The format of inmsg is:
- * ----------------------------------------------------------------------------------------------
- * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ... |
- * ----------------------------------------------------------------------------------------------
+ * The actual process function will not process data until one byte after 'process id'. Thus
+ * the message data passed into the process function is 'inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t)'.
+ *
+ * @param inmsg The format of inmsg is: \n
+ * ---------------------------------------------------------------------------------------------- \n
+ * | struct csmsg_header | process id(uint32_t) | process data(char*) | ... |                     \n
+ * ---------------------------------------------------------------------------------------------- \n
+ * or \n
+ * ------------------------------------------------------------------------------------------------------------------------------------ \n
+ * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ... |                                       \n
+ * ------------------------------------------------------------------------------------------------------------------------------------ \n
  * @param outmsg
  * @param outmsglen
  */
@@ -122,7 +131,7 @@ int csclient_print(const struct csclient* cli);
  *
  * @sa csclient_udp_once
  */
-void csclient_udp(struct csclient* cli, FILE* fp, struct sockaddr* servaddr, cssocklen_t addrlen);
+void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_udp_once This function process udp send&recv one time.
@@ -131,7 +140,7 @@ void csclient_udp(struct csclient* cli, FILE* fp, struct sockaddr* servaddr, css
  * @param servaddr
  * @param addrlen
  */
-void csclient_udp_once(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen);
+void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_sendrecv 
@@ -148,7 +157,7 @@ void csclient_udp_once(struct csclient* cli, struct sockaddr* servaddr, cssockle
  *
  * @sa cssendrecv_init cssendrecv_clear
  */
-ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen);
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 void csclient_msgpool_dispatch_init(struct csclient* cli);
 

@@ -336,6 +336,12 @@ int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  * @param outmsglen
  *
  * @return   
+ * - 0 if succeed.
+ * - 1 if verify fail.
+ * - -2 if message is unkown.
+ * - others, if copy account fail, see cs_memcpy for return code.
+ *
+ * @sa cs_memcpy
  */
 int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -350,14 +356,20 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 			return ret;
 		}
 
-		fprintf(stdout, "client: verify succeed.\n");
+        fprintf(stdout, "client: verify succeed");
 
 		if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
-			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
-		}
+            fprintf(stdout, ", additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
+        } else {
+            fprintf(stdout, ".\n");
+        }
+    } else if (inmsg[0] == g_fail){
+        fprintf(stderr, "client: verify fail, %s\n", inmsg + 1);
+        return 1;
     } else {
-		fprintf(stderr, "client: verify fail.\n");
-	}
+        fprintf(stderr, "client: account_verify - unkown message.\n");
+        return -2;
+    }
 
     return ret;
 }
@@ -382,7 +394,13 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  * @param outmsg 
  * @param outmsglen
  *
- * @return   0 if an account is created, 1 otherwise.
+ * @return
+ * - 0 if succeed.
+ * - 1 if fail.
+ * - -2 if message is unkown.
+ * - others, if copy account fail, see cs_memcpy for return code.
+ *
+ * @sa cs_memcpy
  */
 int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -402,9 +420,13 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
 		if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
 		}
+    } else if (inmsg[0] == g_fail){
+        fprintf(stderr, "client: login fail, %s\n", inmsg + 1);
+        return 1;
     } else {
-		fprintf(stderr, "client: login fail.\n");
-	}
+        fprintf(stderr, "client: account_login - unkown message.\n");
+        return -2;
+    }
 
     return ret;
 }
@@ -429,6 +451,12 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
  * @param outmsglen
  *
  * @return   
+ * - 0 if succeed.
+ * - 1 if verify fail.
+ * - -2 if message is unkown.
+ * - others, if copy account fail, see cs_memcpy for return code.
+ *
+ * @sa cs_memcpy
  */
 int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -442,11 +470,14 @@ int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 		if (inmsg[1] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
+    } else if (inmsg[0] == g_fail){
+        fprintf(stderr, "client: logout fail, %s\n", inmsg + 1);
+        return 1;
+    } else {
+        fprintf(stderr, "client: account_logout - unkown message.\n");
+        return -2;
     }
-	else {
-		fprintf(stderr, "client: logout fail. message: %s.\n", inmsg + 1);
-		return 1;
-	}
+
     return ret;
 }
 
@@ -470,6 +501,12 @@ int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  * @param outmsglen Not used.
  *
  * @return   
+ * - 0 if succeed.
+ * - 1 if verify fail.
+ * - -2 if message is unkown.
+ * - others, if copy account fail, see cs_memcpy for return code.
+ *
+ * @sa cs_memcpy
  */
 int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -493,11 +530,14 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
 		if (inmsg[1] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
+    } else if (inmsg[0] == g_fail){
+        fprintf(stderr, "client: chagneusername fail, %s\n", inmsg + 1);
+        return 1;
+    } else {
+        fprintf(stderr, "client: account_changeusername - unkown message.\n");
+        return -2;
     }
-	else {
-		fprintf(stderr, "client: change username fail. message: %s.\n", inmsg + 1);
-		return 1;
-	}
+
     return ret;
 }
 
@@ -521,6 +561,12 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
  * @param outmsglen Not used.
  *
  * @return   
+ * - 0 if succeed.
+ * - 1 if verify fail.
+ * - -2 if message is unkown.
+ * - others, if copy account fail, see cs_memcpy for return code.
+ *
+ * @sa cs_memcpy
  */
 int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -544,11 +590,14 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
 		if (inmsg[1] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
+    } else if (inmsg[0] == g_fail){
+        fprintf(stderr, "client: changepasswd fail, %s\n", inmsg + 1);
+        return 1;
+    } else {
+        fprintf(stderr, "client: account_changepasswd - unkown message.\n");
+        return -2;
     }
-	else {
-		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg + 1);
-		return 1;
-	}
+
     return ret;
 }
 
@@ -572,6 +621,12 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
  * @param outmsglen Not used.
  *
  * @return   
+ * - 0 if succeed.
+ * - 1 if verify fail.
+ * - -2 if message is unkown.
+ * - others, if copy account fail, see cs_memcpy for return code.
+ *
+ * @sa cs_memcpy
  */
 int am_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -585,11 +640,14 @@ int am_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* ou
 		if (inmsg[1] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
+    } else if (inmsg[0] == g_fail){
+        fprintf(stderr, "client: changegrade fail, %s\n", inmsg + 1);
+        return 1;
+    } else {
+        fprintf(stderr, "client: account_changegrade - unkown message.\n");
+        return -2;
     }
-	else {
-		fprintf(stderr, "client: change passwd fail. message: %s.\n", inmsg + 1);
-		return 1;
-	}
+
     return 0;
 }
 

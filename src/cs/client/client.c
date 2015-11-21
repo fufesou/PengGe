@@ -74,11 +74,13 @@ void csclient_init(struct csclient* cli, int tcpudp)
     /*
      * @par code to be added
      * @code{.c}
-     * cli->len_sendbuf = g_cli_sendbuflen;
-     * cli->len_recvbuf = g_cli_recvbuflen;
+     * cli->size_sendbuf = g_cli_sendbuflen;
+     * cli->size_recvbuf = g_cli_recvbuflen;
      * @endcode
      *
      */
+    cli->size_senbuf = sizeof(cli->sendbuf);
+    cli->size_recvbuf = sizeof(cli->recvbuf);
 
     cli->hsock = cssock_open(tcpudp);
     if (cssock_block(cli->hsock, nonblocking) != 0) {
@@ -114,7 +116,7 @@ void csclient_clear(void* cli)
 int csclient_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     uint32_t id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
-    return am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header), outmsg, outmsglen);
+    return am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t), outmsg, outmsglen);
 }
 
 int csclient_print(const struct csclient *cli)
@@ -140,7 +142,7 @@ void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, css
 	}
 }
 
-void csclient_udp(struct csclient* cli, FILE* fp, struct sockaddr* servaddr, cssocklen_t addrlen)
+void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     csclient_connect(cli, servaddr, addrlen);
     while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
@@ -151,11 +153,11 @@ void csclient_udp(struct csclient* cli, FILE* fp, struct sockaddr* servaddr, css
             break;
         }
 
-		csclient_udp_once(cli, servaddr, addrlen);
+        csclient_udp_once(cli, servaddr, addrlen);
     }
 }
 
-void csclient_udp_once(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen)
+void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     ssize_t numbytes = csclient_sendrecv(cli, servaddr, addrlen);
 	if (numbytes > 0) {

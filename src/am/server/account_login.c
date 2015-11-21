@@ -31,9 +31,9 @@ void am_login_add(
     node_login = (struct list_login_t*)malloc(sizeof(struct list_login_t));
 	cs_memcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
 
-	node_login->account_sock.data_verification = malloc(len_verification) + 1;
-    cs_memcpy(node_login->account_sock.data_verification, len_verification + 1, data_verification, len_verification + 1);
-    node_login->account_sock.size_verification = len_verification + 1;
+    node_login->account_sock.data_verification = malloc(len_verification);
+    cs_memcpy(node_login->account_sock.data_verification, len_verification, data_verification, len_verification);
+    node_login->account_sock.size_verification = len_verification;
 
     list_add(&node_login->listnode, node_head);
 }

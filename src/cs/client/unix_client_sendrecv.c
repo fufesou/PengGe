@@ -57,7 +57,7 @@ static void s_register_alrm(void);
 }
 #endif
 
-ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen)
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
@@ -77,7 +77,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssoc
 
     sendagain:
         s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
-        s_sendhdr.numbytes = htonl((uint32_t)strlen(cli->sendbuf) + 1);
+        s_sendhdr.numbytes = htonl(cli->len_senddata);
         csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
         sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + ntohl(s_sendhdr.numbytes), 0, servaddr, addrlen);
 

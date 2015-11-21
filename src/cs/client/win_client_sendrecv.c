@@ -64,7 +64,7 @@ void s_sendrecv_clear(void* unused);
 }
 #endif
 
-ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssocklen_t addrlen)
+ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
     char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
@@ -91,9 +91,10 @@ ssize_t csclient_sendrecv(struct csclient* cli, struct sockaddr* servaddr, cssoc
     s_recv_stat = RECV_RESEND;
     while (RECV_RESEND == s_recv_stat) {
         s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
-        s_sendhdr.numbytes = htonl(strlen(cli->sendbuf) + 1);
+        s_sendhdr.numbytes = htonl(cli->len_senddata);
         csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
-        if (SOCKET_ERROR == sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + s_sendhdr.numbytes, 0, servaddr, addrlen)) {
+
+        if (SOCKET_ERROR == sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + ntohl(s_sendhdr.numbytes), 0, servaddr, addrlen)) {
             fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->prompt, cssock_get_last_error());
             return -2;
         }
@@ -136,7 +137,7 @@ int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
             if (ETRYAGAIN(errcode)) {
                 continue;
             } else {
-                fprintf(stderr, "recvfrom() fail, error code: %d", errcode);
+                fprintf(stderr, "recvfrom() fail, error code: %d.\n", errcode);
                 return -3;
             }
         } else if (recvbytes > (ssize_t)sizeof(struct csmsg_header) &&

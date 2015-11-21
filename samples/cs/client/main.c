@@ -60,14 +60,14 @@ int main(int argc, char* argv[])
 
 
     csclient_msgpool_dispatch_init(&udpclient);
-// #define TEST_FILE_INPUT
+#define TEST_FILE_INPUT
 
 #ifdef TEST_FILE_INPUT
     csclient_connect(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
-	while (!feof(fp_input)) {
-		uint32_t size_sendbuf = sizeof(udpclient.sendbuf);
+    while (!feof(fp_input)) {
+        udpclient.len_senddata = udpclient.size_senbuf;
         fgets(data_input, sizeof(data_input), fp_input);
-		if (msgdispatch(data_input, udpclient.sendbuf, &size_sendbuf) != 0) {
+        if (msgdispatch(data_input, udpclient.sendbuf, &udpclient.len_senddata) != 0) {
 			fprintf(stderr, "dispatch message error.\n");
 		} else {
 			csclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));

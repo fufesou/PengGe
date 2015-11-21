@@ -21,7 +21,7 @@ int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count)
 
 #ifdef _CHECK_ARGS
     if (dst == NULL || src == NULL) {
-        return 1;
+        return -1;
     }
 #endif
 
