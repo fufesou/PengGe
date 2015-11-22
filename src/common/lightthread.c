@@ -16,7 +16,6 @@
 #include  <pthread.h>
 #include  <unistd.h>
 #include  <sys/time.h>
-#define THREAD_IDEL_TIMESLICE_MS 20
 #endif
 
 #include  <time.h>
@@ -126,33 +125,33 @@ csmutex_t csmutex_create(void)
 	return handle;
 }
 
-void csmutex_destroy(csmutex_t handle)
+void csmutex_destroy(csmutex_t* handle)
 {
-	if (handle) {
-		CloseHandle(handle);
+    if (*handle) {
+        CloseHandle(*handle);
 	}
 }
 
-int csmutex_lock(csmutex_t handle)
+int csmutex_lock(csmutex_t* handle)
 {
-	if (handle && WaitForSingleObject(handle, INFINITE) == WAIT_OBJECT_0) {
+    if ((*handle) && WaitForSingleObject(*handle, INFINITE) == WAIT_OBJECT_0) {
 		return 0;
 	}
 	return -1;
 }
 
-int csmutex_try_lock(csmutex_t handle, unsigned int msec)
+int csmutex_try_lock(csmutex_t* handle, unsigned int msec)
 {
-	if (handle && WaitForSingleObject(handle, msec) == WAIT_OBJECT_0) {
+    if ((*handle) && WaitForSingleObject(*handle, msec) == WAIT_OBJECT_0) {
 		return 0;
 	}
 	return -1;
 }
 
-void csmutex_unlock(csmutex_t handle)
+void csmutex_unlock(csmutex_t* handle)
 {
-	if (handle) {
-		ReleaseMutex(handle);
+    if (*handle) {
+        ReleaseMutex(*handle);
 	}
 }
 
@@ -276,29 +275,29 @@ csmutex_t csmutex_create(void)
 	return handle;
 }
 
-void csmutex_destroy(csmutex_t handle)
+void csmutex_destroy(csmutex_t* handle)
 {
-    pthread_mutex_destroy(&handle);
+    pthread_mutex_destroy(handle);
 }
 
-int csmutex_lock(csmutex_t handle)
+int csmutex_lock(csmutex_t* handle)
 {
-	return (pthread_mutex_lock(&handle) == 0) ? 0 : -1;
+    return (pthread_mutex_lock(handle) == 0) ? 0 : -1;
 }
 
-int csmutex_try_lock(csmutex_t handle, unsigned int msec)
+int csmutex_try_lock(csmutex_t* handle, unsigned int msec)
 {
     cstimelong_t start;
 	int rt;
 
-	if ((rt = pthread_mutex_trylock(&handle)) == EBUSY) {
+    if ((rt = pthread_mutex_trylock(handle)) == EBUSY) {
         cstimelong_cur(&start);
 		while (rt == EBUSY) {
             if (cstimelong_span_millisec(&start) > msec) {
 				rt = -1;
 			} else {
 				usleep(2000);
-				rt = pthread_mutex_trylock(&handle);
+                rt = pthread_mutex_trylock(handle);
 			}
 		}
 	}
@@ -306,9 +305,9 @@ int csmutex_try_lock(csmutex_t handle, unsigned int msec)
 	return rt;
 }
 
-void csmutex_unlock(csmutex_t handle)
+void csmutex_unlock(csmutex_t* handle)
 {
-	pthread_mutex_unlock(&handle);
+    pthread_mutex_unlock(handle);
 }
 
 

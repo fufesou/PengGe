@@ -151,14 +151,14 @@ static int s_account_create(const char* tel, const char* randcode, struct accoun
 		delnode = s_list_tmp.next;
 		while (delnode != (&s_list_tmp)) {
 
-			csmutex_lock(s_mutex_tmp);
+            csmutex_lock(&s_mutex_tmp);
             node_tmp = container_of(delnode, struct list_account_tmp_t, listnode);
 			delnode = delnode->next;
 
 			if (s_account_tmp_timeout(node_tmp)) {
 				s_account_tmp_remove(node_tmp);
 			}
-			csmutex_unlock(s_mutex_tmp);
+            csmutex_unlock(&s_mutex_tmp);
 		}
 
 		cssleep(10 * 60 * 1000);
@@ -189,7 +189,7 @@ void s_account_tmp_clear(void)
     struct list_account_tmp_t* node_tmp = NULL;
     struct list_head* delnode = s_list_tmp.next;
 
-	csmutex_lock(s_mutex_tmp);
+    csmutex_lock(&s_mutex_tmp);
     while (delnode != (&s_list_tmp)) {
         node_tmp = container_of(delnode, struct list_account_tmp_t, listnode);
         free(node_tmp->account_tmp.randcode);
@@ -199,7 +199,7 @@ void s_account_tmp_clear(void)
 
     s_list_tmp.prev = &s_list_tmp;
     s_list_tmp.next = &s_list_tmp;
-	csmutex_unlock(s_mutex_tmp);
+    csmutex_unlock(&s_mutex_tmp);
 }
 
 void s_account_tmp_remove(struct list_account_tmp_t* list_tmp)
@@ -272,9 +272,9 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
 
 	*errmsg = NULL;
 
-	csmutex_lock(s_mutex_login);
+    csmutex_lock(&s_mutex_login);
 	*account_find = &am_login_find(&s_list_login, id)->account;
-	csmutex_unlock(s_mutex_login);
+    csmutex_unlock(&s_mutex_login);
     if ((*account_find) == NULL) {
         if (am_account_find_id(id, account_database) != 0) {
 			*errmsg = msg_not_found;
@@ -369,7 +369,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 	const char* msg_err = NULL;
 	int ret_stat = 0;
 
-	csmutex_lock(s_mutex_tmp);
+    csmutex_lock(&s_mutex_tmp);
     if ((node_tmp = s_account_tmp_find(inmsg)) == NULL) {
 		msg_err = msg_err_tel;
 		ret_stat = 1;
@@ -394,15 +394,15 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 		goto err;
     }
 	s_account_tmp_remove(node_tmp);
-	csmutex_unlock(s_mutex_tmp);
+    csmutex_unlock(&s_mutex_tmp);
 
-    csmutex_lock(s_mutex_login);
+    csmutex_lock(&s_mutex_login);
     am_account_data2basic(&account, &account_basic);
     outmsg[0] = g_succeed;
     cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
     am_login_add(&s_list_login, &account, data_verification, len_verification);
 	*outmsglen = sizeof(account_basic) + 1;
-    csmutex_unlock(s_mutex_login);
+    csmutex_unlock(&s_mutex_login);
 
     return 0;
 
@@ -410,7 +410,7 @@ err:
 	outmsg[0] = g_fail;
 	cs_memcpy(outmsg + 1, *outmsglen - 1, msg_err, strlen(msg_err) + 1);
     *outmsglen = 1 + strlen(msg_err) + 1;
-    csmutex_unlock(s_mutex_tmp);
+    csmutex_unlock(&s_mutex_tmp);
 
     return ret_stat;
 }
@@ -467,9 +467,9 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
     outmsg[0] = g_succeed;
     cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
 
-	csmutex_lock(s_mutex_login);
+    csmutex_lock(&s_mutex_login);
     login_status = am_login_tryadd(&s_list_login, &account, data_verification, len_verification);
-	csmutex_unlock(s_mutex_login);
+    csmutex_unlock(&s_mutex_login);
     if (login_status == 1) {
         cs_memcpy(outmsg + 1 + sizeof(account_basic),
                 *outmsglen - 1 - sizeof(account_basic),
@@ -528,24 +528,21 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
         return 3;
     }
 
-    if (csmutex_lock(s_mutex_login) != 0) {
+    if (csmutex_lock(&s_mutex_login) != 0) {
         fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
     }
-#ifdef _DEBUG
-    fprintf(stdout, "threadid---------------------------------%d.\n", csthread_getpid());
-#endif
     if ((account_login = am_login_find(&s_list_login, id)) == NULL) {
         *outmsg = g_fail;
         cs_memcpy(outmsg + 1, *outmsglen - 1, msg_account_not_found, strlen(msg_account_not_found) + 1);
         *outmsglen = 1 + strlen(msg_account_not_found) + 1;
-        csmutex_unlock(s_mutex_login);
+        csmutex_unlock(&s_mutex_login);
         return 1;
     }
     if (memcmp(data_verification, account_login->data_verification, len_verification) != 0) {
         *outmsg = g_fail;
         cs_memcpy(outmsg + 1, *outmsglen - 1, msg_verification, strlen(msg_verification) + 1);
         *outmsglen = 1 + strlen(msg_verification) + 1;
-        csmutex_unlock(s_mutex_login);
+        csmutex_unlock(&s_mutex_login);
         return 2;
     }
 	
@@ -556,7 +553,7 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
         *(outmsg + 1) = 0;
         *outmsglen = 1;
     }
-    csmutex_unlock(s_mutex_login);
+    csmutex_unlock(&s_mutex_login);
     *outmsg = g_succeed;
 
     return 0;
@@ -615,9 +612,9 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
         cs_memcpy(account_data->username, sizeof(account_data->username), username_new, strlen(username_new));
 
 		if (account_data == (&account_database)) {
-			csmutex_lock(s_mutex_login);
+            csmutex_lock(&s_mutex_login);
             am_login_add(&s_list_login, account_data, data_verification, len_verification);
-			csmutex_unlock(s_mutex_login);
+            csmutex_unlock(&s_mutex_login);
             csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
 		} else {
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
@@ -683,9 +680,9 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
         cs_memcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new));
 
 		if (account_login == (&account_database)) {
-			csmutex_lock(s_mutex_login);
+            csmutex_lock(&s_mutex_login);
             am_login_add(&s_list_login, account_login, data_verification, len_verification);
-			csmutex_unlock(s_mutex_login);
+            csmutex_unlock(&s_mutex_login);
             csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
 		} else {
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
@@ -750,9 +747,9 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
         account_login->grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
 
 		if (account_login == (&account_database)) {
-			csmutex_lock(s_mutex_login);
+            csmutex_lock(&s_mutex_login);
             am_login_add(&s_list_login, account_login, data_verification, len_verification);
-			csmutex_unlock(s_mutex_login);
+            csmutex_unlock(&s_mutex_login);
             csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
 		} else {
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
@@ -777,8 +774,8 @@ int am_server_account_init(void)
 
     if (csthread_create(s_thread_clear_tmp, NULL, &s_handle_thread) != 0) {
 		fprintf(stderr, "am_server: create tmp account cleaner thread error.\n");
-        csmutex_destroy(s_mutex_login);
-        csmutex_destroy(s_mutex_tmp);
+        csmutex_destroy(&s_mutex_login);
+        csmutex_destroy(&s_mutex_tmp);
 		return 1;
 	}
 
@@ -793,17 +790,17 @@ void s_am_server_account_clear(void* unused)
 {
 	(void)unused;
 
-	csmutex_lock(s_mutex_login);
+    csmutex_lock(&s_mutex_login);
     if (am_login_write(&s_list_login) != 0) {
 		fprintf(stderr, "fatal error, current account data cannot be update to the database!\n");
 	}
 	am_login_clear(&s_list_login);
-	csmutex_unlock(s_mutex_login);
+    csmutex_unlock(&s_mutex_login);
 
     s_account_tmp_clear();
 	s_thread_exit = 1;
     csthread_wait_terminate(s_handle_thread);
 
-    csmutex_destroy(s_mutex_login);
-    csmutex_destroy(s_mutex_tmp);
+    csmutex_destroy(&s_mutex_login);
+    csmutex_destroy(&s_mutex_tmp);
 }

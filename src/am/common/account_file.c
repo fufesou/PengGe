@@ -55,19 +55,19 @@ static void s_am_account_config_clear(void* unused);
 
 int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account)
 {
-	csmutex_lock(s_mutex_file);
+    csmutex_lock(&s_mutex_file);
     fseek(s_fpcfg, 0, SEEK_SET);
     while (!feof(s_fpcfg)) {
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
             if (memcmp((char*)account + dataoffset, keydata, cmpcount) == 0) {
-				csmutex_unlock(s_mutex_file);
+                csmutex_unlock(&s_mutex_file);
                 return 0;
             }
         } else if (ferror(s_fpcfg)) {
             fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
         }
     }
-	csmutex_unlock(s_mutex_file);
+    csmutex_unlock(&s_mutex_file);
 
     return 1;
 }
@@ -107,21 +107,21 @@ int am_account_find_tel_username(const char* tel_username, struct account_data_t
         return 0;
     }
 
-    csmutex_lock(s_mutex_file);
+    csmutex_lock(&s_mutex_file);
     fseek(s_fpcfg, 0, SEEK_SET);
     while (!feof(s_fpcfg)) {
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
             if (
                     memcmp((char*)account + offset_tel, tel_username, strlen(account->tel)) == 0 ||
                     memcmp((char*)account + offset_username, tel_username, strlen(account->username)) == 0 ) {
-                csmutex_unlock(s_mutex_file);
+                csmutex_unlock(&s_mutex_file);
                 return 0;
             }
         } else if (ferror(s_fpcfg)) {
             fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
         }
     }
-    csmutex_unlock(s_mutex_file);
+    csmutex_unlock(&s_mutex_file);
     return 1;
 }
 
@@ -154,7 +154,7 @@ void s_am_account_config_clear(void* unused)
         }
     }
 
-    csmutex_destroy(s_mutex_file);
+    csmutex_destroy(&s_mutex_file);
 }
 
 int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic)
@@ -175,33 +175,23 @@ int am_account_print(FILE* streamptr, const struct account_data_t* account)
 
 int am_account_write(const struct account_data_t* account)
 {
-    if (csmutex_lock(s_mutex_file) != 0) {
+    if (csmutex_lock(&s_mutex_file) != 0) {
         fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
     }
     if (fseek(s_fpcfg, 0, SEEK_END) != 0) {
         fprintf(stderr, "write new account error, call fseek fail.\n");
-        csmutex_unlock(s_mutex_file);
+        csmutex_unlock(&s_mutex_file);
         return 1;
     }
     if (fwrite((void*)account, sizeof(struct account_data_t), 1, s_fpcfg) != 1) {
         fprintf(stderr, "write new account error, fwrite fail.\n");
-        csmutex_unlock(s_mutex_file);
+        csmutex_unlock(&s_mutex_file);
         return 1;
     }
 
-    /** oops, i cannot find a way to synchronize file IO.
-     *
-     * The fclose() and fopen() operations are very clumsy.
-     *
-     */
-    /*
     if (fflush(s_fpcfg)) {
         fprintf(stderr, "file - %s, line - %d: fflush error.", __FILE__, __LINE__);
     }
-    */
-    fclose(s_fpcfg);
-    cs_fopen(&s_fpcfg, s_cfgfile, "ab+");
-    csmutex_unlock(s_mutex_file);
 
     return 0;
 }
@@ -215,7 +205,7 @@ int am_account_update(const struct account_data_t* account)
 
 	cs_fopen(&fptmp, tmpname, "ab+");
 
-    csmutex_lock(s_mutex_file);
+    csmutex_lock(&s_mutex_file);
     rewind(s_fpcfg);
     while (!feof(s_fpcfg)) {
         if (fread(&account_tmp, sizeof(account_tmp), 1, s_fpcfg) == 1) {
@@ -255,7 +245,7 @@ int am_account_update(const struct account_data_t* account)
         csfatal_ext(&errcode, cserr_exit, "update file fatal error, open file error.\n");
     }
 
-    csmutex_unlock(s_mutex_file);
+    csmutex_unlock(&s_mutex_file);
 
 	return 0;
 }

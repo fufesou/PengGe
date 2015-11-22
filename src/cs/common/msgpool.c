@@ -120,14 +120,14 @@ void s_clearpool(struct csmsgpool* pool)
 
     pool->filled_buf.clear_buf(&pool->filled_buf);
     pool->empty_buf.clear_buf(&pool->empty_buf);
-	csmutex_destroy(pool->hmutex);
+    csmutex_destroy(&pool->hmutex);
 }
 
 char* cspool_pushitem(struct csmsgpool* pool, struct array_buf* buf, char* item)
 {
-    csmutex_lock(pool->hmutex);
+    csmutex_lock(&pool->hmutex);
     item = buf->push_item(buf, item);
-    csmutex_unlock(pool->hmutex);
+    csmutex_unlock(&pool->hmutex);
 
     return item;
 }
@@ -136,9 +136,9 @@ char* cspool_pullitem(struct csmsgpool* pool, struct array_buf* buf)
 {
     char* item;
 
-    csmutex_lock(pool->hmutex);
+    csmutex_lock(&pool->hmutex);
     item = buf->pull_item(buf);
-    csmutex_unlock(pool->hmutex);
+    csmutex_unlock(&pool->hmutex);
     return item;
 }
 
@@ -146,9 +146,9 @@ int cspool_pushdata(struct csmsgpool* pool, const char* data, int datalen)
 {
     char* poolbuf = NULL;
 
-    csmutex_lock(pool->hmutex);
+    csmutex_lock(&pool->hmutex);
     poolbuf = pool->empty_buf.pull_item(&pool->empty_buf);
-    csmutex_unlock(pool->hmutex);
+    csmutex_unlock(&pool->hmutex);
 
     if (poolbuf == NULL) {
         return 1;
@@ -156,15 +156,15 @@ int cspool_pushdata(struct csmsgpool* pool, const char* data, int datalen)
 
     if (cs_memcpy(poolbuf, pool->len_item, data, datalen) != 0)
     {
-        csmutex_lock(pool->hmutex);
+        csmutex_lock(&pool->hmutex);
         pool->empty_buf.push_item(&pool->empty_buf, poolbuf);
-        csmutex_unlock(pool->hmutex);
+        csmutex_unlock(&pool->hmutex);
         return -1;
     }
 
-    csmutex_lock(pool->hmutex);
+    csmutex_lock(&pool->hmutex);
     pool->filled_buf.push_item(&pool->filled_buf, poolbuf);
-    csmutex_unlock(pool->hmutex);
+    csmutex_unlock(&pool->hmutex);
     if (pool->use_sem_in_pool) {
         /*
          * @brief error handle block should be added here.
@@ -184,9 +184,9 @@ int cspool_pulldata(struct csmsgpool* pool, char* data, int datalen)
             return 2;
         }
     }
-    csmutex_lock(pool->hmutex);
+    csmutex_lock(&pool->hmutex);
     bufitem = pool->filled_buf.pull_item(&pool->filled_buf);
-    csmutex_unlock(pool->hmutex);
+    csmutex_unlock(&pool->hmutex);
 
     if (bufitem == NULL) {
         return 1;
@@ -194,15 +194,15 @@ int cspool_pulldata(struct csmsgpool* pool, char* data, int datalen)
 
     if (cs_memcpy(data, datalen, bufitem, strlen(bufitem) + 1) != 0)
     {
-        csmutex_lock(pool->hmutex);
+        csmutex_lock(&pool->hmutex);
         pool->filled_buf.push_item(&pool->filled_buf, bufitem);
-        csmutex_unlock(pool->hmutex);
+        csmutex_unlock(&pool->hmutex);
         return -1;
     }
 
-    csmutex_lock(pool->hmutex);
+    csmutex_lock(&pool->hmutex);
     pool->empty_buf.push_item(&pool->empty_buf, bufitem);
-    csmutex_unlock(pool->hmutex);
+    csmutex_unlock(&pool->hmutex);
 
     return 0;
 }

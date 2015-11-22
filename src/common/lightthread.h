@@ -92,7 +92,7 @@ csmutex_t csmutex_create(void);
  *
  * @param handle
  */
-void csmutex_destroy(csmutex_t handle);
+void csmutex_destroy(csmutex_t* handle);
 
 /**
  * @brief  csmutex_lock 
@@ -101,7 +101,7 @@ void csmutex_destroy(csmutex_t handle);
  *
  * @return  0 if OK; -1 if failed.
  */
-int csmutex_lock(csmutex_t handle);
+int csmutex_lock(csmutex_t* handle);
 
 /**
  * @brief  csmutex_try_lock This function returns zero if a lock on the mutex object referenced by mutex is acquired.
@@ -115,14 +115,14 @@ int csmutex_lock(csmutex_t handle);
  * 2. -1, if timeout.
  * 3. others error code.
  */
-int csmutex_try_lock(csmutex_t handle, unsigned int msec);
+int csmutex_try_lock(csmutex_t* handle, unsigned int msec);
 
 /**
  * @brief  csmutex_unlock This function unlock the numtex.
  *
  * @param handle handle specify the mutex.
  */
-void csmutex_unlock(csmutex_t handle);
+void csmutex_unlock(csmutex_t* handle);
 
 
 /**************************************************
