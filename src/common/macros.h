@@ -5,7 +5,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
- * modified  Sat 2015-11-14 11:11:33 (+0800)
+ * modified  Sun 2015-11-22 19:16:28 (+0800)
  */
 
 #ifndef  MACROS_H
@@ -59,6 +59,9 @@
 #define TO_MULTIPLE_OF(num, base) \
     (((num)+base-1) & (~(base-1)))
 
+
+#define INVALIE_ARGS -1
+#define UNKOWN_ERR -2
 
 #endif  // MACROS_H
 

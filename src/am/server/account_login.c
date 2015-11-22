@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Sat 2015-11-21 15:20:30 (+0800)
+ * @modified  Sun 2015-11-22 18:46:11 (+0800)
  */
 
 #include  <malloc.h>
@@ -45,7 +45,7 @@ int am_login_remove(
 			uint32_t len_verification)
 {
 	struct list_login_t* node_login = NULL;
-	struct account_login_t* account_login = am_login_find(node_head, id_account);
+	struct account_login_t* account_login = am_login_find_id(node_head, id_account);
 
 	if (account_login == NULL) {
 		return 1;
@@ -85,14 +85,30 @@ int am_login_remove_account(struct account_login_t* account_login)
 	return 0;
 }
 
-struct account_login_t* am_login_find(const struct list_head* node_head, uint32_t id_account)
+struct account_login_t* am_login_find_id(const struct list_head* node_head, uint32_t id)
 {
     struct list_login_t* login_data = NULL;
     struct list_head* node_login = node_head->next;
 
     while (node_login != node_head) {
         login_data = container_of(node_login, struct list_login_t, listnode);
-        if (login_data->account_sock.account.id == id_account) {
+        if (login_data->account_sock.account.id == id) {
+            return &login_data->account_sock;
+        }
+        node_login = node_login->next;
+    }
+
+	return NULL;
+}
+
+struct account_login_t* am_login_find_tel(const struct list_head* node_head, const char* tel)
+{
+    struct list_login_t* login_data = NULL;
+    struct list_head* node_login = node_head->next;
+
+    while (node_login != node_head) {
+        login_data = container_of(node_login, struct list_login_t, listnode);
+        if (strncmp(login_data->account_sock.account.tel, tel, strlen(tel))) {
             return &login_data->account_sock;
         }
         node_login = node_login->next;

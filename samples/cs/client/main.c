@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
     csclient_connect(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
     while (!feof(fp_input)) {
         udpclient.len_senddata = udpclient.size_senbuf;
+        data_input[0] = 0;
         fgets(data_input, sizeof(data_input), fp_input);
         if (msgdispatch(data_input, udpclient.sendbuf, &udpclient.len_senddata) != 0) {
 			fprintf(stderr, "dispatch message error.\n");
@@ -101,10 +102,10 @@ int msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
             return am_account_logout_request(outmsg, outmsglen);
 
         case '4':
-			return am_account_changeusername_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, strchr(strchr(inmsg+1, '\0') + 1, '\0') + 1, outmsg, outmsglen);
+            return am_account_changeusername_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, outmsg, outmsglen);
 
         case '5':
-			return am_account_changepasswd_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, strchr(strchr(inmsg+1, '\0') + 1, '\0') + 1, outmsg, outmsglen);
+            return am_account_changepasswd_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, outmsg, outmsglen);
 	}
 
 	return 1;

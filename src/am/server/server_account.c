@@ -16,7 +16,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Fri 2015-11-20 23:53:19 (+0800)
+ * @modified  Sun 2015-11-22 20:27:08 (+0800)
  */
 
 #ifdef WIN32
@@ -96,11 +96,23 @@ static void s_am_server_account_clear(void*);
  * @warning These operations may be thread unsafe.
  */
 
+/**
+ * @brief  s_account_tmp_add s_account_tmp_add will add temporary account to be the
+ * next of s_list_tmp, making the account sorted automatically by created time.
+ *
+ * @param tel
+ * @param randcode
+ *
+ * @note When applying other operations on the temporary account list, the sort attribute helps.
+ *
+ * @sa s_account_tmp_clear s_account_tmp_find s_account_tmp_timeout
+ */
 static void s_account_tmp_add(const char* tel, const char* randcode);
 static void s_account_tmp_clear(void);
 static void s_account_tmp_remove(struct list_account_tmp_t* list_tmp);
 static struct list_account_tmp_t* s_account_tmp_find(const char* tel);
 static int s_account_tmp_timeout(struct list_account_tmp_t* list_tmp);
+
 
 /**
  * @brief  s_account_find Find account with 'id' in login list or in the database.
@@ -115,13 +127,21 @@ static int s_account_tmp_timeout(struct list_account_tmp_t* list_tmp);
 static int s_account_find(uint32_t id, struct account_data_t** account_find, struct account_data_t* account_database, const char** errmsg);
 
 /**
+ * @brief  s_account_created This function will try finding account by telphone number in both login list and database.
+ *
+ * @param tel
+ *
+ * @return  0 if not created, 1 if created. 
+ */
+static int s_account_created(const char* tel);
+
+/**
  * @brief s_account_create
  * @param tel
- * @param randcode
  * @param account
  * @return
  */
-static int s_account_create(const char* tel, const char* randcode, struct account_data_t* account);
+static int s_account_create(const char* tel, struct account_data_t* account);
 
 
 #ifdef __cplusplus
@@ -228,6 +248,7 @@ int s_account_tmp_timeout(struct list_account_tmp_t* list_tmp)
 	return (cstimelong_span_sec(&list_tmp->account_tmp.time_created) > g_timeout_verification);
 }
 
+
 void s_gen_randcode(int len, char* code, char low, char high)
 {
     int i = 0;
@@ -254,15 +275,39 @@ void s_gen_randcode_test(int len, char* code, char low, char high)
     code[len] = '\0';
 }
 
-int s_account_create(const char* tel, const char* randcode, struct account_data_t* account)
+int s_account_create(const char* tel, struct account_data_t* account)
 {
+	char rand_passwd[sizeof(account->passwd)];
+	char rand_username[sizeof(account->username)];
+
+    size_t len_rand_passwd = 6;
+    size_t len_rand_username = 8;
+
     account->grade = 0;
     account->id = (g_curmaxid++);
     if (cs_memcpy(account->tel, SIZEOF_ARR(account->tel), tel, strlen(tel) + 1) != 0) {
         return 1;
     }
+
+    memset(account->username, '\0', sizeof(account->username));
+	if (len_rand_username > (sizeof(rand_username) - 1)) {
+		len_rand_username = sizeof(rand_username) - 1;
+	}
+	s_gen_randcode(len_rand_username, rand_username, 'a', 'z');
+    if (cs_memcpy(account->username, SIZEOF_ARR(account->username), rand_username, strlen(rand_username) + 1) != 0) {
+		return 1;
+	}
+
     memset(account->passwd, '\0', sizeof(account->passwd));
-    return cs_memcpy(account->passwd, SIZEOF_ARR(account->passwd), randcode, strlen(randcode) + 1);
+	if (len_rand_passwd > (sizeof(rand_passwd) - 1)) {
+		len_rand_passwd = sizeof(rand_passwd) - 1;
+	}
+#ifdef _DEBUG
+	s_gen_randcode_test(len_rand_passwd, rand_passwd, 'a', 'z');
+#else
+	s_gen_randcode(len_rand_passwd, rand_passwd, 'a', 'z');
+#endif
+    return cs_memcpy(account->passwd, SIZEOF_ARR(account->passwd), rand_passwd, strlen(rand_passwd) + 1);
 }
 
 int s_account_find(uint32_t id, struct account_data_t** account_find, struct account_data_t* account_database, const char** errmsg)
@@ -273,10 +318,10 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
 	*errmsg = NULL;
 
     csmutex_lock(&s_mutex_login);
-	*account_find = &am_login_find(&s_list_login, id)->account;
+	*account_find = &am_login_find_id(&s_list_login, id)->account;
     csmutex_unlock(&s_mutex_login);
     if ((*account_find) == NULL) {
-        if (am_account_find_id(id, account_database) != 0) {
+        if (am_account_find_id(id, account_database) == 0) {
 			*errmsg = msg_not_found;
 			return 1;
 		} else {
@@ -288,8 +333,24 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
 	return 0;
 }
 
+int s_account_created(const char* tel)
+{
+	struct account_data_t account;
+    if (am_login_find_tel(&s_list_login, tel) != NULL) {
+		return 1;
+	}
+
+	return am_account_find_tel(tel, &account);
+}
+
 /**
- * @brief  am_account_create_reply This function handle the request of creating a new account
+ * @brief  am_account_create_reply This function handle the request of creating a new account.
+ *
+ * One telphone number can only create one account. After a new account is created, the only
+ * fields are telphone and random code. And the newly created account with created time will 
+ * be added to a temporary list. 
+ *
+ * The temporary account list will clear the timeout temporary account periodically.
  *
  * @param inmsg The format of inmsg here is: \n
  * ------------------------------------------------\n
@@ -301,9 +362,9 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
  * | succeed(char) | ... |                            \n
  * ---------------------------------------------------\n
  *  or \n
- * ------------------------------------------------\n
- * | fail(char) | ... |                            \n
- * ------------------------------------------------\n
+ * ----------------------------------------------------------------\n
+ * | fail(char) | error message | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param data_verification unused.
  * @param len_verification unused.
@@ -314,9 +375,16 @@ int s_account_find(uint32_t id, struct account_data_t** account_find, struct acc
 int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
     char* randcode = NULL;
+	const char* msg_exist = "This telephone has already been registered.";
 
 	(void)data_verification;
 	(void)len_verification;
+
+	if (s_account_created(inmsg)) {
+		csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_exist);
+		*outmsglen = 1 + strlen(msg_exist) + 1;
+		return 1;
+	}
 
     randcode = (char*)malloc(g_len_randomcode + 1);
 
@@ -335,7 +403,9 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
 }
 
 /**
- * @brief  am_account_verify_reply 
+ * @brief  am_account_verify_reply This function will verify the telephone and random code for newly created temporary account.
+ *
+ * If this verification passed, an actual account with random "username-passwd" will be added to the login list.
  *
  * @param inmsg The format of inmsg here is: \n
  * ------------------------------------------------------------------\n
@@ -355,7 +425,9 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
  *
  * @param outmsglen
  *
- * @return   
+ * @return  
+ *
+ * @note Verifying mutliple times is allowed here.
  */
 int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -388,7 +460,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 		goto err;
 	}
 
-    if (s_account_create(inmsg, node_tmp->account_tmp.randcode, &account) != 0) {
+    if (s_account_create(inmsg, &account) != 0) {
         msg_err = msg_err_create;
 		ret_stat = 4;
 		goto err;
@@ -419,9 +491,9 @@ err:
  * @brief  am_account_login_reply 
  *
  * @param inmsg The format of inmsg here is:  \n
- * ----------------------------------------------------------------------------\n
- * | tel or username(char*) | passwd(char*) | ... |                            \n
- * ----------------------------------------------------------------------------\n
+ * ----------------------------------------------------------------\n
+ * | tel(char*) | passwd(char*) | ... |                            \n
+ * ----------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
@@ -442,6 +514,9 @@ err:
  * @param outmsglen
  *
  * @return  0 if succeed, 1 if fail. 
+ *
+ * @warning Consider of efficience, this function dose not prevent the same host from loging in the same account.
+ * This may lead to heavy list if the user maliciously continually log in the same account.
  */
 int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
@@ -449,17 +524,17 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
     struct account_data_t account;
     struct account_basic_t account_basic;
     const char* msg_account_not_exist = "account not exist.";
-    const char* msg_account_login_fail = "tel(user name) or password error.";
+    const char* msg_account_passwd = "invalid keywords or passwd";
     const char* msg_account_login_other = "this account have been logined on other socket.";
 
-    if (am_account_find_tel_username(inmsg, &account) != 0) {
+    login_status = am_account_find_login(inmsg, &account);
+    if (login_status == 0) {
         csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_not_exist);
         *outmsglen = 1 + strlen(msg_account_not_exist);
         return 1;
-    }
-    if (strncmp(strchr(inmsg, '\0') + 1, account.passwd, strlen(account.passwd)) != 0) {
-        csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_login_fail);
-        *outmsglen = 1 + strlen(msg_account_login_fail) + 1;
+    } else if (login_status == 2) {
+        csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_passwd);
+        *outmsglen = 1 + strlen(msg_account_passwd);
         return 1;
     }
 
@@ -531,7 +606,7 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
     if (csmutex_lock(&s_mutex_login) != 0) {
         fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
     }
-    if ((account_login = am_login_find(&s_list_login, id)) == NULL) {
+    if ((account_login = am_login_find_id(&s_list_login, id)) == NULL) {
         *outmsg = g_fail;
         cs_memcpy(outmsg + 1, *outmsglen - 1, msg_account_not_found, strlen(msg_account_not_found) + 1);
         *outmsglen = 1 + strlen(msg_account_not_found) + 1;
@@ -563,9 +638,9 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
  * @brief  am_account_changeusername_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
  * @param inmsg The format of inmsg is \n
- * ---------------------------------------------------------------------------------------------------------------------------\n
- * | user id(uint32_t) | old username(char*) | passwd(char*) | new username(char*) | ... |                                    \n
- * ---------------------------------------------------------------------------------------------------------------------------\n
+ * -----------------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | passwd(char*) | new username(char*) | ... |                                    \n
+ * -----------------------------------------------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
@@ -591,7 +666,6 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
 {
 	const char* errmsg = NULL;
 	const char* passwd = NULL;
-	const char* username_old = NULL;
 	const char* username_new = NULL;
 	struct account_data_t* account_data = NULL;
 	struct account_data_t account_database;
@@ -603,13 +677,11 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
 		return 1;
 	}
 
-    username_old = inmsg + sizeof(uint32_t);
-    passwd = strchr(username_old, '\0') + 1;
+	passwd = inmsg + sizeof(uint32_t);
     username_new = strchr(passwd, '\0') + 1;
 
-    if ((strncmp(username_old, account_data->username, strlen(account_data->username)) == 0) &&
-                (strncmp(passwd, account_data->passwd, strlen(account_data->passwd)) == 0)) {
-        cs_memcpy(account_data->username, sizeof(account_data->username), username_new, strlen(username_new));
+    if (strncmp(passwd, account_data->passwd, strlen(account_data->passwd)) == 0) {
+        cs_memcpy(account_data->username, sizeof(account_data->username), username_new, strlen(username_new) + 1);
 
 		if (account_data == (&account_database)) {
             csmutex_lock(&s_mutex_login);
@@ -620,7 +692,7 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
 		}
     } else {
-        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "username or passwd error.");
+        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
 
     *outmsglen = strlen(outmsg) + 1;
@@ -631,9 +703,9 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
  * @brief  am_account_changepasswd_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
  * @param inmsg The format of inmsg is \n
- * ---------------------------------------------------------------------------------------------------------------------\n
- * | user id(uint32_t) | username(char*) | passwd(char*) | new passwd(char*) | ... |                                    \n
- * ---------------------------------------------------------------------------------------------------------------------\n
+ * ---------------------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | passwd(char*) | new passwd(char*) | ... |                                    \n
+ * ---------------------------------------------------------------------------------------------------\n
  *
  * @param data_verification
  * @param len_verification
@@ -658,7 +730,6 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
 int am_account_changepasswd_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
 	const char* errmsg = NULL;
-	const char* username = NULL;
 	const char* passwd_old = NULL;
 	const char* passwd_new = NULL;
 	struct account_data_t* account_login = NULL;
@@ -671,13 +742,11 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
 		return 1;
 	}
 
-    username = inmsg + sizeof(uint32_t);
-    passwd_old = strchr(username, '\0') + 1;
+	passwd_old = inmsg + sizeof(uint32_t);
     passwd_new = strchr(passwd_old, '\0') + 1;
 
-    if ((strncmp(username, account_login->username, strlen(account_login->username)) == 0) &&
-                (strncmp(passwd_old, account_login->passwd, strlen(account_login->passwd)) == 0)) {
-        cs_memcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new));
+    if (strncmp(passwd_old, account_login->passwd, strlen(account_login->passwd)) == 0) {
+        cs_memcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new) + 1);
 
 		if (account_login == (&account_database)) {
             csmutex_lock(&s_mutex_login);
@@ -688,7 +757,7 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
 		}
     }  else {
-        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "username or passwd error.");
+        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
 
     *outmsglen = strlen(outmsg) + 1;
@@ -699,9 +768,9 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
  * @brief  am_account_changegrade_reply The client has already hold the new and old information. So, server only need to tell the client yes or no.
  *
  * @param inmsg The format of inmsg is \n
- * -----------------------------------------------------------------------------------------------------------\n
- * | user id(uint32_t) | username(char*) | passwd(char*) | grade(uint32_t) | ... |                            \n
- * -----------------------------------------------------------------------------------------------------------\n
+ * -----------------------------------------------------------------------------------------\n
+ * | user id(uint32_t) | passwd(char*) | grade(uint32_t) | ... |                            \n
+ * -----------------------------------------------------------------------------------------\n
  *
  * @param outmsg The format of outmsg is \n
  * -----------------------------------------------------------------------\n
@@ -727,7 +796,6 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
 int am_account_changegrade_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
 	const char* errmsg = NULL;
-	const char* username = NULL;
 	const char* passwd = NULL;
 	struct account_data_t* account_login = NULL;
 	struct account_data_t account_database;
@@ -739,11 +807,9 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
 		return 1;
 	}
 
-    username = inmsg + sizeof(uint32_t);
-    passwd = strchr(username, '\0') + 1;
+    passwd = inmsg + sizeof(uint32_t);
 
-    if ((strncmp(username, account_login->username, strlen(account_login->username)) == 0) &&
-                (strncmp(passwd, account_login->passwd, strlen(account_login->passwd)) == 0)) {
+    if (strncmp(passwd, account_login->passwd, strlen(account_login->passwd)) == 0) {
         account_login->grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
 
 		if (account_login == (&account_database)) {
@@ -755,7 +821,7 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
             csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
 		}
     } else {
-        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "username or passwd error.");
+        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
 
     *outmsglen = strlen(outmsg) + 1;

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Mon 2015-11-16 19:55:30 (+0800)
+ * @modified  Sun 2015-11-22 20:08:31 (+0800)
  */
 
 #ifdef WIN32
@@ -61,7 +61,7 @@ int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
             if (memcmp((char*)account + dataoffset, keydata, cmpcount) == 0) {
                 csmutex_unlock(&s_mutex_file);
-                return 0;
+                return 1;
             }
         } else if (ferror(s_fpcfg)) {
             fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
@@ -69,7 +69,7 @@ int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct
     }
     csmutex_unlock(&s_mutex_file);
 
-    return 1;
+    return 0;
 }
 
 int am_account_find_id(uint32_t id, struct account_data_t* account)
@@ -77,52 +77,39 @@ int am_account_find_id(uint32_t id, struct account_data_t* account)
     return s_account_find_common(&id, sizeof(id), offsetof(struct account_data_t, id), account);
 }
 
-int am_account_find_username(const char* username, struct account_data_t* account)
-{
-    if (strlen(username) >= sizeof(account->username)) {
-        fprintf(stderr, "account find error, the size of key is too large.\n");
-        return 1;
-    }
-    return s_account_find_common((void*)username, strlen(username) + 1, offsetof(struct account_data_t, username), account);
-}
-
 int am_account_find_tel(const char* tel, struct account_data_t* account)
 {
     if (strlen(tel) >= sizeof(account->tel)) {
         fprintf(stderr, "account find error, the size of key is too large.\n");
-        return 1;
+        return 0;
     }
     return s_account_find_common((void*)tel, strlen(tel) + 1, offsetof(struct account_data_t, tel), account);
 }
 
-int am_account_find_tel_username(const char* tel_username, struct account_data_t* account)
+int am_account_find_login(const char* login, struct account_data_t* account)
 {
     static int offset_tel = offsetof(struct account_data_t, tel);
-    static int offset_username = offsetof(struct account_data_t, username);
-
-    if (am_account_find_tel(tel_username, account) == 0) {
-        return 0;
-    }
-    if (am_account_find_username(tel_username, account) == 0) {
-        return 0;
-    }
+	size_t len_first = strlen(login);
+	size_t len_second = strlen(login + len_first + 1); 
 
     csmutex_lock(&s_mutex_file);
     fseek(s_fpcfg, 0, SEEK_SET);
     while (!feof(s_fpcfg)) {
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
-            if (
-                    memcmp((char*)account + offset_tel, tel_username, strlen(account->tel)) == 0 ||
-                    memcmp((char*)account + offset_username, tel_username, strlen(account->username)) == 0 ) {
-                csmutex_unlock(&s_mutex_file);
-                return 0;
-            }
+            if (memcmp((char*)account + offset_tel, login, len_first) == 0) {
+				csmutex_unlock(&s_mutex_file);
+                if (memcmp(account->passwd, login + len_first + 1, len_second) == 0) {
+                    return 1;
+                } else {
+                    return 2;
+                }
+			}
         } else if (ferror(s_fpcfg)) {
             fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
         }
     }
     csmutex_unlock(&s_mutex_file);
-    return 1;
+    return 0;
 }
 
 void am_account_config_init(void)
@@ -192,6 +179,7 @@ int am_account_write(const struct account_data_t* account)
     if (fflush(s_fpcfg)) {
         fprintf(stderr, "file - %s, line - %d: fflush error.", __FILE__, __LINE__);
     }
+    csmutex_unlock(&s_mutex_file);
 
     return 0;
 }

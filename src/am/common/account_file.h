@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Fri 2015-11-20 18:54:47 (+0800)
+ * @modified  Sun 2015-11-22 20:08:03 (+0800)
  */
 
 #ifndef _ACCOUNT_FILE_H
@@ -38,21 +38,11 @@ int am_account_write(const struct account_data_t* account);
  * @brief am_account_find_id
  * @param id
  * @param account
- * @return return 0 if account is found, or return 1.
+ * @return 1 if account is found, or return 0.
  *
  * @note atomic write should be guaranteed here.
  */
 int am_account_find_id(uint32_t id, struct account_data_t* account);
-
-/**
- * @brief am_account_find_username
- * @param username
- * @param account
- * @return return 0 if account is found, or return 1.
- *
- * @todo atomic write should be guaranteed here.
- */
-int am_account_find_username(const char* username, struct account_data_t* account);
 
 /**
  * @brief  am_account_find_tel 
@@ -60,19 +50,21 @@ int am_account_find_username(const char* username, struct account_data_t* accoun
  * @param tel
  * @param account
  *
- * @return return 0 if account is found, or return 1.
+ * @return 1 if account is found, or return 0.
  */
 int am_account_find_tel(const char* tel, struct account_data_t* account);
 
 /**
- * @brief  am_account_find_tel_username This function find the account whose tel or username is equal to tel_username.
+ * @brief  am_account_find_login This function find the account with login information.
  *
- * @param tel_username
+ * The login information here contains: tel--passwd or email--passwd
+ *
+ * @param login
  * @param account
  *
- * @return return 0 if account is found, or return 1.
+ * @return 1 if account is found, or return 0.
  */
-int am_account_find_tel_username(const char* tel_username, struct account_data_t* account);
+int am_account_find_login(const char* login, struct account_data_t* account);
 
 /**
  * @brief  am_account_update If account exist already, the data will be updated, otherwise new account will be appended. 
