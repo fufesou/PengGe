@@ -175,7 +175,7 @@ void s_sendrecv_clear(void* unused)
 {
     (void)unused;
     if (s_mutex != 0) {
-        csmutex_destroy(s_mutex);
+        csmutex_destroy(&s_mutex);
         s_mutex = 0;
     }
 }
