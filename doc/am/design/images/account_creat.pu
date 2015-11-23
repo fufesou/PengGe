@@ -1,0 +1,19 @@
+@startuml
+
+participant client
+participant server
+
+client -> server : create request(qq, tel, passwd)
+note right: Is it safe to send passwd here?\n
+server -> server : 查看tel是否已注册
+
+alt tel 已经注册
+server --> client : invalid tel
+else tel 未注册
+server -> server : set user number(qq)
+server -> server : 生成发送验证码
+server -> server : 生成临时账号
+server --> client : account created
+end
+
+@enduml

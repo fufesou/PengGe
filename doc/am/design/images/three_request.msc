@@ -1,7 +1,0 @@
-msc {
-    a [label="client"], b [label="server"];
-
-    a => b [label="request message"];
-    b => a [label="reply message"];
-    a => a [label="react to reply"];
-}

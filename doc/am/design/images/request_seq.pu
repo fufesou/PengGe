@@ -1,0 +1,10 @@
+@startuml
+
+participant client
+participant server
+
+client -> server : request
+server --> client : reply
+client -> client : react
+
+@enduml
