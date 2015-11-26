@@ -4,18 +4,15 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Sun 2015-11-22 20:08:03 (+0800)
+ * @modified  Thu 2015-11-26 22:29:10 (+0800)
  */
 
 #ifndef _ACCOUNT_FILE_H
 #define _ACCOUNT_FILE_H
 
 struct account_data_t {
-    uint8_t		grade;
-    uint32_t	id;
-    char		tel[ACCOUNT_TEL_LEN];
-    char		username[ACCOUNT_USERNAME_LEN];
-    char		passwd[ACCOUNT_PASSWD_LEN];
+	struct account_basic_t	data_basic;
+    char					passwd[ACCOUNT_PASSWD_LEN];
 };
 
 #ifdef __cplusplus
@@ -53,6 +50,16 @@ int am_account_find_id(uint32_t id, struct account_data_t* account);
  * @return 1 if account is found, or return 0.
  */
 int am_account_find_tel(const char* tel, struct account_data_t* account);
+
+/**
+ * @brief  am_account_find_usernum 
+ *
+ * @param usernum
+ * @param account
+ *
+ * @return   
+ */
+int am_account_find_usernum(const char* usernum, struct account_data_t* account);
 
 /**
  * @brief  am_account_find_login This function find the account with login information.

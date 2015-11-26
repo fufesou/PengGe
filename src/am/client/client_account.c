@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sun 2015-11-22 20:21:24 (+0800)
+ * @modified  Thu 2015-11-26 21:58:01 (+0800)
  */
 
 #ifdef WIN32
@@ -54,8 +54,9 @@ static struct account_client_t
 /**************************************************
  **             the request block                 **
  **************************************************/
-int am_account_create_request(const char* tel, char* outmsg, uint32_t* outmsglen)
+int am_account_create_request(const char* usernum, const char* tel, char* outmsg, uint32_t* outmsglen)
 {
+	uint32_t len_num = 0;
 	uint32_t len_tel = 0;
 	uint32_t msglen = 0;
 
@@ -64,13 +65,17 @@ int am_account_create_request(const char* tel, char* outmsg, uint32_t* outmsglen
 	}
     *(uint32_t*)outmsg = htonl(am_method_getid("account_create"));
 
+    len_num = strlen(usernum);
 	len_tel = strlen(tel);
-    msglen = sizeof(uint32_t) + len_tel + 1;
+    msglen = sizeof(uint32_t) + len_num + len_tel + 2;
 
-    if (*outmsglen < msglen) {
+    if (*outmsglen < msglen || len_tel == 0) {
+		return -1;
+	}
+    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), usernum, len_num + 1) != 0) {
 		return 1;
 	}
-    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
+    if (cs_memcpy(outmsg + sizeof(uint32_t) + len_num + 1, *outmsglen - sizeof(uint32_t) - len_num - 1, tel, len_tel + 1) != 0) {
 		return 1;
 	}
 

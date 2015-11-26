@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-14
- * @modified  Sat 2015-11-14 11:17:08 (+0800)
+ * @modified  Wed 2015-11-25 19:09:02 (+0800)
  */
 
 #ifndef _CONFIG_MACROS_H
@@ -26,5 +26,6 @@
 #define ACCOUNT_PASSWD_LEN		32
 #define ACCOUNT_USERNAME_LEN	64
 #define ACCOUNT_TEL_LEN			16
+#define ACCOUNT_USERNUM_LEN		16
 
 #endif //CONFIG_MACROS_H

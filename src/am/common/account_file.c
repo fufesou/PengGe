@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Sun 2015-11-22 20:08:31 (+0800)
+ * @modified  Thu 2015-11-26 22:41:31 (+0800)
  */
 
 #ifdef WIN32
@@ -74,21 +74,32 @@ int s_account_find_common(void* keydata, int cmpcount, size_t dataoffset, struct
 
 int am_account_find_id(uint32_t id, struct account_data_t* account)
 {
-    return s_account_find_common(&id, sizeof(id), offsetof(struct account_data_t, id), account);
+	size_t offset = offsetof(struct account_basic_t, id) + offsetof(struct account_data_t, data_basic);
+    return s_account_find_common(&id, sizeof(id), offset, account);
 }
 
 int am_account_find_tel(const char* tel, struct account_data_t* account)
 {
-    if (strlen(tel) >= sizeof(account->tel)) {
+    if (strlen(tel) >= sizeof(account->data_basic.tel)) {
         fprintf(stderr, "account find error, the size of key is too large.\n");
         return 0;
     }
-    return s_account_find_common((void*)tel, strlen(tel) + 1, offsetof(struct account_data_t, tel), account);
+	size_t offset = offsetof(struct account_basic_t, tel) + offsetof(struct account_data_t, data_basic);
+    return s_account_find_common((void*)tel, strlen(tel) + 1, offset, account);
+}
+
+int am_account_find_usernum(const char* usernum, struct account_data_t* account)
+{
+    if (strlen(usernum) >= sizeof(account->data_basic.usernum)) {
+        fprintf(stderr, "account find error, the size of key is too large.\n");
+        return 0;
+    }
+	size_t offset = offsetof(struct account_basic_t, usernum) + offsetof(struct account_data_t, data_basic);
+    return s_account_find_common((void*)usernum, strlen(usernum) + 1, offset, account);
 }
 
 int am_account_find_login(const char* login, struct account_data_t* account)
 {
-    static int offset_tel = offsetof(struct account_data_t, tel);
 	size_t len_first = strlen(login);
 	size_t len_second = strlen(login + len_first + 1); 
 
@@ -96,7 +107,8 @@ int am_account_find_login(const char* login, struct account_data_t* account)
     fseek(s_fpcfg, 0, SEEK_SET);
     while (!feof(s_fpcfg)) {
         if (fread(account, sizeof(*account), 1, s_fpcfg) == 1) {
-            if (memcmp((char*)account + offset_tel, login, len_first) == 0) {
+			if ((memcmp(account->data_basic.tel, login, len_first) == 0) ||
+						(memcmp(account->data_basic.usernum, login, len_first) == 0)) {
 				csmutex_unlock(&s_mutex_file);
                 if (memcmp(account->passwd, login + len_first + 1, len_second) == 0) {
                     return 1;
@@ -146,7 +158,7 @@ void s_am_account_config_clear(void* unused)
 
 int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic)
 {
-    return cs_memcpy(basic, sizeof(basic), data, sizeof(basic));
+    return cs_memcpy(basic, sizeof(basic), &data->data_basic, sizeof(basic));
 }
 
 int am_account_print(FILE* streamptr, const struct account_data_t* account)
@@ -154,10 +166,10 @@ int am_account_print(FILE* streamptr, const struct account_data_t* account)
     return fprintf(
                 streamptr,
                 "account info: id - %d, name - %s, passwd - %s, grade - %d.\n",
-                account->id,
-                account->username,
+                account->data_basic.id,
+                account->data_basic.username,
                 account->passwd,
-                account->grade);
+                account->data_basic.grade);
 }
 
 int am_account_write(const struct account_data_t* account)
@@ -192,20 +204,17 @@ int am_account_update(const struct account_data_t* account)
 	struct account_data_t account_tmp;
 
 	cs_fopen(&fptmp, tmpname, "ab+");
+    if (fwrite(account, sizeof(*account), 1, fptmp) != 1) {
+        fprintf(stderr, "update account error, cannot write account data to tmp file.\n");
+        fclose(fptmp);
+        return 1;
+    }
 
     csmutex_lock(&s_mutex_file);
     rewind(s_fpcfg);
     while (!feof(s_fpcfg)) {
         if (fread(&account_tmp, sizeof(account_tmp), 1, s_fpcfg) == 1) {
-            if (account_tmp.id == account->id) {
-                if (fwrite(account, sizeof(*account), 1, fptmp) != 1) {
-                    fprintf(stderr, "update account error, cannot write account data to tmp file.\n");
-                    fclose(fptmp);
-                    return 1;
-                } else {
-                    break;
-                }
-            } else {
+            if (account_tmp.data_basic.id != account->data_basic.id) {
                 if (fwrite(&account_tmp, sizeof(account_tmp), 1, fptmp) != 1) {
                     fprintf(stderr, "update account error, cannot write account data to tmp file.\n");
                     fclose(fptmp);
@@ -214,16 +223,8 @@ int am_account_update(const struct account_data_t* account)
             }
         }
     }
-	while (!feof(s_fpcfg)) {
-		if (fread(&account_tmp, sizeof(account_tmp), 1, s_fpcfg) == 1) {
-			if (fwrite(&account_tmp, sizeof(account_tmp), 1, fptmp) != 1) {
-				fprintf(stderr, "update account error, cannot write account data to tmp file.\n");
-				fclose(fptmp);
-				return 1;
-			}
-		}
-	}
 
+    fclose(fptmp);
 	fclose(s_fpcfg);
 	remove(s_cfgfile);
 	rename(tmpname, s_cfgfile);

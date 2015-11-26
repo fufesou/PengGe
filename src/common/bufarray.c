@@ -43,7 +43,7 @@ void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
     buf->clear_buf = s_clear_buf;
     buf->get_num_contained_item = s_get_num_contained_items;
 
-    buf->data = (char**)malloc(sizeof(char*) * buf->num_item);
+    buf->data = (char**)calloc(buf->num_item, sizeof(char*));
     for (i=0; i<buf->num_item; ++i) {
         buf->data[i] = NULL;
     }
@@ -58,7 +58,7 @@ void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
     buf->tail = nmalloc;
 
     for (i=0; i<nmalloc; ++i) {
-        buf->data[i] = (char*)malloc(sizeof(char) * buf->len_item);
+        buf->data[i] = (char*)calloc(buf->len_item, sizeof(char));
         memset(buf->data[i], 0, buf->len_item);
     }
 }

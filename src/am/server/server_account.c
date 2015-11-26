@@ -16,7 +16,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sun 2015-11-22 20:27:08 (+0800)
+ * @modified  Thu 2015-11-26 22:45:50 (+0800)
  */
 
 #ifdef WIN32
@@ -48,6 +48,7 @@
 
 struct account_tmp_t
 {
+	char usernum[ACCOUNT_USERNUM_LEN];
 	char tel[ACCOUNT_TEL_LEN];
 	char* randcode;
 	uint8_t size_randcode;
@@ -71,6 +72,7 @@ extern uint32_t g_len_randomcode;
 extern uint32_t g_curmaxid;
 extern uint32_t g_timeout_verification;
 extern uint32_t g_max_account_tmp;
+extern char g_curmaxnum[ACCOUNT_USERNUM_LEN];
 
 
 static int s_thread_exit = 0;
@@ -80,7 +82,7 @@ static csmutex_t s_mutex_tmp;
 static LIST_HEAD(s_list_login);
 static LIST_HEAD(s_list_tmp);
 
-
+static const char* s_usernum_inc(char* num, size_t len);
 static void s_gen_randcode(int len, char* code, char low, char high);
 static void s_gen_randcode_test(int len, char* code, char low, char high);
 
@@ -100,14 +102,14 @@ static void s_am_server_account_clear(void*);
  * @brief  s_account_tmp_add s_account_tmp_add will add temporary account to be the
  * next of s_list_tmp, making the account sorted automatically by created time.
  *
- * @param tel
+ * @param info
  * @param randcode
  *
  * @note When applying other operations on the temporary account list, the sort attribute helps.
  *
  * @sa s_account_tmp_clear s_account_tmp_find s_account_tmp_timeout
  */
-static void s_account_tmp_add(const char* tel, const char* randcode);
+static void s_account_tmp_add(const char* info, const char* randcode);
 static void s_account_tmp_clear(void);
 static void s_account_tmp_remove(struct list_account_tmp_t* list_tmp);
 static struct list_account_tmp_t* s_account_tmp_find(const char* tel);
@@ -141,7 +143,7 @@ static int s_account_created(const char* tel);
  * @param account
  * @return
  */
-static int s_account_create(const char* tel, struct account_data_t* account);
+static int s_account_create(struct account_tmp_t* account_tmp, struct account_data_t* account);
 
 
 #ifdef __cplusplus
@@ -187,16 +189,45 @@ static int s_account_create(const char* tel, struct account_data_t* account);
 	return 0;
 }
 
-void s_account_tmp_add(const char* tel, const char* randcode)
+const char* s_usernum_inc(char* num, size_t len)
+{
+	char* plast = strchr(num, '\0') - 1;
+	char* pmove = plast;
+	while (pmove != (num - 1)) {
+		if (*pmove == '9') {
+			*pmove-- = '0';
+		} else {
+			*pmove += 1;
+			break;
+		}
+	}
+	if (pmove == (num - 1)) {
+        if ((size_t)(plast - num) > (len - 2)) {
+			fprintf(stderr, "too many users registered.");
+			return NULL;
+		}
+		*(plast + 2) = '\0';
+		*(plast + 1) = '0';
+	}
+	return num;
+}
+
+void s_account_tmp_add(const char* info, const char* randcode)
 {
     uint32_t randcodelen = strlen(randcode);
-	struct list_account_tmp_t* tmp_new = (struct list_account_tmp_t*)malloc(sizeof(struct list_account_tmp_t));
+    struct list_account_tmp_t* tmp_new = (struct list_account_tmp_t*)calloc(1, sizeof(struct list_account_tmp_t));
+    const char* usernum = info;
+	char* tel = strchr(usernum, '\0') + 1;
 
+	if (*usernum == '\0') {
+		s_usernum_inc(g_curmaxnum, sizeof(g_curmaxnum));
+		usernum = &g_curmaxnum[0];
+	}
+	cs_memcpy(tmp_new->account_tmp.usernum, sizeof(tmp_new->account_tmp.usernum), usernum, strlen(usernum) + 1);
 	cs_memcpy(tmp_new->account_tmp.tel, sizeof(tmp_new->account_tmp.tel), tel, strlen(tel) + 1);
 
-    tmp_new->account_tmp.randcode = (char*)malloc(randcodelen + 1);
+    tmp_new->account_tmp.randcode = (char*)calloc(randcodelen + 1, sizeof(char));
     cs_memcpy(tmp_new->account_tmp.randcode, randcodelen + 1, randcode, randcodelen);
-    tmp_new->account_tmp.randcode[randcodelen] = '\0';
     tmp_new->account_tmp.size_randcode = randcodelen + 1;
 
 	cstimelong_cur(&tmp_new->account_tmp.time_created);
@@ -275,26 +306,34 @@ void s_gen_randcode_test(int len, char* code, char low, char high)
     code[len] = '\0';
 }
 
-int s_account_create(const char* tel, struct account_data_t* account)
+int s_account_create(struct account_tmp_t* account_tmp, struct account_data_t* account)
 {
 	char rand_passwd[sizeof(account->passwd)];
-	char rand_username[sizeof(account->username)];
+    char rand_username[sizeof(account->data_basic.username)];
 
     size_t len_rand_passwd = 6;
     size_t len_rand_username = 8;
 
-    account->grade = 0;
-    account->id = (g_curmaxid++);
-    if (cs_memcpy(account->tel, SIZEOF_ARR(account->tel), tel, strlen(tel) + 1) != 0) {
+    account->data_basic.grade = 0;
+    account->data_basic.id = (g_curmaxid++);
+    if (cs_memcpy(
+                account->data_basic.tel,
+                SIZEOF_ARR(account->data_basic.tel),
+                account_tmp->tel,
+                strlen(account_tmp->tel) + 1) != 0) {
         return 1;
     }
 
-    memset(account->username, '\0', sizeof(account->username));
+    memset(account->data_basic.username, '\0', sizeof(account->data_basic.username));
 	if (len_rand_username > (sizeof(rand_username) - 1)) {
 		len_rand_username = sizeof(rand_username) - 1;
 	}
 	s_gen_randcode(len_rand_username, rand_username, 'a', 'z');
-    if (cs_memcpy(account->username, SIZEOF_ARR(account->username), rand_username, strlen(rand_username) + 1) != 0) {
+    if (cs_memcpy(
+					account->data_basic.username,
+					SIZEOF_ARR(account->data_basic.username),
+					rand_username,
+					strlen(rand_username) + 1) != 0) {
 		return 1;
 	}
 
@@ -307,7 +346,16 @@ int s_account_create(const char* tel, struct account_data_t* account)
 #else
 	s_gen_randcode(len_rand_passwd, rand_passwd, 'a', 'z');
 #endif
-    return cs_memcpy(account->passwd, SIZEOF_ARR(account->passwd), rand_passwd, strlen(rand_passwd) + 1);
+    cs_memcpy(
+                account->data_basic.usernum,
+                SIZEOF_ARR(account->data_basic.usernum),
+                account_tmp->usernum,
+                sizeof(account_tmp->usernum));
+    return cs_memcpy(
+                account->passwd,
+                SIZEOF_ARR(account->passwd),
+                rand_passwd,
+                strlen(rand_passwd) + 1);
 }
 
 int s_account_find(uint32_t id, struct account_data_t** account_find, struct account_data_t* account_database, const char** errmsg)
@@ -353,9 +401,9 @@ int s_account_created(const char* tel)
  * The temporary account list will clear the timeout temporary account periodically.
  *
  * @param inmsg The format of inmsg here is: \n
- * ------------------------------------------------\n
- * | tel(char*) | ... |                            \n
- * ------------------------------------------------\n
+ * -----------------------------------------------------------------\n
+ * | usernum(char*) | tel(char*) | ... |                            \n
+ * -----------------------------------------------------------------\n
  *
  * @param outmsg The format of outmsg here is: \n
  * ---------------------------------------------------\n
@@ -460,7 +508,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 		goto err;
 	}
 
-    if (s_account_create(inmsg, &account) != 0) {
+    if (s_account_create(&node_tmp->account_tmp, &account) != 0) {
         msg_err = msg_err_create;
 		ret_stat = 4;
 		goto err;
@@ -681,7 +729,11 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
     username_new = strchr(passwd, '\0') + 1;
 
     if (strncmp(passwd, account_data->passwd, strlen(account_data->passwd)) == 0) {
-        cs_memcpy(account_data->username, sizeof(account_data->username), username_new, strlen(username_new) + 1);
+        cs_memcpy(
+                    account_data->data_basic.username,
+                    sizeof(account_data->data_basic.username),
+                    username_new,
+                    strlen(username_new) + 1);
 
 		if (account_data == (&account_database)) {
             csmutex_lock(&s_mutex_login);
@@ -810,7 +862,7 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
     passwd = inmsg + sizeof(uint32_t);
 
     if (strncmp(passwd, account_login->passwd, strlen(account_login->passwd)) == 0) {
-        account_login->grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
+        account_login->data_basic.grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
 
 		if (account_login == (&account_database)) {
             csmutex_lock(&s_mutex_login);

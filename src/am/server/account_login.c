@@ -28,10 +28,10 @@ void am_login_add(
 {
     struct list_login_t* node_login = NULL;
 
-    node_login = (struct list_login_t*)malloc(sizeof(struct list_login_t));
+    node_login = (struct list_login_t*)calloc(1, sizeof(struct list_login_t));
 	cs_memcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
 
-    node_login->account_sock.data_verification = malloc(len_verification);
+    node_login->account_sock.data_verification = calloc(len_verification, sizeof(char));
     cs_memcpy(node_login->account_sock.data_verification, len_verification, data_verification, len_verification);
     node_login->account_sock.size_verification = len_verification;
 
@@ -56,8 +56,8 @@ int am_login_remove(
 	}
 
     node_login = container_of(account_login, struct list_login_t, account_sock);
-	if (am_account_write(&node_login->account_sock.account) != 0) {
-		fprintf(stderr, "server: write account - %s fail.\n", node_login->account_sock.account.tel);
+    if (am_account_update(&node_login->account_sock.account) != 0) {
+        fprintf(stderr, "server: update account - %s fail.\n", node_login->account_sock.account.data_basic.usernum);
 		return 3;
 	}
 
@@ -73,8 +73,8 @@ int am_login_remove_account(struct account_login_t* account_login)
 	struct list_login_t* node_login = NULL;
 
     node_login = container_of(account_login, struct list_login_t, account_sock);
-	if (am_account_write(&node_login->account_sock.account) != 0) {
-		fprintf(stderr, "server: write account - %s fail.\n", node_login->account_sock.account.tel);
+    if (am_account_update(&node_login->account_sock.account) != 0) {
+        fprintf(stderr, "server: update account - %s fail.\n", node_login->account_sock.account.data_basic.usernum);
 		return 1;
 	}
 
@@ -92,7 +92,7 @@ struct account_login_t* am_login_find_id(const struct list_head* node_head, uint
 
     while (node_login != node_head) {
         login_data = container_of(node_login, struct list_login_t, listnode);
-        if (login_data->account_sock.account.id == id) {
+        if (login_data->account_sock.account.data_basic.id == id) {
             return &login_data->account_sock;
         }
         node_login = node_login->next;
@@ -108,7 +108,7 @@ struct account_login_t* am_login_find_tel(const struct list_head* node_head, con
 
     while (node_login != node_head) {
         login_data = container_of(node_login, struct list_login_t, listnode);
-        if (strncmp(login_data->account_sock.account.tel, tel, strlen(tel))) {
+        if (strncmp(login_data->account_sock.account.data_basic.tel, tel, strlen(tel))) {
             return &login_data->account_sock;
         }
         node_login = node_login->next;
@@ -129,7 +129,7 @@ int am_login_exist(
 
     while (node_login != node_head) {
         login_data = container_of(node_login, struct list_login_t, listnode);
-        if (login_data->account_sock.account.id == account->id) {
+        if (login_data->account_sock.account.data_basic.id == account->data_basic.id) {
             login_status = 1;
 
             if (memcmp(login_data->account_sock.data_verification, data_verification, len_verification) == 0) {
@@ -150,7 +150,7 @@ int am_login_write(const struct list_head* node_head)
 
     while (node_login != node_head) {
         login_data = container_of(node_login, struct list_login_t, listnode);
-        if (am_account_write(&login_data->account_sock.account) != 0) {
+        if (am_account_update(&login_data->account_sock.account) != 0) {
 			return 1;
 		}
 

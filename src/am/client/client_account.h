@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Sun 2015-11-22 20:15:49 (+0800)
+ * @modified  Thu 2015-11-26 01:12:42 (+0800)
  */
 
 #ifndef _CLIENT_ACCOUNT_H
@@ -28,11 +28,13 @@ extern "C"
 /**
  * @brief  am_account_create_request This function start a creating account session.
  *
+ * @param usernum The usernum should better be provided by user's qq number. If This parameter is NULL,
+ * or usernum is not a valid number string, the server will provide a number with at least 12 character length.
  * @param tel The telphone number.
  * @param outmsg The format of outmsg here is: \n
- * -----------------------------------------------------------------------\n
- * | process id(uint32_t) | tel(char*) | ... |                            \n
- * -----------------------------------------------------------------------\n
+ * ---------------------------------------------------------------------------------------------------------\n
+ * | process id(uint32_t) | usernum(char*) | tel(char*) | usernum(char*) | ... |                            \n
+ * ---------------------------------------------------------------------------------------------------------\n
  *
  * @param outmsglen The buffer size of outmsg.
  *
@@ -40,7 +42,7 @@ extern "C"
  *
  * @note We support only telephone account creation for now.
  */
-int am_account_create_request(const char* tel, char* outmsg, uint32_t* outmsglen);
+int am_account_create_request(const char* usernum, const char* tel, char* outmsg, uint32_t* outmsglen);
 
 /**
  * @brief  am_account_verify_request 
