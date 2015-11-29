@@ -4,7 +4,7 @@
  * @author cxl, <shuanlgongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Sun 2015-11-22 18:33:10 (+0800)
+ * @modified  Sun 2015-11-29 17:40:12 (+0800)
  */
 
 #ifndef _ACCOUNT_LOGIN_H
@@ -78,6 +78,8 @@ int am_login_tryadd(struct list_head* node_head, const struct account_data_t* ac
 struct account_login_t* am_login_find_id(const struct list_head* node_head, uint32_t id);
 
 struct account_login_t* am_login_find_tel(const struct list_head* node_head, const char* tel);
+
+struct account_login_t* am_login_find_id_verification(const struct list_head* node_head, uint32_t id, const void* data_verification, uint32_t len_verification);
 
 /**
  * @brief  am_login_exist 

@@ -16,7 +16,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Thu 2015-11-26 22:45:50 (+0800)
+ * @modified  Sun 2015-11-29 17:49:41 (+0800)
  */
 
 #ifdef WIN32
@@ -115,18 +115,6 @@ static void s_account_tmp_remove(struct list_account_tmp_t* list_tmp);
 static struct list_account_tmp_t* s_account_tmp_find(const char* tel);
 static int s_account_tmp_timeout(struct list_account_tmp_t* list_tmp);
 
-
-/**
- * @brief  s_account_find Find account with 'id' in login list or in the database.
- *
- * @param id
- * @param account_find The pointer to the find result.
- * @param account_database The pointer to the database find result.
- * @param errmsg The pointer to the error message.
- *
- * @return   0 if the account with 'id' is found.
- */
-static int s_account_find(uint32_t id, struct account_data_t** account_find, struct account_data_t* account_database, const char** errmsg);
 
 /**
  * @brief  s_account_created This function will try finding account by telphone number in both login list and database.
@@ -358,29 +346,6 @@ int s_account_create(struct account_tmp_t* account_tmp, struct account_data_t* a
                 strlen(rand_passwd) + 1);
 }
 
-int s_account_find(uint32_t id, struct account_data_t** account_find, struct account_data_t* account_database, const char** errmsg)
-{
-	const char* msg_not_found = "cannot find account.";
-	const char* msg_unknown_err = "unkown error occurs, login account does not appear in login msg";
-
-	*errmsg = NULL;
-
-    csmutex_lock(&s_mutex_login);
-	*account_find = &am_login_find_id(&s_list_login, id)->account;
-    csmutex_unlock(&s_mutex_login);
-    if ((*account_find) == NULL) {
-        if (am_account_find_id(id, account_database) == 0) {
-			*errmsg = msg_not_found;
-			return 1;
-		} else {
-			*account_find = account_database;
-			*errmsg = msg_unknown_err;
-		}
-	} 
-
-	return 0;
-}
-
 int s_account_created(const char* tel)
 {
 	struct account_data_t account;
@@ -423,12 +388,13 @@ int s_account_created(const char* tel)
 int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
     char* randcode = NULL;
-	const char* msg_exist = "This telephone has already been registered.";
+    char* tel = strchr(inmsg, '\0') + 1;
+    const char* msg_exist = "This telephone has already been registered.";
 
 	(void)data_verification;
 	(void)len_verification;
 
-	if (s_account_created(inmsg)) {
+    if (s_account_created(tel)) {
 		csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_exist);
 		*outmsglen = 1 + strlen(msg_exist) + 1;
 		return 1;
@@ -712,15 +678,17 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
  */
 int am_account_changeusername_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
-	const char* errmsg = NULL;
 	const char* passwd = NULL;
 	const char* username_new = NULL;
 	struct account_data_t* account_data = NULL;
-	struct account_data_t account_database;
 	uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
-	if (s_account_find(id, &account_data, &account_database, &errmsg) != 0) {
-        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, errmsg, id);
+    csmutex_lock(&s_mutex_login);
+    account_data = &am_login_find_id_verification(&s_list_login, id, data_verification, len_verification)->account;
+    csmutex_unlock(&s_mutex_login);
+
+    if (account_data == NULL) {
+        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
 		*outmsglen = strlen(outmsg);
 		return 1;
 	}
@@ -734,15 +702,7 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
                     sizeof(account_data->data_basic.username),
                     username_new,
                     strlen(username_new) + 1);
-
-		if (account_data == (&account_database)) {
-            csmutex_lock(&s_mutex_login);
-            am_login_add(&s_list_login, account_data, data_verification, len_verification);
-            csmutex_unlock(&s_mutex_login);
-            csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
-		} else {
-            csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
-		}
+        csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
     } else {
         csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
@@ -781,33 +741,27 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
  */
 int am_account_changepasswd_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
-	const char* errmsg = NULL;
 	const char* passwd_old = NULL;
 	const char* passwd_new = NULL;
 	struct account_data_t* account_login = NULL;
-	struct account_data_t account_database;
 	uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
-	if (s_account_find(id, &account_login, &account_database, &errmsg) != 0) {
-		csprintf(inmsg, *outmsglen, "%c%s wiht id: %d.\n", g_fail, errmsg, id);
-		*outmsglen = strlen(outmsg);
-		return 1;
-	}
+    csmutex_lock(&s_mutex_login);
+    account_login = &am_login_find_id_verification(&s_list_login, id, data_verification, len_verification)->account;
+    csmutex_unlock(&s_mutex_login);
 
-	passwd_old = inmsg + sizeof(uint32_t);
+    if (account_login == NULL) {
+        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
+        *outmsglen = strlen(outmsg);
+        return 1;
+    }
+
+    passwd_old = inmsg + sizeof(uint32_t);
     passwd_new = strchr(passwd_old, '\0') + 1;
 
     if (strncmp(passwd_old, account_login->passwd, strlen(account_login->passwd)) == 0) {
         cs_memcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new) + 1);
-
-		if (account_login == (&account_database)) {
-            csmutex_lock(&s_mutex_login);
-            am_login_add(&s_list_login, account_login, data_verification, len_verification);
-            csmutex_unlock(&s_mutex_login);
-            csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
-		} else {
-            csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
-		}
+		csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
     }  else {
         csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
@@ -847,31 +801,25 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
  */
 int am_account_changegrade_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
 {
-	const char* errmsg = NULL;
 	const char* passwd = NULL;
 	struct account_data_t* account_login = NULL;
-	struct account_data_t account_database;
 	uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
-	if (s_account_find(id, &account_login, &account_database, &errmsg) != 0) {
-        csprintf(inmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, errmsg, id);
-		*outmsglen = strlen(outmsg);
-		return 1;
-	}
+    csmutex_lock(&s_mutex_login);
+    account_login = &am_login_find_id_verification(&s_list_login, id, data_verification, len_verification)->account;
+    csmutex_unlock(&s_mutex_login);
+
+    if (account_login == NULL) {
+        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
+        *outmsglen = strlen(outmsg);
+        return 1;
+    }
 
     passwd = inmsg + sizeof(uint32_t);
 
     if (strncmp(passwd, account_login->passwd, strlen(account_login->passwd)) == 0) {
         account_login->data_basic.grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
-
-		if (account_login == (&account_database)) {
-            csmutex_lock(&s_mutex_login);
-            am_login_add(&s_list_login, account_login, data_verification, len_verification);
-            csmutex_unlock(&s_mutex_login);
-            csprintf(outmsg, *outmsglen, "%c%s.", g_succeed, "account is not in login list.");
-		} else {
-            csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
-		}
+		csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
     } else {
         csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }

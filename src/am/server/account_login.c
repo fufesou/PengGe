@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Sun 2015-11-22 18:46:11 (+0800)
+ * @modified  Sun 2015-11-29 17:46:11 (+0800)
  */
 
 #include  <malloc.h>
@@ -113,7 +113,29 @@ struct account_login_t* am_login_find_tel(const struct list_head* node_head, con
         }
         node_login = node_login->next;
     }
+	return NULL;
+}
 
+struct account_login_t* am_login_find_id_verification(
+			const struct list_head* node_head,
+			uint32_t id,
+			const void* data_verification,
+			uint32_t len_verification)
+{
+    struct list_login_t* login_data = NULL;
+    struct list_head* node_login = node_head->next;
+
+    while (node_login != node_head) {
+        login_data = container_of(node_login, struct list_login_t, listnode);
+        if (login_data->account_sock.account.data_basic.id == id) {
+            if (memcmp(login_data->account_sock.data_verification, data_verification, len_verification) == 0) {
+				return &login_data->account_sock;
+			} else {
+				return NULL;
+			}
+        }
+        node_login = node_login->next;
+    }
 	return NULL;
 }
 

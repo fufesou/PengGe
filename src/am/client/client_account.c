@@ -293,10 +293,10 @@ int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
     if (inmsg[0] == g_succeed) {
         printf("client: create account succeed, please wait for a moment to receiving the random telcode, then revify it.\n");
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: verify fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: account_create fail, %s\n", inmsg + 1);
         return 1;
     } else {
-        fprintf(stderr, "client: account_verify - unkown message.\n");
+        fprintf(stderr, "client: account_create - unkown message.\n");
         return -2;
     }
 
@@ -335,11 +335,11 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 
     if (inmsg[0] == g_succeed) {
         if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
-			fprintf(stderr, "client: verify suceed, but client cannot update account data.\n");
+            fprintf(stderr, "client: account_verify suceed, but client cannot update account data.\n");
 			return ret;
 		}
 
-        fprintf(stdout, "client: verify succeed");
+        fprintf(stdout, "client: account_verify succeed");
 
 		if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
             fprintf(stdout, ", additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
@@ -347,7 +347,7 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
             fprintf(stdout, ".\n");
         }
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: verify fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: account_verify fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_verify - unkown message.\n");
@@ -394,7 +394,7 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
 
     if (inmsg[0] == g_succeed) {
         if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
-			fprintf(stderr, "client: login suceed, but client cannot update account data.\n");
+            fprintf(stderr, "client: account_loginsuceed, but client cannot update account data.\n");
 			return ret;
 		}
 
@@ -404,7 +404,7 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
 		}
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: login fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: account_login fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_login - unkown message.\n");
@@ -454,7 +454,7 @@ int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: logout fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: account_logout fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_logout - unkown message.\n");
@@ -504,17 +504,17 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
 						sizeof(s_account_client.account_basic.username),
 						&s_account_tmp.account_basic.username,
                         sizeof(s_account_tmp.account_basic.username))) != 0) {
-			fprintf(stderr, "client: change username fail. please check the buffer size of local account username.\n");
+            fprintf(stderr, "client: account_changeusername fail. please check the buffer size of local account username.\n");
 			return ret;
 		}
 
-		fprintf(stdout, "client: change username succeed.\n");
+        fprintf(stdout, "client: account_changeusername succeed.\n");
 
 		if (inmsg[1] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: change username fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: account_changeusername fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_changeusername - unkown message.\n");
@@ -564,17 +564,17 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
                         sizeof(s_account_client.passwd),
                         &s_account_tmp.passwd,
                         sizeof(s_account_tmp.passwd))) != 0) {
-			fprintf(stderr, "client: change passwd fail. please check the buffer size of local account passwd.\n");
+            fprintf(stderr, "client: account_changepasswd fail. please check the buffer size of local account passwd.\n");
 			return ret;
 		}
 
-		fprintf(stdout, "client: change passwd succeed.\n");
+        fprintf(stdout, "client: account_changepasswd succeed.\n");
 
 		if (inmsg[1] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: change passwd fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: account_changepasswd fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_changepasswd - unkown message.\n");
@@ -618,13 +618,13 @@ int am_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* ou
 
     if (inmsg[0] == g_succeed) {
 		s_account_client.account_basic.grade = s_account_tmp.account_basic.grade;
-		fprintf(stdout, "client: change passwd succeed.\n");
+        fprintf(stdout, "client: account_changegrade succeed.\n");
 
 		if (inmsg[1] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
 		}
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: changegrade fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: account_changegrade fail, %s\n", inmsg + 1);
         return 1;
     } else {
         fprintf(stderr, "client: account_changegrade - unkown message.\n");
