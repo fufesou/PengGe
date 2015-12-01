@@ -19,7 +19,7 @@ extern "C"
 	typedef void* csmutex_t;
 	typedef void* cssem_t;
     typedef void* csthread_t;
-	typedef unsigned int __stdcall (*csthread_proc_t)(void*);
+	typedef unsigned int (__stdcall *csthread_proc_t)(void*);
 
 #else
 	typedef pthread_mutex_t csmutex_t;

@@ -10,7 +10,7 @@
 #define  UNPRTT_H
 
 
-#include  <stdint.h>
+#include    "cstypes.h"
 
 struct rtt_info {
   float		rtt_rtt;	/* most recent measured RTT, in seconds */

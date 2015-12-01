@@ -26,10 +26,10 @@
 #define SEND_NOSIGNAL   MSG_NOSIGNAL
 #endif
 
-#include  <stdint.h>
 #include  <stdio.h>
 #include  <string.h>
 #include  <fcntl.h>
+#include    "cstypes.h"
 #include    "macros.h"
 #include    "list.h"
 #include    "error.h"
@@ -225,12 +225,7 @@ int cssock_block(cssock_t handle, int block)
 int cssock_print(cssock_t handle, const char* header)
 {
     struct sockaddr_in addr_in;
-#ifdef WIN32
-    int nlen;
-#else
-    socklen_t nlen;
-#endif
-    nlen = sizeof(struct sockaddr_in);
+	cssocklen_t nlen = sizeof(struct sockaddr_in);
     const char* msgheader = "";
     char addrstr[INET6_ADDRSTRLEN];
 

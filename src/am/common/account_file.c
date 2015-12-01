@@ -17,12 +17,15 @@
 #define THREAD_IDEL_TIMESLICE_MS 20
 #endif
 
+#ifndef _MSC_VER /* *nix */
+#include  <semaphore.h>
+#endif
+
 #include  <time.h>
 #include  <stdio.h>
 #include  <stdlib.h>
-#include  <stdint.h>
 #include  <string.h>
-#include  <semaphore.h>
+#include    "cstypes.h"
 #include    "config_macros.h"
 #include    "list.h"
 #include    "clearlist.h"
@@ -85,12 +88,13 @@ int am_account_find_id(uint32_t id, struct account_data_t* account)
 int am_account_find_tel(const char* tel, struct account_data_t* account)
 {
 	uint32_t fileid = 0;
+	size_t offset = 0;
     if (strlen(tel) >= sizeof(account->data_basic.tel)) {
         fprintf(stderr, "account find error, the size of key is too large.\n");
         return 0;
     }
-	size_t offset = offsetof(struct account_basic_t, tel) + offsetof(struct account_data_t, data_basic);
 
+	offset = offsetof(struct account_basic_t, tel) + offsetof(struct account_data_t, data_basic);
 	for (; fileid<ACCOUNT_FILE_NUM; ++fileid) {
 		if (s_account_find_common(fileid, (void*)tel, strlen(tel) + 1, offset, account) == 1) {
 			return 1;
@@ -103,12 +107,13 @@ int am_account_find_tel(const char* tel, struct account_data_t* account)
 int am_account_find_usernum(const char* usernum, struct account_data_t* account)
 {
 	uint32_t fileid = 0;
+	size_t offset = 0;
     if (strlen(usernum) >= sizeof(account->data_basic.usernum)) {
         fprintf(stderr, "account find error, the size of key is too large.\n");
         return 0;
     }
-	size_t offset = offsetof(struct account_basic_t, usernum) + offsetof(struct account_data_t, data_basic);
 
+	offsetof(struct account_basic_t, usernum) + offsetof(struct account_data_t, data_basic);
 	for (; fileid<ACCOUNT_FILE_NUM; ++fileid) {
 		if (s_account_find_common(fileid, (void*)usernum, strlen(usernum) + 1, offset, account) == 1) {
 			return 1;
@@ -194,7 +199,7 @@ void s_am_account_config_clear(void* unused)
 
 int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic)
 {
-    return cs_memcpy(basic, sizeof(basic), &data->data_basic, sizeof(basic));
+    return cs_memcpy(basic, sizeof(*basic), &data->data_basic, sizeof(*basic));
 }
 
 int am_account_print(FILE* streamptr, const struct account_data_t* account)

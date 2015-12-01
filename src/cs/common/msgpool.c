@@ -13,11 +13,14 @@
 #include  <sys/socket.h>
 #endif
 
+#ifndef _MSC_VER /* *nix */
+#include  <semaphore.h>
+#endif
+
 #include  <stdio.h>
 #include  <malloc.h>
-#include  <stdint.h>
 #include  <string.h>
-#include  <semaphore.h>
+#include    "cstypes.h"
 #include    "macros.h"
 #include    "utility_wrap.h"
 #include    "bufarray.h"

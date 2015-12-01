@@ -19,6 +19,7 @@
 #include  <arpa/inet.h>
 #include  <pthread.h>
 #include  <semaphore.h>
+#include    "cstypes.h"
 #include    "config_macros.h"
 #include    "macros.h"
 #include    "unprtt.h"

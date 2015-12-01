@@ -18,7 +18,7 @@
 
 #include  <stdio.h>
 #include  <stdlib.h>
-#include  <stdint.h>
+#include    "cstypes.h"
 #include    "sock_types.h"
 #include    "sock_wrap.h"
 #include    "macros.h"

@@ -7,9 +7,9 @@
  * @modified  Fri 2015-11-20 18:30:59 (+0800)
  */
 
-#include  <stdint.h>
 #include  <stdlib.h>
 #include  <string.h>
+#include    "cstypes.h"
 #include    "macros.h"
 #include    "config_macros.h"
 #include    "account.h"
@@ -17,12 +17,21 @@
 #define REGISTER_ACCOUNT_PROCESS_BEGIN \
     static struct account_method_t s_methodarr[] = { 
 
+#ifdef _MSC_VER
+#define REGISTER_ACCOUNT_PROCESS(method) \
+		{ \
+			#method, \
+			am_##method##_reply, \
+			am_##method##_react \
+		}, 
+#else
 #define REGISTER_ACCOUNT_PROCESS(method) \
         { \
             .methodname = #method, \
             .reply = am_##method##_reply, \
             .react = am_##method##_react \
         }, 
+#endif
 
 #define REGISTER_ACCOUNT_PROCESS_END \
     };
@@ -46,17 +55,18 @@ REGISTER_ACCOUNT_PROCESS_END
 static int s_method_sorted = 0;
 static int s_sizeof_method = SIZEOF_ARR(s_methodarr);
 
-static inline int s_comp_method(const void* lhs, const void* rhs)
-{
-    return strcmp(((const struct account_method_t*)lhs)->methodname, ((const struct account_method_t*)rhs)->methodname);
-}
-
+static int s_comp_method(const void* lhs, const void* rhs);
 static uint32_t s_findmethod_sorted(const char* methodname);
 static uint32_t s_findmethod_unsorted(const char* methodname);
 
 #ifdef __cplusplus
 }
 #endif
+
+int s_comp_method(const void* lhs, const void* rhs)
+{
+	return strcmp(((const struct account_method_t*)lhs)->methodname, ((const struct account_method_t*)rhs)->methodname);
+}
 
 void am_method_sort(void)
 {

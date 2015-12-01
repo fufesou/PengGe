@@ -7,7 +7,7 @@
  * @modified  Thu 2015-11-26 22:09:20 (+0800)
  */
 
-#include  <stdint.h>
+#include    "cstypes.h"
 
 #include    "config_macros.h"
 

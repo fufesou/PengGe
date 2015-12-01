@@ -23,9 +23,9 @@
 #include  <netinet/in.h>
 #endif
 
-#include  <stdint.h>
 #include  <stdio.h>
 #include  <string.h>
+#include    "cstypes.h"
 #include    "config_macros.h"
 #include    "account_macros.h"
 #include    "utility_wrap.h"
@@ -339,6 +339,7 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 			return ret;
 		}
 
+        s_account_client.account_basic.id = ntohl(s_account_client.account_basic.id);
         fprintf(stdout, "client: account_verify succeed");
 
 		if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
@@ -398,7 +399,8 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
 			return ret;
 		}
 
-		fprintf(stdout, "client: login succeed.\n");
+        s_account_client.account_basic.id = ntohl(s_account_client.account_basic.id);
+        fprintf(stdout, "client: login succeed.\n");
 
 		if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
 			fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));

@@ -18,10 +18,13 @@
 #include  <sys/time.h>
 #endif
 
+#ifndef _MSC_VER  /* *nix */
+#include  <semaphore.h>
+#endif
+
 #include  <time.h>
 #include  <stdio.h>
 #include  <string.h>
-#include  <semaphore.h>
 
 #include    "lightthread.h"
 #include    "macros.h"

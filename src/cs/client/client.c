@@ -18,14 +18,17 @@
 #include  <unistd.h>
 #endif
 
+#ifndef _MSC_VER  /* *nix */
+#include  <semaphore.h>
+#endif
+
 struct csmsgpool;
 
 #include  <assert.h>
-#include  <stdint.h>
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
-#include  <semaphore.h>
+#include    "cstypes.h"
 #include    "config_macros.h"
 #include    "macros.h"
 #include    "list.h"

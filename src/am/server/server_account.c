@@ -25,24 +25,27 @@
 #include  <netinet/in.h>
 #endif
 
+#ifndef _MSC_VER /* *nix */
+#include  <semaphore.h>
+#endif
+
 #include  <time.h>
 #include  <assert.h>
 #include  <malloc.h>
-#include  <stdint.h>
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
-#include  <semaphore.h>
-#include    "../../common/config_macros.h"
-#include    "../../common/macros.h"
-#include    "../../common/list.h"
-#include    "../../common/timespan.h"
-#include    "../../common/lightthread.h"
-#include    "../../common/clearlist.h"
-#include    "../../common/utility_wrap.h"
-#include    "../common/account_macros.h"
-#include    "../common/account.h"
-#include    "../common/account_file.h"
+#include    "cstypes.h"
+#include    "config_macros.h"
+#include    "macros.h"
+#include    "list.h"
+#include    "timespan.h"
+#include    "lightthread.h"
+#include    "clearlist.h"
+#include    "utility_wrap.h"
+#include    "account_macros.h"
+#include    "account.h"
+#include    "account_file.h"
 #include    "account_login.h"
 
 
@@ -484,6 +487,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
 
     csmutex_lock(&s_mutex_login);
     am_account_data2basic(&account, &account_basic);
+    account_basic.id = htonl(account_basic.id);   /**< id is converted to net endian */
     outmsg[0] = g_succeed;
     cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
     am_login_add(&s_list_login, &account, data_verification, len_verification);
@@ -553,6 +557,7 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
     }
 
     am_account_data2basic(&account, &account_basic);
+    account_basic.id = htonl(account_basic.id);
     outmsg[0] = g_succeed;
     cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
 
@@ -818,7 +823,7 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
     passwd = inmsg + sizeof(uint32_t);
 
     if (strncmp(passwd, account_login->passwd, strlen(account_login->passwd)) == 0) {
-        account_login->data_basic.grade = ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
+        account_login->data_basic.grade = (uint8_t)ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
 		csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
     } else {
         csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");

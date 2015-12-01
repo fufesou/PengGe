@@ -41,7 +41,7 @@
  *
  * @note msvc2013 seems not to support 'typeof()'.
  */
-#ifdef MSVC
+#ifdef _MSC_VER
 #define container_of(ptr, type, member) ((type *)((char *)ptr - offsetof(type, member)))
 #else
 #define container_of(ptr, type, member) ({          \

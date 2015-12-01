@@ -22,11 +22,14 @@
 #include  <unistd.h>
 #endif
 
+#ifndef _MSC_VER /* *nix */
+#include  <semaphore.h>
+#endif
+
 #include  <assert.h>
 #include  <stdlib.h>
 #include  <stdio.h>
-#include  <stdint.h>
-#include  <semaphore.h>
+#include    "cstypes.h"
 #include    "config_macros.h"
 #include    "macros.h"
 #include    "utility_wrap.h"

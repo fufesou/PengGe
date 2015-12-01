@@ -8,15 +8,15 @@
  */
 
 #include  <malloc.h>
-#include  <stdint.h>
 #include  <stdio.h>
 #include  <string.h>
-#include    "../../common/config_macros.h"
-#include    "../../common/macros.h"
-#include    "../../common/list.h"
-#include    "../../common/utility_wrap.h"
-#include    "../common/account.h"
-#include    "../common/account_file.h"
+#include    "cstypes.h"
+#include    "config_macros.h"
+#include    "macros.h"
+#include    "list.h"
+#include    "utility_wrap.h"
+#include    "account.h"
+#include    "account_file.h"
 #include    "account_login.h"
 
 

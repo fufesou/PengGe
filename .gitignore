@@ -1,5 +1,7 @@
 # C++ objects and libs
 
+*.suo
+*.ncb
 *.slo
 *.lo
 *.o

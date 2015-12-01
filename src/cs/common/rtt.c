@@ -48,7 +48,7 @@ rtt_init(struct rtt_info *ptr)
 	ptr->rtt_rtt    = 0;
 	ptr->rtt_srtt   = 0;
 	ptr->rtt_rttvar = 0.75;
-	ptr->rtt_rto = rtt_minmax(RTT_RTOCALC(ptr));
+	ptr->rtt_rto = rtt_minmax((float)RTT_RTOCALC(ptr));
 		/* first RTO at (srtt + (4 * rttvar)) = 3 seconds */
 }
 /* end rtt1 */
@@ -100,7 +100,7 @@ rtt_stop(struct rtt_info *ptr, uint32_t ms)
 {
 	double		delta;
 
-	ptr->rtt_rtt = ms / 1000.0;		/* measured RTT in seconds */
+	ptr->rtt_rtt = ms / 1000.0f;		/* measured RTT in seconds */
 
 	/*
 	 * Update our estimators of RTT and mean deviation of RTT.
@@ -109,14 +109,14 @@ rtt_stop(struct rtt_info *ptr, uint32_t ms)
 	 */
 
 	delta = ptr->rtt_rtt - ptr->rtt_srtt;
-	ptr->rtt_srtt += delta / 8;		/* g = 1/8 */
+	ptr->rtt_srtt += (float)(delta / 8);		/* g = 1/8 */
 
 	if (delta < 0.0)
 		delta = -delta;				/* |delta| */
 
-	ptr->rtt_rttvar += (delta - ptr->rtt_rttvar) / 4;	/* h = 1/4 */
+	ptr->rtt_rttvar += (float)(delta - ptr->rtt_rttvar) / 4;	/* h = 1/4 */
 
-	ptr->rtt_rto = rtt_minmax(RTT_RTOCALC(ptr));
+	ptr->rtt_rto = rtt_minmax((float)RTT_RTOCALC(ptr));
 }
 /* end rtt_stop */
 

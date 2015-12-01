@@ -18,9 +18,12 @@
 #include  <unistd.h>
 #endif
 
-#include  <stdio.h>
-#include  <stdint.h>
+#ifndef _MSC_VER /* *nix */
 #include  <semaphore.h>
+#endif
+
+#include  <stdio.h>
+#include    "cstypes.h"
 #include    "bufarray.h"
 #include    "sock_types.h"
 #include    "lightthread.h"

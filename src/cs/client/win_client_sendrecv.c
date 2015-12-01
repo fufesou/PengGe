@@ -9,13 +9,16 @@
 
 #ifdef WIN32
 
+#ifndef _MSC_VER /* *nix */
+#include  <semaphore.h>
+#endif
+
 #include  <winsock2.h>
 #include  <windows.h>
 #include  <process.h>
-#include  <semaphore.h>
 #include  <stdio.h>
-#include  <stdint.h>
 #include  <string.h>
+#include    "cstypes.h"
 #include    "config_macros.h"
 #include    "macros.h"
 #include    "timespan.h"

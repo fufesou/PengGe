@@ -20,8 +20,8 @@
 
 #include  <stdio.h>
 #include  <stdlib.h>
-#include  <stdint.h>
 #include  <string.h>
+#include    "cstypes.h"
 #include    "config_macros.h"
 #include    "macros.h"
 #include    "list.h"
@@ -81,6 +81,10 @@ int main(int argc, char* argv[])
 #undef TEST_FILE_INPUT
 
     csclearlist_clear();
+
+#ifdef _MSC_VER
+	system("pause");
+#endif
 
     return 0;
 }
