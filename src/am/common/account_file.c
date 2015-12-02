@@ -113,7 +113,7 @@ int am_account_find_usernum(const char* usernum, struct account_data_t* account)
         return 0;
     }
 
-	offsetof(struct account_basic_t, usernum) + offsetof(struct account_data_t, data_basic);
+    offset = offsetof(struct account_basic_t, usernum) + offsetof(struct account_data_t, data_basic);
 	for (; fileid<ACCOUNT_FILE_NUM; ++fileid) {
 		if (s_account_find_common(fileid, (void*)usernum, strlen(usernum) + 1, offset, account) == 1) {
 			return 1;
