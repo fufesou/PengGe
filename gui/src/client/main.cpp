@@ -6,16 +6,16 @@
  * @date 2015-12-02
  */
 
-#include <QApplication>
-#include "loginwindow.h"
+#include  <QApplication>
+#include    "clientcontroller.h"
 
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-	Server::CLoginWindow loginWin;
-	loginWin.show();
+    GuiClient::CController clientController;
+    clientController.showLogin();
 
     return app.exec();
 }

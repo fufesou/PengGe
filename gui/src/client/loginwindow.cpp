@@ -15,14 +15,15 @@
 #include    "loginwindow.h"
 #include    "../common/wordsbutton.h"
 
-namespace Server
+namespace GuiClient
 {
 	CLoginWindow::CLoginWindow(QWidget* vParent)
 		: QWidget(vParent)
 	{
 		initWidgets();
 
-		this->setGeometry(200, 200, 500, 400);
+        setGeometry(200, 200, 500, 400);
+        setFixedSize(500, 400);
 	}
 
 	void CLoginWindow::initWidgets()
@@ -30,8 +31,11 @@ namespace Server
 		QGridLayout* pMainLayout = new QGridLayout(this);
 		this->setLayout(pMainLayout);
 
-		QLabel* plbIndividuation = new QLabel(tr("put individual picture here"), this);
-        plbIndividuation->setStyleSheet("QLabel { background-color: orange; }");
+        QLabel* plbIndividuation = new QLabel(this);
+        plbIndividuation->setStyleSheet(
+                    "QLabel {"
+                        "image: url(:/img/aa0.jpg);"
+                    "}");
 
 		m_plbPhoto = new QLabel(tr("photo here"), this);
 		m_pleUserNumber = new QLineEdit(this);
@@ -51,10 +55,8 @@ namespace Server
         pMainLayout->addWidget(m_pbtnRegister, 6, 9, 1, 1);
         pMainLayout->addWidget(m_pbtnRetrievePasswd, 7, 9, 1, 1);
         pMainLayout->addWidget(m_pbtnLogin, 9, 3, 1, 6);
-    }
 
-    void CLoginWindow::login()
-    {
-
+        bool bIsLoginConOK = connect(m_pbtnLogin, SIGNAL(clicked(bool)), this, SIGNAL(login()));
+        Q_ASSERT(bIsLoginConOK);
     }
 }

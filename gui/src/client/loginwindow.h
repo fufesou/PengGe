@@ -16,7 +16,7 @@ QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QLineEdit)
 QT_FORWARD_DECLARE_CLASS(QLabel)
 
-namespace Server
+namespace GuiClient
 {
     class CLoginWindow : public QWidget
 	{
@@ -28,7 +28,7 @@ namespace Server
 	private:
 		void initWidgets(void);
 
-	private slots:
+    signals:
         void login(void);
 
 	private:

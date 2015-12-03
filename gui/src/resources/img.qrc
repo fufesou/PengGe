@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/aa0.jpg</file>
+        <file>img/aa1.jpg</file>
+        <file>img/aa2.jpg</file>
+        <file>img/aa3.jpg</file>
+        <file>img/aa4.jpg</file>
+        <file>img/aa5.jpg</file>
+        <file>img/aa6.jpg</file>
+        <file>img/aa7.jpg</file>
+        <file>img/aa8.jpg</file>
+        <file>img/aa9.jpg</file>
+        <file>img/aa10.jpg</file>
+        <file>img/aa11.jpg</file>
+        <file>img/aa12.jpg</file>
+        <file>img/aa13.jpg</file>
+        <file>img/aa14.jpg</file>
+        <file>img/aa15.jpg</file>
+        <file>img/aa16.jpg</file>
+        <file>img/aa17.jpg</file>
+        <file>img/aa18.jpg</file>
+        <file>img/aa19.jpg</file>
+        <file>img/dog.jpg</file>
+        <file>img/express.jpg</file>
+        <file>img/test.png</file>
+    </qresource>
+</RCC>

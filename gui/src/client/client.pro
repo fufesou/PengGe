@@ -8,18 +8,25 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = server
+TARGET = GuiClient
 TEMPLATE = app
 
 
 SOURCES += \
         main.cpp \
         loginwindow.cpp \
-        ../common/wordsbutton.cpp
+        ../common/wordsbutton.cpp \
+        mainwidget.cpp \
+        clientcontroller.cpp \
+    logingwidget.cpp
 
 HEADERS  += \
         loginwindow.h \
-        ../common/wordsbutton.h
+        ../common/wordsbutton.h \
+        mainwidget.h \
+        clientcontroller.h \
+    logingwidget.h
 
 RESOURCES += \
-    ../resources/qss.qrc
+    ../resources/qss.qrc \
+    ../resources/img.qrc
