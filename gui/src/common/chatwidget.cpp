@@ -59,7 +59,7 @@ namespace GuiCommon
         pLogArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         pMainLayout->addWidget(pLogArea, 2, 2, 5, 8);
 
-        m_pLogWidget->setGeometry(0, 0, 400, 300);
+        pLogArea->setWidgetResizable(true);
         pLogArea->setStyleSheet(
                     "QWidget{background-color: transparent;} QScrollArea{background-color: rgba(255, 255, 255, 59);}");
 
@@ -81,9 +81,12 @@ namespace GuiCommon
     void CChatWidget::sendButtonClicked()
     {
         QString msg = m_pteInput->toPlainText();
-        m_pteInput->clear();
-        addMsg(msg, QString("this"), eSend);
-        sendMessage(msg);
+        if (msg.size() > 0)
+        {
+            m_pteInput->clear();
+            addMsg(msg, QString("this"), eSend);
+            sendMessage(msg);
+        }
     }
 
     void CChatWidget::addMsg(const QString& vMsg, const QString& vSenderName, EMsgSendRecv vSendRecv)
