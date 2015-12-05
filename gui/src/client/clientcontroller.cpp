@@ -48,7 +48,8 @@ namespace GuiClient
     void CController::login()
     {
         m_pLoginWidget->hide();
-        m_pLogingWidget->show();
+        // m_pLogingWidget->show();
+        m_pMainWidget->show();
     }
 
     void CController::succeedLogin()

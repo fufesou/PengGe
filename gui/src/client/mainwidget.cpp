@@ -16,6 +16,7 @@ namespace GuiClient
     CMainWidget::CMainWidget(QWidget* vParent)
         : QWidget(vParent)
     {
+        this->setGeometry(600, 100, 200, 600);
     }
 
     void CMainWidget::initWidgets()

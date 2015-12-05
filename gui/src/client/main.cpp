@@ -8,14 +8,19 @@
 
 #include  <QApplication>
 #include    "clientcontroller.h"
+#include    "chatwidget.h"
 
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    /*
     GuiClient::CController clientController;
     clientController.showLogin();
+    */
+    GuiCommon::CChatWidget chatWidget;
+    chatWidget.show();
 
     return app.exec();
 }

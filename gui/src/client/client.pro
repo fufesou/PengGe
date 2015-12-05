@@ -11,21 +11,27 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = GuiClient
 TEMPLATE = app
 
+INCLUDEPATH += ../common
+
 
 SOURCES += \
-        main.cpp \
-        loginwindow.cpp \
-        ../common/wordsbutton.cpp \
-        mainwidget.cpp \
-        clientcontroller.cpp \
-    logingwidget.cpp
+    main.cpp \
+    loginwindow.cpp \
+    ../common/wordsbutton.cpp \
+    mainwidget.cpp \
+    clientcontroller.cpp \
+    logingwidget.cpp \
+    ../common/chatwidget.cpp
 
 HEADERS  += \
-        loginwindow.h \
-        ../common/wordsbutton.h \
-        mainwidget.h \
-        clientcontroller.h \
-    logingwidget.h
+    loginwindow.h \
+    ../common/wordsbutton.h \
+    mainwidget.h \
+    clientcontroller.h \
+    logingwidget.h \
+    ../common/chatwidget.h \
+    ../common/guimacros.h \
+    ../common/guitypes.h
 
 RESOURCES += \
     ../resources/qss.qrc \
