@@ -1,0 +1,31 @@
+QListWidget#PropertyEditor_List 
+{ 
+  background-color: Transparent; 
+  padding-right: 0px; 
+  padding-top: 2px; 
+  padding-left: 2px; 
+}
+QListWidget#PropertyEditor_List::item 
+{
+  padding: 3px; 
+  margin-left: 3px;
+  background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 white, stop:1 Transparent); 
+  border-left: 1px solid rgb(145,155,155); 
+  border-top: 1px solid rgb(145,155,155);
+  border-bottom: 1px solid rgb(145,155,155);
+  border-right: 0px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+QListWidget#PropertyEditor_List::item:hover, QListWidget#PropertyEditor_List::item:selected 
+{ 
+  background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(255,200,60), stop:0.039 rgb(255,200,60), stop:0.04 white, stop:0.4 white, stop:1 Transparent); 
+  border-left-color: rgb(230,139,44);
+}
+QListWidget#PropertyEditor_List::item:selected 
+{ 
+  margin-left: 0px;
+  background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgb(255,200,60), stop:0.039 rgb(255,200,60), stop:0.04 white);
+  border-left-color: rgb(230,139,44);
+  color: black;
+}

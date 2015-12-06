@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-02
- * @modified  Thu 2015-12-03 00:07:46 (+0800)
+ * @modified  周六 2015-12-05 17:21:33 中国标准时间
  */
 
 #include  <QString>
@@ -13,7 +13,7 @@
 
 #include    "wordsbutton.h"
 
-namespace Common
+namespace GuiCommon
 {
     CWordsButton::CWordsButton(const QString& vWords, QWidget* vParent)
 		: QPushButton(vWords, vParent)
