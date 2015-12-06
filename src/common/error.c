@@ -17,12 +17,13 @@
 #include  <stdarg.h>
 #include  <stdio.h>
 #include  <stdlib.h>
-#include    "cstypes.h"
-#include    "error.h"
-#include    "list.h"
-#include    "sock_types.h"
-#include    "sock_wrap.h"
-#include    "clearlist.h"
+#include    "common/macros.h"
+#include    "common/cstypes.h"
+#include    "common/error.h"
+#include    "common/list.h"
+#include    "common/sock_types.h"
+#include    "common/sock_wrap.h"
+#include    "common/clearlist.h"
 
 #ifdef __cplusplus
 extern "C"

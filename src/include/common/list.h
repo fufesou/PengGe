@@ -4,6 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
+ * @modified  Sun 2015-12-06 18:25:03 (+0800)
  */
 
 #ifndef  LIST_H
@@ -14,13 +15,13 @@ extern "C" {
 #endif
 
 struct list_head {
-	struct list_head *next, *prev;
+    struct list_head *next, *prev;
 };
 
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
 
 #define LIST_HEAD(name) \
-	struct list_head name = LIST_HEAD_INIT(name)
+    struct list_head name = LIST_HEAD_INIT(name)
 
 void INIT_LIST_HEAD(struct list_head *list);
 

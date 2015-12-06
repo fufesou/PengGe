@@ -4,14 +4,14 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-29
- * @modified  周三 2015-11-11 17:54:20 中国标准时间
+ * @modified  Sun 2015-12-06 18:20:54 (+0800)
  */
 
 #include  <memory.h>
 #include  <stdio.h>
-#include    "macros.h"
-#include    "error.h"
-#include    "utility_wrap.h"
+#include    "common/macros.h"
+#include    "common/error.h"
+#include    "common/utility_wrap.h"
 
 int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count)
 {
@@ -52,23 +52,23 @@ int cs_fopen(FILE** streamptr, const char* filename, const char* mode)
 
 cssigfunc* cssignal(int signo, cssigfunc* func)
 {
-	struct sigaction act, oact;
-	act.sa_handler = func;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
-	if (signo == SIGALRM) {
+    struct sigaction act, oact;
+    act.sa_handler = func;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = 0;
+    if (signo == SIGALRM) {
 #ifdef SA_INTERRUPT
-		act.sa_flags |= SA_INTERRUPT; /* SunOS 4.x */
+        act.sa_flags |= SA_INTERRUPT; /* SunOS 4.x */
 #endif
-	} else {
+    } else {
 #ifdef SA_RESTART
-		act.sa_flags |= SA_RESTART; /* SVR4, 4.4BSD */
+        act.sa_flags |= SA_RESTART; /* SVR4, 4.4BSD */
 #endif
-	}
-	if (sigaction(signo, &act, &oact) < 0) {
-		return (SIG_ERR);
-	}
-	return (oact.sa_handler);
+    }
+    if (sigaction(signo, &act, &oact) < 0) {
+        return (SIG_ERR);
+    }
+    return (oact.sa_handler);
 }
 
 cssigfunc* cssignal_ext(int signo, cssigfunc* func)
@@ -76,8 +76,8 @@ cssigfunc* cssignal_ext(int signo, cssigfunc* func)
     cssigfunc* sigfunc;
     if ((sigfunc = cssignal(signo, func)) == SIG_ERR) {
         csfatal("signal error");
-	}
-	return sigfunc;
+    }
+    return sigfunc;
 }
 
 #endif

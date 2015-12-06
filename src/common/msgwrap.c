@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  周五 2015-11-06 12:04:44 中国标准时间
+ * @modified  Sun 2015-12-06 18:20:44 (+0800)
  */
 
 #ifdef WIN32
@@ -18,14 +18,14 @@
 #include  <stdio.h>
 #include  <assert.h>
 #include  <string.h>
-#include    "cstypes.h"
-#include    "macros.h"
-#include    "utility_wrap.h"
-#include	"sock_types.h"
-#include    "lightthread.h"
-#include    "bufarray.h"
-#include    "msgpool.h"
-#include    "msgwrap.h"
+#include    "common/cstypes.h"
+#include    "common/macros.h"
+#include    "common/utility_wrap.h"
+#include    "common/sock_types.h"
+#include    "common/lightthread.h"
+#include    "common/bufarray.h"
+#include    "common/msgwrap.h"
+#include    "cs/msgpool.h"
 
 
 int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int addrlen)
@@ -44,11 +44,11 @@ int csmsg_merge(const struct csmsg_header* msgheader, const char* data, char* un
 
     assert((len_unitheader + msgdatalen) < unitlen);
     if (cs_memcpy(unit, unitlen, msgheader, len_unitheader) != 0) {
-		return 1;
-	}
+        return 1;
+    }
     if (cs_memcpy(unit + len_unitheader, unitlen - len_unitheader, data, msgdatalen) != 0) {
-		return 1;
-	}
+        return 1;
+    }
 
     return 0;
 }

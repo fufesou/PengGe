@@ -4,26 +4,26 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Fri 2015-11-20 18:30:59 (+0800)
+ * @modified  Sun 2015-12-06 18:04:16 (+0800)
  */
 
 #include  <stdlib.h>
 #include  <string.h>
-#include    "cstypes.h"
-#include    "macros.h"
-#include    "config_macros.h"
-#include    "account.h"
+#include    "common/cstypes.h"
+#include    "common/macros.h"
+#include    "common/config_macros.h"
+#include    "am/account.h"
 
 #define REGISTER_ACCOUNT_PROCESS_BEGIN \
     static struct account_method_t s_methodarr[] = { 
 
 #ifdef _MSC_VER
 #define REGISTER_ACCOUNT_PROCESS(method) \
-		{ \
-			#method, \
-			am_##method##_reply, \
-			am_##method##_react \
-		}, 
+        { \
+            #method, \
+            am_##method##_reply, \
+            am_##method##_react \
+        }, 
 #else
 #define REGISTER_ACCOUNT_PROCESS(method) \
         { \
@@ -65,7 +65,7 @@ static uint32_t s_findmethod_unsorted(const char* methodname);
 
 int s_comp_method(const void* lhs, const void* rhs)
 {
-	return strcmp(((const struct account_method_t*)lhs)->methodname, ((const struct account_method_t*)rhs)->methodname);
+    return strcmp(((const struct account_method_t*)lhs)->methodname, ((const struct account_method_t*)rhs)->methodname);
 }
 
 void am_method_sort(void)
@@ -94,13 +94,13 @@ uint32_t am_method_getid(const char* methodname)
 
 uint32_t s_findmethod_sorted(const char* methodname)
 {
-	int low = 0;
-	int mid = s_sizeof_method >> 1;
-	int high = s_sizeof_method - 1;
+    int low = 0;
+    int mid = s_sizeof_method >> 1;
+    int high = s_sizeof_method - 1;
 
-	if (!s_method_sorted) {
-		am_method_sort();
-	}
+    if (!s_method_sorted) {
+        am_method_sort();
+    }
 
     while (low < high) {
         while ((strcmp(methodname, s_methodarr[mid].methodname) < 0) && (low < high)) {

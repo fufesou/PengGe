@@ -6,37 +6,35 @@ CONFIG -= qt
 CONFIG(debug, release|debug):
 DEFINES +=  _DEBUG
 
-INCLUDEPATH += 	../../../src/common \
-                ../../../src/cs/common \
-                ../../../src/cs/server \
-                ../../../src/am/common \
-                ../../../src/am/client \
-                ../../../src/am/server
+INCLUDEPATH += 	../../../src/include
 
 
 HEADERS += \
-    ../../../src/common/bufarray.h \
-    ../../../src/common/buflist.h \
-    ../../../src/common/error.h \
-    ../../../src/common/lightthread.h \
-    ../../../src/common/list.h \
-    ../../../src/common/macros.h \
-    ../../../src/common/msgwrap.h \
-    ../../../src/common/sock_types.h \
-    ../../../src/common/sock_wrap.h \
-    ../../../src/common/timespan.h \
-    ../../../src/common/utility_wrap.h \
-    ../../../src/cs/server/server.h \
-    ../../../src/cs/common/msgpool.h \
-    ../../../src/cs/common/msgpool_dispatch.h \
-    ../../../src/cs/common/unprtt.h \
-    ../../../src/common/clearlist.h \
-    ../../../src/am/common/account.h \
-    ../../../src/am/common/account_file.h \
-    ../../../src/am/common/account_macros.h \
-    ../../../src/am/client/client_account.h \
-    ../../../src/am/server/account_login.h \
-    ../../../src/am/server/server_account.h
+    ../../../src/include/common/bufarray.h \
+    ../../../src/include/common/buflist.h \
+    ../../../src/include/common/clearlist.h \
+    ../../../src/include/common/config_macros.h \
+    ../../../src/include/common/cstypes.h \
+    ../../../src/include/common/error.h \
+    ../../../src/include/common/lightthread.h \
+    ../../../src/include/common/list.h \
+    ../../../src/include/common/macros.h \
+    ../../../src/include/common/msgwrap.h \
+    ../../../src/include/common/sock_types.h \
+    ../../../src/include/common/sock_wrap.h \
+    ../../../src/include/common/timespan.h \
+    ../../../src/include/common/utility_wrap.h \
+    ../../../src/include/cs/client.h \
+    ../../../src/include/cs/msgpool.h \
+    ../../../src/include/cs/msgpool_dispatch.h \
+    ../../../src/include/cs/server.h \
+    ../../../src/include/cs/unprtt.h \
+    ../../../src/include/am/account.h \
+    ../../../src/include/am/account_file.h \
+    ../../../src/include/am/account_login.h \
+    ../../../src/include/am/account_macros.h \
+    ../../../src/include/am/client_account.h \
+    ../../../src/include/am/server_account.h
 
 
 SOURCES += \

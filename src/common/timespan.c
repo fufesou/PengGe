@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-26
- * @modified  Sat 2015-10-31 19:13:32 (+0800)
+ * @modified  Sun 2015-12-06 18:20:52 (+0800)
  */
 
 #ifdef WIN32
@@ -16,7 +16,7 @@
 #endif
 
 #include  <stdio.h>
-#include	"timespan.h"
+#include    "common/timespan.h"
 
 void csgettimeofday(struct timeval* tv, void* tz)
 {
@@ -39,19 +39,19 @@ void csgettimeofday(struct timeval* tv, void* tz)
     tv->tv_sec = (long)clock;
     tv->tv_usec = wtm.wMilliseconds * 1000;
 #else
-	gettimeofday(tv, tz);
+    gettimeofday(tv, tz);
 #endif
 }
 
 void cstimelong_cur(cstimelong_t* tl)
 {
 #ifdef WIN32
-	FILETIME ft;
-	GetSystemTimeAsFileTime(&ft);
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
     tl->HighPart = ft.dwHighDateTime;
-	tl->LowPart = ft.dwLowDateTime;
+    tl->LowPart = ft.dwLowDateTime;
 #else
-	gettimeofday(tl, NULL);
+    gettimeofday(tl, NULL);
 #endif
 }
 
@@ -61,9 +61,9 @@ unsigned long long cstimelong_span_microsec(const cstimelong_t* start)
     cstimelong_cur(&end);
 
 #ifdef WIN32
-	return (end.QuadPart - start->QuadPart) / 10;
+    return (end.QuadPart - start->QuadPart) / 10;
 #else
-	return 1000000LL * (end.tv_sec - start->tv_sec) + end.tv_usec - start->tv_usec;
+    return 1000000LL * (end.tv_sec - start->tv_sec) + end.tv_usec - start->tv_usec;
 #endif
 }
 

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
- * @modified  周五 2015-11-06 12:14:19 中国标准时间
+ * @modified  Sun 2015-12-06 18:11:54 (+0800)
  */
 
 #ifdef WIN32
@@ -18,21 +18,22 @@
 #include  <process.h>
 #include  <stdio.h>
 #include  <string.h>
-#include    "cstypes.h"
-#include    "config_macros.h"
-#include    "macros.h"
-#include    "timespan.h"
-#include    "unprtt.h"
-#include    "list.h"
-#include    "clearlist.h"
-#include    "sock_types.h"
-#include    "lightthread.h"
-#include    "sock_wrap.h"
-#include    "bufarray.h"
-#include    "msgpool.h"
-#include    "msgwrap.h"
-#include    "utility_wrap.h"
-#include    "client.h"
+#include    "common/cstypes.h"
+#include    "common/config_macros.h"
+#include    "common/macros.h"
+#include    "common/timespan.h"
+#include    "common/list.h"
+#include    "common/clearlist.h"
+#include    "common/sock_types.h"
+#include    "common/lightthread.h"
+#include    "common/sock_wrap.h"
+#include    "common/bufarray.h"
+#include    "common/msgwrap.h"
+#include    "common/utility_wrap.h"
+#include    "cs/msgpool.h"
+#include    "cs/unprtt.h"
+#include    "cs/msgpool_dispatch.h"
+#include    "cs/client.h"
 
 
 #ifdef __cplusplus

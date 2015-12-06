@@ -18,14 +18,14 @@
 
 #include  <stdio.h>
 #include  <stdlib.h>
-#include    "cstypes.h"
-#include    "sock_types.h"
-#include    "sock_wrap.h"
-#include    "macros.h"
-#include    "list.h"
-#include    "clearlist.h"
-#include    "server.h"
-#include    "server_account.h"
+#include    "common/macros.h"
+#include    "common/cstypes.h"
+#include    "common/sock_types.h"
+#include    "common/sock_wrap.h"
+#include    "common/list.h"
+#include    "common/clearlist.h"
+#include    "cs/server.h"
+#include    "am/server_account.h"
 
 
 void s_check_args(int argc, char* argv[]);

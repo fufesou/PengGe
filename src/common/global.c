@@ -7,9 +7,9 @@
  * @modified  Thu 2015-11-26 22:09:20 (+0800)
  */
 
-#include    "cstypes.h"
+#include    "common/cstypes.h"
 
-#include    "config_macros.h"
+#include    "common/config_macros.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -18,21 +18,29 @@
 #include  <arpa/inet.h>
 #endif
 
+#ifndef _MSC_VER  /* *nix */
+#include  <semaphore.h>
+#endif
+
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
-#include    "cstypes.h"
-#include    "config_macros.h"
-#include    "macros.h"
-#include    "list.h"
-#include    "sock_types.h"
-#include    "sock_wrap.h"
-#include    "utility_wrap.h"
-#include    "clearlist.h"
-#include    "client.h"
-#include    "client_account.h"
+#include    "common/cstypes.h"
+#include    "common/config_macros.h"
+#include    "common/macros.h"
+#include    "common/list.h"
+#include    "common/lightthread.h"
+#include    "common/bufarray.h"
+#include    "common/sock_types.h"
+#include    "common/sock_wrap.h"
+#include    "common/utility_wrap.h"
+#include    "common/clearlist.h"
+#include    "cs/msgpool.h"
+#include    "cs/msgpool_dispatch.h"
+#include    "cs/client.h"
+#include    "am/client_account.h"
 
-int msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen);
+int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen);
 
 int main(int argc, char* argv[])
 {
@@ -68,7 +76,7 @@ int main(int argc, char* argv[])
         udpclient.len_senddata = udpclient.size_senbuf;
         data_input[0] = 0;
         fgets(data_input, sizeof(data_input), fp_input);
-        if (msgdispatch(data_input, udpclient.sendbuf, &udpclient.len_senddata) != 0) {
+        if (s_msgdispatch(data_input, udpclient.sendbuf, &udpclient.len_senddata) != 0) {
 			fprintf(stderr, "dispatch message error.\n");
 		} else {
 			csclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
@@ -90,7 +98,7 @@ int main(int argc, char* argv[])
 }
 
 
-int msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
+int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
 {
 	switch (*inmsg) {
 		case '0':

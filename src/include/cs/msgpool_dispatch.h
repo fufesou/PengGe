@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Wed 2015-11-18 22:43:56 (+0800)
+ * @modified  Sun 2015-12-06 18:23:22 (+0800)
  */
 
 #ifndef _MSGPOOL_DISPATCH
@@ -25,26 +25,26 @@ extern "C"
 {
 #endif
 
-typedef int (*pfunc_msgprocess_t)(char* inmsg, char* outmsg, uint32_t* outmsglen);
-typedef int (*pfunc_msgprocess_af_t)(cssock_t handle, void* outmsg);
+typedef int (CS_CALLBACK *pfunc_msgprocess_t)(char* inmsg, char* outmsg, uint32_t* outmsglen);
+typedef int (CS_CALLBACK *pfunc_msgprocess_af_t)(cssock_t handle, void* outmsg);
 
 struct csmsgpool_dispatch
 {
-	char* prompt;
+    char* prompt;
 
     struct csmsgpool pool_unprocessed;
 
-	/** This pool can be ignored if immediately sending data is not required after process.
-	 * 
-	 * @sa semd_msg
-	 */
-	struct csmsgpool pool_processed;
+    /** This pool can be ignored if immediately sending data is not required after process.
+     * 
+     * @sa semd_msg
+     */
+    struct csmsgpool pool_processed;
 
-	/** process_msg This variable must be set to point a function. */
+    /** process_msg This variable must be set to point a function. */
     pfunc_msgprocess_t process_msg;
 
-	/** process_af_msg If send message is not required after process, set process_af_msg to 0;
-	 */
+    /** process_af_msg If send message is not required after process, set process_af_msg to 0;
+     */
     pfunc_msgprocess_af_t process_af_msg;
 };
 

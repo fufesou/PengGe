@@ -11,7 +11,7 @@
 #define _ERROR_H
 
 typedef size_t cserr_t;
-typedef void (*cserr_clear_func)(void);
+typedef void (CS_CALLBACK *cserr_clear_func)(void);
 
 #ifdef __cplusplus
 extern "C"

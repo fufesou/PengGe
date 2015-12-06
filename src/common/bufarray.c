@@ -4,23 +4,24 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-17
+ * @modified  Sun 2015-12-06 18:19:12 (+0800)
  */
 
 #include  <malloc.h>
 #include  <string.h>
 #include  <stdio.h>
-#include    "bufarray.h"
-#include    "macros.h"
+#include    "common/macros.h"
+#include    "common/bufarray.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 static void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc);
-static char* s_pull_item(struct array_buf* buf);
-static char* s_push_item(struct array_buf* buf, char* item);
-static void s_clear_buf(struct array_buf* buf);
-static int s_get_num_contained_items(const struct array_buf* buf);
+static char* CS_CALLBACK s_pull_item(struct array_buf* buf);
+static char* CS_CALLBACK s_push_item(struct array_buf* buf, char* item);
+static void CS_CALLBACK s_clear_buf(struct array_buf* buf);
+static int CS_CALLBACK s_get_num_contained_items(const struct array_buf* buf);
 
 #ifdef __cplusplus
 }

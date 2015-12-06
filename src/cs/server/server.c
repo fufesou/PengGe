@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-28
- * @modified  Fri 2015-11-20 20:35:28 (+0800)
+ * @modified  Sun 2015-12-06 18:17:16 (+0800)
  */
 
 #ifdef WIN32
@@ -29,22 +29,22 @@
 #include  <assert.h>
 #include  <stdlib.h>
 #include  <stdio.h>
-#include    "cstypes.h"
-#include    "config_macros.h"
-#include    "macros.h"
-#include    "utility_wrap.h"
-#include    "error.h"
-#include    "bufarray.h"
-#include    "list.h"
-#include    "clearlist.h"
-#include    "sock_types.h"
-#include    "lightthread.h"
-#include    "sock_wrap.h"
-#include    "msgpool.h"
-#include    "msgpool_dispatch.h"
-#include    "msgwrap.h"
-#include 	"server.h"
-#include    "account.h"
+#include    "common/cstypes.h"
+#include    "common/config_macros.h"
+#include    "common/macros.h"
+#include    "common/utility_wrap.h"
+#include    "common/error.h"
+#include    "common/bufarray.h"
+#include    "common/list.h"
+#include    "common/clearlist.h"
+#include    "common/sock_types.h"
+#include    "common/lightthread.h"
+#include    "common/sock_wrap.h"
+#include    "common/msgwrap.h"
+#include    "cs/msgpool.h"
+#include    "cs/msgpool_dispatch.h"
+#include    "cs/server.h"
+#include    "am/account.h"
 
 
 #ifdef __cplusplus
@@ -71,7 +71,7 @@ static int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen
 
 void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 {
-	int error;
+    int error;
 
     serv->prompt = s_serv_prompt;
 
@@ -80,7 +80,7 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
 
     if (port == 0) {
         cssock_close(serv->hsock);
-		error = 1;
+        error = 1;
         csfatal_ext(&error, cserr_exit, "%s invalid port.\n", serv->prompt);
     }
 
@@ -88,13 +88,13 @@ void csserver_init(struct csserver *serv, int tcpudp, u_short port, u_long addr)
     serv->sa_in.sin_port = htons(port);
     serv->sa_in.sin_addr.s_addr = addr;
 
-	cssock_bind(serv->hsock, (struct sockaddr*)&serv->sa_in, sizeof(struct sockaddr_in));
-	printf("%s bind() is OK\n", serv->prompt);
+    cssock_bind(serv->hsock, (struct sockaddr*)&serv->sa_in, sizeof(struct sockaddr_in));
+    printf("%s bind() is OK\n", serv->prompt);
 
     s_init_msgpool_dispatch(serv);
 
-	csclearlist_add(s_clear_msgpool_dispatch, NULL);
-	csclearlist_add(s_csserver_clear, serv);
+    csclearlist_add(s_clear_msgpool_dispatch, NULL);
+    csclearlist_add(s_csserver_clear, serv);
 }
 
 void s_csserver_clear(void* serv)
@@ -139,7 +139,7 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
 int csserver_send(cssock_t handle, void* sendbuf)
 {
     ssize_t sendbytes;
-	struct csmsg_header* msghdr = NULL;
+    struct csmsg_header* msghdr = NULL;
     uint32_t msgdatalen = ntohl(GET_HEADER_DATA(sendbuf, numbytes));
 
     msghdr = (struct csmsg_header*)sendbuf;
@@ -168,21 +168,21 @@ int csserver_send(cssock_t handle, void* sendbuf)
 void csserver_udp(struct csserver* serv)
 {
     char* buf = NULL;
-	int numbytes = 0;
+    int numbytes = 0;
     struct csmsgpool* recvpool = &s_msgpool_dispatch.pool_unprocessed;
 
     printf("%s: I\'m ready to receive a datagram...\n", serv->prompt);
     while (1) {
 
-		/** @brief block untile one buffer avaliable. */
-		while ((buf = cspool_pullitem(recvpool, &recvpool->empty_buf)) == NULL)
-					;
+        /** @brief block untile one buffer avaliable. */
+        while ((buf = cspool_pullitem(recvpool, &recvpool->empty_buf)) == NULL)
+                    ;
 
         numbytes = csserver_recv(serv->hsock, buf, recvpool->len_item);
         if (numbytes > 0) {
 
-			/** Push to pool will succeed in normal case. There is no need to test the return value. */
-			cspool_pushitem(recvpool, &recvpool->filled_buf, buf);
+            /** Push to pool will succeed in normal case. There is no need to test the return value. */
+            cspool_pushitem(recvpool, &recvpool->filled_buf, buf);
             cssem_post(&recvpool->hsem_filled);
         }
         else if (numbytes <= 0) {
@@ -199,21 +199,21 @@ void csserver_udp(struct csserver* serv)
 }
 
 void s_init_msgpool_dispatch(struct csserver* serv)
-{	
-	csmsgpool_dispatch_init(&s_msgpool_dispatch);
+{   
+    csmsgpool_dispatch_init(&s_msgpool_dispatch);
 
     s_msgpool_dispatch.prompt = "server msgpool_dispatch:";
-	s_msgpool_dispatch.process_msg = s_msg_dispatch;
+    s_msgpool_dispatch.process_msg = s_msg_dispatch;
     s_msgpool_dispatch.process_af_msg = csserver_send;
 
     cspool_init(
-                &s_msgpool_dispatch.pool_unprocessed,			/**> struct csmsgpool* pool	*/
-                MAX_MSG_LEN + sizeof(struct csmsg_header),		/**> int itemlen 			*/
-                SERVER_POOL_NUM_ITEM,							/**> int itemnum 			*/
-                NUM_THREAD,										/**> int threadnum			*/
-                serv->hsock,									/**> cssock_t socket 		*/
-                csmsgpool_process,								/**> csthread_proc_t proc 	*/
-                (void*)&s_msgpool_dispatch);					/**> void* pargs 			*/
+                &s_msgpool_dispatch.pool_unprocessed,           /**> struct csmsgpool* pool */
+                MAX_MSG_LEN + sizeof(struct csmsg_header),      /**> int itemlen            */
+                SERVER_POOL_NUM_ITEM,                           /**> int itemnum            */
+                NUM_THREAD,                                     /**> int threadnum          */
+                serv->hsock,                                    /**> cssock_t socket        */
+                csmsgpool_process,                              /**> csthread_proc_t proc   */
+                (void*)&s_msgpool_dispatch);                    /**> void* pargs            */
 
     cspool_init(
                 &s_msgpool_dispatch.pool_processed,
@@ -227,7 +227,7 @@ void s_init_msgpool_dispatch(struct csserver* serv)
 
 void s_clear_msgpool_dispatch(void* unused)
 {
-	(void)unused;
+    (void)unused;
     cspool_clear(&s_msgpool_dispatch.pool_unprocessed);
     cspool_clear(&s_msgpool_dispatch.pool_processed);
 }
@@ -247,24 +247,24 @@ void s_clear_msgpool_dispatch(void* unused)
  */
 int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
-	int ret = 0;
-	uint32_t id_process = -1;
-	static uint32_t s_fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t);
-	if (*outmsglen < s_fixedlen)
-	{
-		return 1;
-	}
+    int ret = 0;
+    uint32_t id_process = -1;
+    static uint32_t s_fixedlen = sizeof(struct csmsg_header) + sizeof(uint32_t);
+    if (*outmsglen < s_fixedlen)
+    {
+        return 1;
+    }
 
-	cs_memcpy(outmsg, *outmsglen, inmsg, s_fixedlen);
-	*outmsglen -= s_fixedlen;
+    cs_memcpy(outmsg, *outmsglen, inmsg, s_fixedlen);
+    *outmsglen -= s_fixedlen;
 
-	id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
-	ret = am_method_get(id_process)->reply(
-				inmsg + s_fixedlen,
-				&((struct csmsg_header*)inmsg)->addr,
-				((struct csmsg_header*)inmsg)->addrlen,
+    id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
+    ret = am_method_get(id_process)->reply(
+                inmsg + s_fixedlen,
+                &((struct csmsg_header*)inmsg)->addr,
+                ((struct csmsg_header*)inmsg)->addrlen,
                 outmsg + s_fixedlen,
-				outmsglen);
+                outmsglen);
 
     /** The length of variables.
      *

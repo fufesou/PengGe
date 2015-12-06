@@ -4,15 +4,15 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-19
- * @modified  Fri 2015-11-20 00:13:26 (+0800)
+ * @modified  Sun 2015-12-06 17:44:34 (+0800)
  */
 
 #include  <malloc.h>
 #include  <stdlib.h>
 
-#include    "macros.h"
-#include    "list.h"
-#include    "clearlist.h"
+#include    "common/macros.h"
+#include    "common/list.h"
+#include    "common/clearlist.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -29,21 +29,21 @@ static void s_clearlist_clear(void);
 #endif
 
 
-void csclearlist_add(void (*pfunc_clear)(void* pargs), void* pargs)
+void csclearlist_add(void (CS_CALLBACK *pfunc_clear)(void* pargs), void* pargs)
 {
     struct list_clear_t* node_clear = NULL;
 
     node_clear = (struct list_clear_t*)malloc(sizeof(struct list_clear_t));
-	node_clear->clear_item.pfunc_clear = pfunc_clear;
-	node_clear->clear_item.pargs = pargs;
+    node_clear->clear_item.pfunc_clear = pfunc_clear;
+    node_clear->clear_item.pargs = pargs;
 
     list_add(&node_clear->listnode, &s_list_clear);
 }
 
 void csclearlist_clear()
 {
-	s_execute_clears();
-	s_clearlist_clear();
+    s_execute_clears();
+    s_clearlist_clear();
 }
 
 void s_execute_clears()
@@ -53,7 +53,7 @@ void s_execute_clears()
 
     while (execnode != (&s_list_clear)) {
         node_clear = container_of(execnode, struct list_clear_t, listnode);
-		node_clear->clear_item.pfunc_clear(node_clear->clear_item.pargs);
+        node_clear->clear_item.pfunc_clear(node_clear->clear_item.pargs);
         execnode = execnode->prev;
     }
 }

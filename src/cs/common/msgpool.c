@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Sat 2015-11-07 14:53:04 (+0800)
+ * @modified  Sun 2015-12-06 18:13:39 (+0800)
  */
 
 #ifdef WIN32
@@ -20,13 +20,13 @@
 #include  <stdio.h>
 #include  <malloc.h>
 #include  <string.h>
-#include    "cstypes.h"
-#include    "macros.h"
-#include    "utility_wrap.h"
-#include    "bufarray.h"
-#include    "sock_types.h"
-#include    "lightthread.h"
-#include    "msgpool.h"
+#include    "common/cstypes.h"
+#include    "common/macros.h"
+#include    "common/utility_wrap.h"
+#include    "common/bufarray.h"
+#include    "common/sock_types.h"
+#include    "common/lightthread.h"
+#include    "cs/msgpool.h"
 
 
 #ifdef __cplusplus
@@ -72,12 +72,12 @@ void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum
     pool->socket = socket;
     pool->threadexit = 0;
 
-	s_initpool(pool, proc, pargs);
+    s_initpool(pool, proc, pargs);
 }
 
 void cspool_clear(struct csmsgpool* pool)
 {
-	s_clearpool(pool);
+    s_clearpool(pool);
 }
 
 void s_initpool(struct csmsgpool* pool, csthread_proc_t proc, void* pargs)
@@ -85,7 +85,7 @@ void s_initpool(struct csmsgpool* pool, csthread_proc_t proc, void* pargs)
     const int init_fillednum = 0;
     int num_items;
     int init_emptynum;
-	int i;
+    int i;
 
     init_buf(&pool->filled_buf, pool->num_item, pool->len_item, init_fillednum);
     pool->len_item = pool->filled_buf.len_item;
@@ -100,10 +100,10 @@ void s_initpool(struct csmsgpool* pool, csthread_proc_t proc, void* pargs)
     pool->use_sem_in_pool = 1;
 
     pool->hthread = (csthread_t*)malloc(sizeof(csthread_t) * pool->num_thread);
-	for (i=0; i<pool->num_thread; ++i) {
-		csthread_create(proc, pargs, pool->hthread + i);
-		cssleep(20);
-	}
+    for (i=0; i<pool->num_thread; ++i) {
+        csthread_create(proc, pargs, pool->hthread + i);
+        cssleep(20);
+    }
 }
 
 void s_clearpool(struct csmsgpool* pool)
@@ -118,8 +118,8 @@ void s_clearpool(struct csmsgpool* pool)
         cssem_post(&pool->hsem_filled);
     }
 
-	csthreadN_wait_terminate(pool->hthread, pool->num_thread);
-	cssem_destroy(&pool->hsem_filled);
+    csthreadN_wait_terminate(pool->hthread, pool->num_thread);
+    cssem_destroy(&pool->hsem_filled);
 
     pool->filled_buf.clear_buf(&pool->filled_buf);
     pool->empty_buf.clear_buf(&pool->empty_buf);

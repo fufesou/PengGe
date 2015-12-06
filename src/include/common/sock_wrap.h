@@ -23,7 +23,7 @@ extern "C" {
  *
  * @see cssock_envclear
  */
-int cssock_envinit(void);
+CS_API int cssock_envinit(void);
 
 /**
  * @brief  cssock_envclear will do basic clear works for sock environment.
@@ -31,7 +31,7 @@ int cssock_envinit(void);
  * The parameter is just used for common prototype.
  *
  */
-void cssock_envclear(void* unused);
+CS_API void cssock_envclear(void* unused);
 
 /**
  * @brief  cssock_get_last_error will return last error number.
@@ -40,7 +40,7 @@ void cssock_envclear(void* unused);
  *
  * @return  The last error number. 
  */
-int cssock_get_last_error(void);
+CS_API int cssock_get_last_error(void);
 
 /**
  * @brief  csaddrin_set 
@@ -49,7 +49,7 @@ int cssock_get_last_error(void);
  * @param ip
  * @param port
  */
-void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port);
+CS_API void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port);
 
 /**
  * @brief  cssock_open cssock_open will create a socket handle according to tcpudp option.
@@ -59,22 +59,22 @@ void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port);
  *
  * @return   
  */
-cssock_t cssock_open(int tcpudp);
+CS_API cssock_t cssock_open(int tcpudp);
 
 /**
  * @brief  cssock_close 
  *
  * @param handle
  */
-void cssock_close(cssock_t handle);
+CS_API void cssock_close(cssock_t handle);
 
-void cssock_connect(cssock_t handle, const struct sockaddr* sa, cssocklen_t addrlen);
+CS_API void cssock_connect(cssock_t handle, const struct sockaddr* sa, cssocklen_t addrlen);
 
-void cssock_bind(cssock_t handle, struct sockaddr* sa, cssocklen_t addrlen);
+CS_API void cssock_bind(cssock_t handle, struct sockaddr* sa, cssocklen_t addrlen);
 
-void cssock_listen(cssock_t handle, int maxconn);
+CS_API void cssock_listen(cssock_t handle, int maxconn);
 
-cssock_t cssock_accept(cssock_t handle, const struct sockaddr* sa, cssocklen_t* addrlen);
+CS_API cssock_t cssock_accept(cssock_t handle, const struct sockaddr* sa, cssocklen_t* addrlen);
 
 /**
  * @brief  cssock_block cssock_block will set socket to be blocking or nonblocking according to block parameter.
@@ -88,7 +88,7 @@ cssock_t cssock_accept(cssock_t handle, const struct sockaddr* sa, cssocklen_t* 
  * 1. block set result, if handle is a valid socket.
  * 2. -1, if handle is not a valid socket.
  */
-int cssock_block(cssock_t handle, int block);
+CS_API int cssock_block(cssock_t handle, int block);
 
 /**
  * @brief  cssock_print print the IP and port for current socket handle, if socket is connected.
@@ -101,7 +101,7 @@ int cssock_block(cssock_t handle, int block);
  * 2. 0, if socket is connected.
  * 3. 1, if socket is not connected.
  */
-int cssock_print(cssock_t handle, const char* header);
+CS_API int cssock_print(cssock_t handle, const char* header);
 
 /**
  * @brief cssock_getsockname
@@ -110,7 +110,7 @@ int cssock_print(cssock_t handle, const char* header);
  * @param addrlen
  * @return
  */
-int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
+CS_API int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
 
 /**
  * @brief cssock_getpeername
@@ -119,7 +119,7 @@ int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addr
  * @param addrlen
  * @return
  */
-int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
+CS_API int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen);
 
 #ifdef WIN32
 const char* cssock_inet_ntop(int af, const void* src, char* dst, cssocklen_t size);

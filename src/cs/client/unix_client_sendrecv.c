@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-31
- * @modified  周五 2015-11-06 12:15:06 中国标准时间
+ * @modified  Sun 2015-12-06 18:11:40 (+0800)
  */
 
 #ifndef WIN32
@@ -19,18 +19,19 @@
 #include  <arpa/inet.h>
 #include  <pthread.h>
 #include  <semaphore.h>
-#include    "cstypes.h"
-#include    "config_macros.h"
-#include    "macros.h"
-#include    "unprtt.h"
-#include    "sock_types.h"
-#include    "lightthread.h"
-#include    "sock_wrap.h"
-#include    "bufarray.h"
-#include    "msgpool.h"
-#include    "msgwrap.h"
-#include    "utility_wrap.h"
-#include    "client.h"
+#include    "common/cstypes.h"
+#include    "common/config_macros.h"
+#include    "common/macros.h"
+#include    "common/sock_types.h"
+#include    "common/lightthread.h"
+#include    "common/sock_wrap.h"
+#include    "common/bufarray.h"
+#include    "common/msgwrap.h"
+#include    "common/utility_wrap.h"
+#include    "cs/unprtt.h"
+#include    "cs/msgpool.h"
+#include    "cs/msgpool_dispatch.h"
+#include    "cs/client.h"
 
 
 #ifdef __cplusplus
@@ -84,17 +85,17 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 
         alarm(rtt_start(&s_rttinfo));
 
-		if (sigsetjmp(s_jmpbuf, 1) != 0) {
+        if (sigsetjmp(s_jmpbuf, 1) != 0) {
             if (rtt_timeout(&s_rttinfo) < 0) {
                 fprintf(stderr, "cssendrecv: no response from server, giving up.\recvbytes");
                 s_rttinit = 0;
-				errno = ETIMEDOUT;
-				return -1;
-			}
-			goto sendagain;
-		}
+                errno = ETIMEDOUT;
+                return -1;
+            }
+            goto sendagain;
+        }
 
-		do {
+        do {
             if ((recvbytes = recvfrom(cli->hsock, cli->recvbuf, sizeof(cli->recvbuf), 0, NULL, NULL)) == -1) {
                 if (errno == EAGAIN || errno == EWOULDBLOCK) {
                     continue;
@@ -102,7 +103,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
             }
         } while (recvbytes < (ssize_t)sizeof(struct csmsg_header) ||
                     (((struct csmsg_header*)cli->recvbuf)->header.seq != s_sendhdr.header.seq));
-		alarm(0);
+        alarm(0);
 
         rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct csmsg_header*)cli->recvbuf)->header.ts);
         csmsg_copyaddr((struct csmsg_header*)cli->recvbuf, servaddr, addrlen);
@@ -118,9 +119,9 @@ void s_sig_alrm(int signo)
 
 void s_register_alrm()
 {
-	if (firstcall) {
-		cssignal_ext(SIGALRM, s_sig_alrm);
-	}
+    if (firstcall) {
+        cssignal_ext(SIGALRM, s_sig_alrm);
+    }
 }
 
 void cssendrecv_init(void)

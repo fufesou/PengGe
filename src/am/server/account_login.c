@@ -4,32 +4,32 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
- * @modified  Sun 2015-11-29 17:46:11 (+0800)
+ * @modified  Sun 2015-12-06 18:00:22 (+0800)
  */
 
 #include  <malloc.h>
 #include  <stdio.h>
 #include  <string.h>
-#include    "cstypes.h"
-#include    "config_macros.h"
-#include    "macros.h"
-#include    "list.h"
-#include    "utility_wrap.h"
-#include    "account.h"
-#include    "account_file.h"
-#include    "account_login.h"
+#include    "common/cstypes.h"
+#include    "common/config_macros.h"
+#include    "common/macros.h"
+#include    "common/list.h"
+#include    "common/utility_wrap.h"
+#include    "am/account.h"
+#include    "am/account_file.h"
+#include    "am/account_login.h"
 
 
 void am_login_add(
-			struct list_head* node_head,
-			const struct account_data_t* account,
-			const void* data_verification,
-			uint32_t len_verification)
+            struct list_head* node_head,
+            const struct account_data_t* account,
+            const void* data_verification,
+            uint32_t len_verification)
 {
     struct list_login_t* node_login = NULL;
 
     node_login = (struct list_login_t*)calloc(1, sizeof(struct list_login_t));
-	cs_memcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
+    cs_memcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
 
     node_login->account_sock.data_verification = calloc(len_verification, sizeof(char));
     cs_memcpy(node_login->account_sock.data_verification, len_verification, data_verification, len_verification);
@@ -39,50 +39,50 @@ void am_login_add(
 }
 
 int am_login_remove(
-			struct list_head* node_head,
-			uint32_t id_account,
-			const void* data_verification,
-			uint32_t len_verification)
+            struct list_head* node_head,
+            uint32_t id_account,
+            const void* data_verification,
+            uint32_t len_verification)
 {
-	struct list_login_t* node_login = NULL;
-	struct account_login_t* account_login = am_login_find_id(node_head, id_account);
+    struct list_login_t* node_login = NULL;
+    struct account_login_t* account_login = am_login_find_id(node_head, id_account);
 
-	if (account_login == NULL) {
-		return 1;
-	}
+    if (account_login == NULL) {
+        return 1;
+    }
 
-	if (memcmp(account_login->data_verification, data_verification, len_verification) != 0) {
-		return 2;
-	}
+    if (memcmp(account_login->data_verification, data_verification, len_verification) != 0) {
+        return 2;
+    }
 
     node_login = container_of(account_login, struct list_login_t, account_sock);
     if (am_account_update(&node_login->account_sock.account) != 0) {
         fprintf(stderr, "server: update account - %s fail.\n", node_login->account_sock.account.data_basic.usernum);
-		return 3;
-	}
+        return 3;
+    }
 
     list_del(&node_login->listnode);
-	free(account_login->data_verification);
-	free(node_login);
+    free(account_login->data_verification);
+    free(node_login);
 
-	return 0;
+    return 0;
 }
 
 int am_login_remove_account(struct account_login_t* account_login)
 {
-	struct list_login_t* node_login = NULL;
+    struct list_login_t* node_login = NULL;
 
     node_login = container_of(account_login, struct list_login_t, account_sock);
     if (am_account_update(&node_login->account_sock.account) != 0) {
         fprintf(stderr, "server: update account - %s fail.\n", node_login->account_sock.account.data_basic.usernum);
-		return 1;
-	}
+        return 1;
+    }
 
     list_del(&node_login->listnode);
-	free(account_login->data_verification);
-	free(node_login);
+    free(account_login->data_verification);
+    free(node_login);
 
-	return 0;
+    return 0;
 }
 
 struct account_login_t* am_login_find_id(const struct list_head* node_head, uint32_t id)
@@ -98,7 +98,7 @@ struct account_login_t* am_login_find_id(const struct list_head* node_head, uint
         node_login = node_login->next;
     }
 
-	return NULL;
+    return NULL;
 }
 
 struct account_login_t* am_login_find_tel(const struct list_head* node_head, const char* tel)
@@ -113,14 +113,14 @@ struct account_login_t* am_login_find_tel(const struct list_head* node_head, con
         }
         node_login = node_login->next;
     }
-	return NULL;
+    return NULL;
 }
 
 struct account_login_t* am_login_find_id_verification(
-			const struct list_head* node_head,
-			uint32_t id,
-			const void* data_verification,
-			uint32_t len_verification)
+            const struct list_head* node_head,
+            uint32_t id,
+            const void* data_verification,
+            uint32_t len_verification)
 {
     struct list_login_t* login_data = NULL;
     struct list_head* node_login = node_head->next;
@@ -129,21 +129,21 @@ struct account_login_t* am_login_find_id_verification(
         login_data = container_of(node_login, struct list_login_t, listnode);
         if (login_data->account_sock.account.data_basic.id == id) {
             if (memcmp(login_data->account_sock.data_verification, data_verification, len_verification) == 0) {
-				return &login_data->account_sock;
-			} else {
-				return NULL;
-			}
+                return &login_data->account_sock;
+            } else {
+                return NULL;
+            }
         }
         node_login = node_login->next;
     }
-	return NULL;
+    return NULL;
 }
 
 int am_login_exist(
-			const struct list_head* node_head,
-			const struct account_data_t* account,
-			const void* data_verification,
-			uint32_t len_verification)
+            const struct list_head* node_head,
+            const struct account_data_t* account,
+            const void* data_verification,
+            uint32_t len_verification)
 {
     int login_status = 0;
     struct list_login_t* login_data = NULL;
@@ -173,13 +173,13 @@ int am_login_write(const struct list_head* node_head)
     while (node_login != node_head) {
         login_data = container_of(node_login, struct list_login_t, listnode);
         if (am_account_update(&login_data->account_sock.account) != 0) {
-			return 1;
-		}
+            return 1;
+        }
 
         node_login = node_login->next;
     }
 
-	return 0;
+    return 0;
 }
 
 int am_login_tryadd(struct list_head* node_head, const struct account_data_t* account, const void* data_verification, uint32_t len_verification)

@@ -36,7 +36,7 @@ extern "C"
  *
  *  @note c11 has introduced memcpy_s.
  */
-int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count);
+CS_API int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count);
 
 /**
  * @brief cs_fopen
@@ -47,7 +47,7 @@ int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count);
  *
  * @todo move this function to common lib.
  */
-int cs_fopen(FILE** streamptr, const char* filename, const char* mode);
+CS_API int cs_fopen(FILE** streamptr, const char* filename, const char* mode);
 
 
 #ifndef WIN32

@@ -4,22 +4,22 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Thu 2015-11-26 22:04:12 (+0800)
+ * @modified  Sun 2015-12-06 18:22:38 (+0800)
  */
 
 #ifndef _ACCOUNT_H
 #define _ACCOUNT_H
 
-#include    "account_macros.h"
+#include    "am/account_macros.h"
 
 
 #pragma pack(4)
 struct account_basic_t {
-	uint8_t grade;
-	uint32_t id;
-	char usernum[ACCOUNT_USERNUM_LEN];
+    uint8_t grade;
+    uint32_t id;
+    char usernum[ACCOUNT_USERNUM_LEN];
     char tel[ACCOUNT_TEL_LEN];
-	char username[ACCOUNT_USERNAME_LEN];
+    char username[ACCOUNT_USERNAME_LEN];
 };
 #pragma pack()
 
@@ -38,8 +38,8 @@ DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
 
-typedef int (*pfunc_react)(char*, char*, __inout uint32_t*);
-typedef int (*pfunc_reply)(char*, const void*, uint32_t, char*, __inout uint32_t*);
+typedef int (CS_CALLBACK *pfunc_react)(char*, char*, __inout uint32_t*);
+typedef int (CS_CALLBACK *pfunc_reply)(char*, const void*, uint32_t, char*, __inout uint32_t*);
 
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.

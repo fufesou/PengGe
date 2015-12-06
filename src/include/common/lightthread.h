@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-26
- * @modified  2015-10-28 00:56:06 (+0800)
+ * @modified  Sun 2015-12-06 18:24:53 (+0800)
  */
 
 #ifndef _LIGHTTHREAD_H
@@ -16,16 +16,16 @@ extern "C"
 #endif
 
 #ifdef WIN32
-	typedef void* csmutex_t;
-	typedef void* cssem_t;
+    typedef void* csmutex_t;
+    typedef void* cssem_t;
     typedef void* csthread_t;
-	typedef unsigned int (__stdcall *csthread_proc_t)(void*);
+    typedef unsigned int (__stdcall *csthread_proc_t)(void*);
 
 #else
-	typedef pthread_mutex_t csmutex_t;
-	typedef sem_t cssem_t;
-	typedef pthread_t csthread_t;
-	typedef void* (*csthread_proc_t)(void*);
+    typedef pthread_mutex_t csmutex_t;
+    typedef sem_t cssem_t;
+    typedef pthread_t csthread_t;
+    typedef void* (CS_CALLBACK *csthread_proc_t)(void*);
 #endif
 
 
@@ -134,9 +134,9 @@ int cssem_wait(cssem_t* handle);
 int cssem_post(cssem_t* handle);
 int cssem_destroy(cssem_t* handle);
 #else
-	#define cssem_wait sem_wait
-	#define cssem_post sem_post
-	#define cssem_destroy sem_destroy
+    #define cssem_wait sem_wait
+    #define cssem_post sem_post
+    #define cssem_destroy sem_destroy
 #endif
 
 

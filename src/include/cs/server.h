@@ -30,18 +30,18 @@ struct csserver
  *
  * @note This function must be called after init_sock_environment being called. 
  */
-void csserver_init(struct csserver* serv, int tcpudp, u_short port, u_long addr);
+CS_API void csserver_init(struct csserver* serv, int tcpudp, u_short port, u_long addr);
 
 /**
  * @brief  csserver_udp This function process communication for udp socket.
  *
  * @param serv
  */
-void csserver_udp(struct csserver* serv);
+CS_API void csserver_udp(struct csserver* serv);
 
-ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes);
+CS_API ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes);
 
-int csserver_send(cssock_t handle, void* sendbuf);
+CS_API int csserver_send(cssock_t handle, void* sendbuf);
 
 
 #ifdef __cplusplus

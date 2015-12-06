@@ -1,10 +1,10 @@
 /**
- * @file msgwrap.h	
+ * @file msgwrap.h  
  * @brief  This file describe the message header for sending and receiving.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Sat 2015-11-14 12:11:32 (+0800)
+ * @modified  Sun 2015-12-06 18:25:09 (+0800)
  */
 
 #ifndef  MSGUNIT_H

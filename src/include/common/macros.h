@@ -5,7 +5,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
- * modified  Sun 2015-11-22 19:16:28 (+0800)
+ * modified  Sun 2015-12-06 18:40:25 (+0800)
  */
 
 #ifndef  MACROS_H
@@ -25,6 +25,25 @@
 
 // #define _CHECK_ARGS
 
+#ifdef WIN32
+#define CS_CALLBACK __cdecl
+#else                   /* *nix */
+#define CS_CALLBACK
+#endif                  /* WIN32 */
+
+#ifdef WIN32
+#ifdef CS_DLL
+#ifdef CS_BUILDING_LIB
+#define CS_API __declspec( dllexport )
+#else
+#define CS_API __declspec( dllimport )
+#endif                  /* CS_BUILDING_LIB */
+#else                   /* !CS_DLL */
+#define CS_API extern
+#endif                  /* CS_DLL */
+#else
+#define CS_API extern   /* *nix */
+#endif                  /* WIN32 */
 
 #define SIZEOF_ARR(arr) (sizeof(arr)/sizeof((arr)[0]))
 
@@ -45,8 +64,8 @@
 #define container_of(ptr, type, member) ((type *)((char *)ptr - offsetof(type, member)))
 #else
 #define container_of(ptr, type, member) ({          \
-	const typeof(((type *)0)->member)*__mptr = (ptr);    \
-		     (type *)((char *)__mptr - offsetof(type, member)); })
+    const typeof(((type *)0)->member)*__mptr = (ptr);    \
+             (type *)((char *)__mptr - offsetof(type, member)); })
 #endif
 #endif
 

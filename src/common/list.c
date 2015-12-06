@@ -4,9 +4,10 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
+ * @modified  Sun 2015-12-06 18:20:38 (+0800)
  */
 
-#include  "list.h"
+#include  "common/list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,19 +26,19 @@ static void __list_del(struct list_head * prev, struct list_head * next);
 
 void INIT_LIST_HEAD(struct list_head *list)
 {
-	list->next = list;
-	list->prev = list;
+    list->next = list;
+    list->prev = list;
 }
 
 void __list_add(
                 struct list_head *new,
-				struct list_head *prev,
-				struct list_head *next)
+                struct list_head *prev,
+                struct list_head *next)
 {
-	next->prev = new;
-	new->next = next;
-	new->prev = prev;
-	prev->next = new;
+    next->prev = new;
+    new->next = next;
+    new->prev = prev;
+    prev->next = new;
 }
 
 /**
@@ -50,7 +51,7 @@ void __list_add(
  */
 void list_add(struct list_head *new, struct list_head *head)
 {
-	__list_add(new, head, head->next);
+    __list_add(new, head, head->next);
 }
 
 
@@ -64,7 +65,7 @@ void list_add(struct list_head *new, struct list_head *head)
  */
 void list_add_tail(struct list_head *new, struct list_head *head)
 {
-	__list_add(new, head->prev, head);
+    __list_add(new, head->prev, head);
 }
 
 /*
@@ -76,8 +77,8 @@ void list_add_tail(struct list_head *new, struct list_head *head)
  */
 void __list_del(struct list_head * prev, struct list_head * next)
 {
-	next->prev = prev;
-	prev->next = next;
+    next->prev = prev;
+    prev->next = next;
 }
 
 /**
@@ -88,7 +89,7 @@ void __list_del(struct list_head * prev, struct list_head * next)
  */
 void list_del(struct list_head *entry)
 {
-	__list_del(entry->prev, entry->next);
+    __list_del(entry->prev, entry->next);
     entry->next = 0;
     entry->prev = 0;
 }
@@ -102,10 +103,10 @@ void list_del(struct list_head *entry)
  */
 void list_replace(struct list_head *old, struct list_head *new)
 {
-	new->next = old->next;
-	new->next->prev = new;
-	new->prev = old->prev;
-	new->prev->next = new;
+    new->next = old->next;
+    new->next->prev = new;
+    new->prev = old->prev;
+    new->prev->next = new;
 }
 
 /**
@@ -115,7 +116,7 @@ void list_replace(struct list_head *old, struct list_head *new)
  */
 int list_is_last(const struct list_head *list, const struct list_head *head)
 {
-	return list->next == head;
+    return list->next == head;
 }
 
 /**
@@ -124,5 +125,5 @@ int list_is_last(const struct list_head *list, const struct list_head *head)
  */
 int list_empty(const struct list_head *head)
 {
-	return head->next == head;
+    return head->next == head;
 }

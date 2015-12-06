@@ -4,14 +4,15 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-16
+ * @modified  Sun 2015-12-06 18:19:48 (+0800)
  */
 
 #include  <malloc.h>
 #include  <stdio.h>
 #include  <assert.h>
-#include  "macros.h"
-#include  "list.h"
-#include  "buflist.h"
+#include  "common/macros.h"
+#include  "common/list.h"
+#include  "common/buflist.h"
 
 #ifdef __cplusplus
 extern "C" {

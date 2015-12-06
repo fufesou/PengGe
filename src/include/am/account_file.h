@@ -4,15 +4,15 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Thu 2015-11-26 22:29:10 (+0800)
+ * @modified  Sun 2015-12-06 18:22:33 (+0800)
  */
 
 #ifndef _ACCOUNT_FILE_H
 #define _ACCOUNT_FILE_H
 
 struct account_data_t {
-	struct account_basic_t	data_basic;
-    char					passwd[ACCOUNT_PASSWD_LEN];
+    struct account_basic_t  data_basic;
+    char                    passwd[ACCOUNT_PASSWD_LEN];
 };
 
 #ifdef __cplusplus

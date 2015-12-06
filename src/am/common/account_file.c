@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
- * @modified  Sun 2015-11-29 17:51:49 (+0800)
+ * @modified  Sun 2015-12-06 18:04:32 (+0800)
  */
 
 #ifdef WIN32
@@ -25,16 +25,17 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
-#include    "cstypes.h"
-#include    "config_macros.h"
-#include    "list.h"
-#include    "clearlist.h"
-#include    "error.h"
-#include    "lightthread.h"
-#include    "utility_wrap.h"
-#include    "account_macros.h"
-#include    "account.h"
-#include    "account_file.h"
+#include    "common/macros.h"
+#include    "common/cstypes.h"
+#include    "common/config_macros.h"
+#include    "common/list.h"
+#include    "common/clearlist.h"
+#include    "common/error.h"
+#include    "common/lightthread.h"
+#include    "common/utility_wrap.h"
+#include    "am/account_macros.h"
+#include    "am/account.h"
+#include    "am/account_file.h"
 
 #ifndef offsetof
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
@@ -60,9 +61,9 @@ static void s_am_account_config_clear(void* unused);
 int s_account_find_common(uint32_t fileid, void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account)
 {
     csmutex_lock(&s_mutex_file[fileid]);
-	if (s_fpcfg[fileid] == 0) {
-		return 0;
-	}
+    if (s_fpcfg[fileid] == 0) {
+        return 0;
+    }
     fseek(s_fpcfg[fileid], 0, SEEK_SET);
     while (!feof(s_fpcfg[fileid])) {
         if (fread(account, sizeof(*account), 1, s_fpcfg[fileid]) == 1) {
@@ -81,77 +82,77 @@ int s_account_find_common(uint32_t fileid, void* keydata, int cmpcount, size_t d
 
 int am_account_find_id(uint32_t id, struct account_data_t* account)
 {
-	size_t offset = offsetof(struct account_basic_t, id) + offsetof(struct account_data_t, data_basic);
+    size_t offset = offsetof(struct account_basic_t, id) + offsetof(struct account_data_t, data_basic);
     return s_account_find_common(id>>10, &id, sizeof(id), offset, account);
 }
 
 int am_account_find_tel(const char* tel, struct account_data_t* account)
 {
-	uint32_t fileid = 0;
-	size_t offset = 0;
+    uint32_t fileid = 0;
+    size_t offset = 0;
     if (strlen(tel) >= sizeof(account->data_basic.tel)) {
         fprintf(stderr, "account find error, the size of key is too large.\n");
         return 0;
     }
 
-	offset = offsetof(struct account_basic_t, tel) + offsetof(struct account_data_t, data_basic);
-	for (; fileid<ACCOUNT_FILE_NUM; ++fileid) {
-		if (s_account_find_common(fileid, (void*)tel, strlen(tel) + 1, offset, account) == 1) {
-			return 1;
-		}
-	}
+    offset = offsetof(struct account_basic_t, tel) + offsetof(struct account_data_t, data_basic);
+    for (; fileid<ACCOUNT_FILE_NUM; ++fileid) {
+        if (s_account_find_common(fileid, (void*)tel, strlen(tel) + 1, offset, account) == 1) {
+            return 1;
+        }
+    }
 
-	return 0;
+    return 0;
 }
 
 int am_account_find_usernum(const char* usernum, struct account_data_t* account)
 {
-	uint32_t fileid = 0;
-	size_t offset = 0;
+    uint32_t fileid = 0;
+    size_t offset = 0;
     if (strlen(usernum) >= sizeof(account->data_basic.usernum)) {
         fprintf(stderr, "account find error, the size of key is too large.\n");
         return 0;
     }
 
     offset = offsetof(struct account_basic_t, usernum) + offsetof(struct account_data_t, data_basic);
-	for (; fileid<ACCOUNT_FILE_NUM; ++fileid) {
-		if (s_account_find_common(fileid, (void*)usernum, strlen(usernum) + 1, offset, account) == 1) {
-			return 1;
-		}
-	}
+    for (; fileid<ACCOUNT_FILE_NUM; ++fileid) {
+        if (s_account_find_common(fileid, (void*)usernum, strlen(usernum) + 1, offset, account) == 1) {
+            return 1;
+        }
+    }
 
-	return 0;
+    return 0;
 }
 
 int am_account_find_login(const char* login, struct account_data_t* account)
 {
-	size_t len_first = strlen(login);
-	size_t len_second = strlen(login + len_first + 1); 
-	uint32_t fileid = 0;
+    size_t len_first = strlen(login);
+    size_t len_second = strlen(login + len_first + 1); 
+    uint32_t fileid = 0;
 
-	for (; fileid < ACCOUNT_FILE_NUM; ++fileid) {
-		csmutex_lock(&s_mutex_file[fileid]);
-		if (s_fpcfg[fileid] == 0) {
-			continue;
-		}
-		fseek(s_fpcfg[fileid], 0, SEEK_SET);
-		while (!feof(s_fpcfg[fileid])) {
-			if (fread(account, sizeof(*account), 1, s_fpcfg[fileid]) == 1) {
-				if ((strncmp(account->data_basic.tel, login, len_first + 1) == 0) ||
-							(strncmp(account->data_basic.usernum, login, len_first + 1) == 0)) {
-					csmutex_unlock(&s_mutex_file[fileid]);
-					if (strncmp(account->passwd, login + len_first + 1, len_second + 1) == 0) {
-						return 1;
-					} else {
-						return 2;
-					}
-				}
-			} else if (ferror(s_fpcfg[fileid])) {
-				fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
-			}
-		}
-		csmutex_unlock(&s_mutex_file[fileid]);
-	}
+    for (; fileid < ACCOUNT_FILE_NUM; ++fileid) {
+        csmutex_lock(&s_mutex_file[fileid]);
+        if (s_fpcfg[fileid] == 0) {
+            continue;
+        }
+        fseek(s_fpcfg[fileid], 0, SEEK_SET);
+        while (!feof(s_fpcfg[fileid])) {
+            if (fread(account, sizeof(*account), 1, s_fpcfg[fileid]) == 1) {
+                if ((strncmp(account->data_basic.tel, login, len_first + 1) == 0) ||
+                            (strncmp(account->data_basic.usernum, login, len_first + 1) == 0)) {
+                    csmutex_unlock(&s_mutex_file[fileid]);
+                    if (strncmp(account->passwd, login + len_first + 1, len_second + 1) == 0) {
+                        return 1;
+                    } else {
+                        return 2;
+                    }
+                }
+            } else if (ferror(s_fpcfg[fileid])) {
+                fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
+            }
+        }
+        csmutex_unlock(&s_mutex_file[fileid]);
+    }
     return 0;
 }
 
@@ -168,14 +169,14 @@ void am_account_config_init(void)
     for (fileid=0; fileid<ACCOUNT_FILE_NUM; ++fileid) {
         csprintf(s_cfgfile[fileid], sizeof(s_cfgfile[fileid]), "%u", fileid);
 
-		/** all files are opened first of all to avoid unexpected errors arising when server's running. */
+        /** all files are opened first of all to avoid unexpected errors arising when server's running. */
         if (cs_fopen(&s_fpcfg[fileid], s_cfgfile[fileid], "ab+") != 0) {
-			errcode = 1;
-			csfatal_ext(&errcode, cserr_exit, "open file error.\n");
-		}
+            errcode = 1;
+            csfatal_ext(&errcode, cserr_exit, "open file error.\n");
+        }
 
         s_mutex_file[fileid] = csmutex_create();
-	}
+    }
 
     csclearlist_add(s_am_account_config_clear, NULL);
     s_inited = 1;
@@ -189,12 +190,12 @@ void s_am_account_config_clear(void* unused)
     for (fileid=0; fileid<ACCOUNT_FILE_NUM; ++fileid) {
         if (s_fpcfg[fileid] != NULL) {
             if (fclose(s_fpcfg[fileid]) != 0) {
-				fprintf(stderr, "close file error.\n");
-			}
-		}
+                fprintf(stderr, "close file error.\n");
+            }
+        }
 
         csmutex_destroy(&s_mutex_file[fileid]);
-	}
+    }
 }
 
 int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic)
@@ -219,11 +220,11 @@ int am_account_write(const struct account_data_t* account)
 
     if (csmutex_lock(&s_mutex_file[fileid])) {
         fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
-		return 1;
+        return 1;
     }
     if (s_fpcfg[fileid] == 0) {
         fprintf(stderr, "file-%u is not open.\n", fileid);
-	}
+    }
     if (fseek(s_fpcfg[fileid], 0, SEEK_END) != 0) {
         fprintf(stderr, "write new account error, call fseek fail.\n");
         csmutex_unlock(&s_mutex_file[fileid]);
@@ -245,14 +246,14 @@ int am_account_write(const struct account_data_t* account)
 
 int am_account_update(const struct account_data_t* account)
 {
-	FILE* fptmp = NULL;
+    FILE* fptmp = NULL;
     int errcode = 0;
-	struct account_data_t account_tmp;
-	char tmpname[16];
+    struct account_data_t account_tmp;
+    char tmpname[16];
     uint32_t fileid = account->data_basic.id >> 10;
 
     csprintf(tmpname, sizeof(tmpname), "t_%u", fileid);
-	cs_fopen(&fptmp, tmpname, "ab+");
+    cs_fopen(&fptmp, tmpname, "ab+");
     if (fwrite(account, sizeof(*account), 1, fptmp) != 1) {
         fprintf(stderr, "update account error, cannot write account data to tmp file.\n");
         fclose(fptmp);
@@ -274,9 +275,9 @@ int am_account_update(const struct account_data_t* account)
     }
 
     fclose(fptmp);
-	fclose(s_fpcfg[fileid]);
-	remove(s_cfgfile[fileid]);
-	rename(tmpname, s_cfgfile[fileid]);
+    fclose(s_fpcfg[fileid]);
+    remove(s_cfgfile[fileid]);
+    rename(tmpname, s_cfgfile[fileid]);
 
     if (cs_fopen(&s_fpcfg[fileid], s_cfgfile[fileid], "ab+") != 0) {
         errcode = 1;
@@ -285,5 +286,5 @@ int am_account_update(const struct account_data_t* account)
 
     csmutex_unlock(&s_mutex_file[fileid]);
 
-	return 0;
+    return 0;
 }
