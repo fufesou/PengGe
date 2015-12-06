@@ -1,10 +1,10 @@
 /**
  * @file clientcontroller.h
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  周四 2015-12-03 22:21:15 中国标准时间
+ * @modified  Sun 2015-12-06 13:20:28 (+0800)
  */
 
 #ifndef _CLIENTCONTROLLER_H
@@ -33,7 +33,7 @@ namespace GuiClient
         CController(void);
         ~CController();
 
-        void showLogin(void);
+        void showLogin(const QString& vUserInfo, const QString& vPasswd);
         static ELoginStatus getLoginStatus() { return m_loginStatus; }
 
     public slots:

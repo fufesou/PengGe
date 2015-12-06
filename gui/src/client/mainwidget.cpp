@@ -1,7 +1,7 @@
 /**
  * @file mainwidget.cpp
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
  * @modified  ���� 2015-12-03 21:05:01 �й���׼ʱ��

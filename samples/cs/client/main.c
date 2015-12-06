@@ -6,7 +6,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-01
- * @modified  Fri 2015-11-20 17:53:10 (+0800)
+ * @modified  Sun 2015-12-06 15:14:15 (+0800)
  */
 
 #ifdef WIN32
@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
 	}
 
 	cssock_envinit();
-    csclient_init(&udpclient, SOCK_DGRAM);
+    csclient_init(&udpclient, SOCK_DGRAM, NULL);
 
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons((unsigned short)atoi(argv[2]));

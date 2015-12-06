@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Thu 2015-11-19 23:25:31 (+0800)
+ * @modified  Sun 2015-12-06 15:08:08 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -65,6 +65,9 @@ struct csclient
  * @param cli
  * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set,
  *  upd socket will be created if SOCK_DGRAM is set.
+ * @param pfunc_msgprocess The function to process message from server.
+ * If pfunc_msgprocess is set NULL, the default process (print message information
+ * on console) will be set.
  *
  * @note 
  * 1. This function must be called after init_sock_environment being called. 
@@ -73,7 +76,7 @@ struct csclient
  *
  * @sa cssock_block cssock_open
  */
-void csclient_init(struct csclient* cli, int tcpudp);
+void csclient_init(struct csclient* cli, int tcpudp, pfunc_msgprocess_t pfunc_msgprocess);
 
 /**
  * @brief  csclient_clear  There may be some clear works after communication,

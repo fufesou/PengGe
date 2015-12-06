@@ -1,3 +1,11 @@
+/**
+ * @file displayitemwidget.cpp
+ * @brief  
+ * @author cxl, <shuanglongchen@yeah.net>
+ * @version 0.1
+ * @date 2015-12-06
+ */
+
 #include  <QLabel>
 #include  <QPushButton>
 #include  <QGridLayout>

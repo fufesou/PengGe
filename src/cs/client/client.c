@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Thu 2015-11-19 23:37:50 (+0800)
+ * @modified  Sun 2015-12-06 15:09:22 (+0800)
  */
 
 #ifdef WIN32
@@ -66,13 +66,13 @@ void s_clear_msgpool_dispatch(void* unused);
 #endif
 
 
-void csclient_init(struct csclient* cli, int tcpudp)
+void csclient_init(struct csclient* cli, int tcpudp, pfunc_msgprocess_t pfunc_msgprocess)
 {
 	int error;
 	int nonblocking = 1;
 
     cli->prompt = s_cli_prompt;
-	cli->pfunc_process_react = csclient_react_dispatch;
+	cli->pfunc_process_react = (pfunc_msgprocess == NULL) ? csclient_react_dispatch : pfunc_msgprocess;
 
     /*
      * @par code to be added

@@ -1,7 +1,7 @@
 /**
  * @file guimacros.h
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
  * @modified  Sat 2015-12-05 21:56:43 (+0800)

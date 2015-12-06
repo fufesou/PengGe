@@ -1,3 +1,11 @@
+/**
+ * @file displayitemwidget.h
+ * @brief  
+ * @author cxl, <shuanglongchen@yeah.net>
+ * @version 0.1
+ * @date 2015-12-06
+ */
+
 #ifndef DISPLAYITEMWIDGET_H
 #define DISPLAYITEMWIDGET_H
 

@@ -1,3 +1,11 @@
+/**
+ * @file listwidget.h
+ * @brief  
+ * @author cxl, <shuanglongchen@yeah.net>
+ * @version 0.1
+ * @date 2015-12-06
+ */
+
 #ifndef LISTWIDGET_H
 #define LISTWIDGET_H
 
