@@ -27,24 +27,24 @@ void INIT_LIST_HEAD(struct list_head *list);
 
 /**
  * list_add - add a new entry
- * @new: new entry to be added
+ * @n: new entry to be added
  * @head: list head to add it after
  *
  * Insert a new entry after the specified head.
  * This is good for implementing stacks.
  */
-void list_add(struct list_head *new, struct list_head *head);
+void list_add(struct list_head *n, struct list_head *head);
 
 
 /**
  * list_add_tail - add a new entry
- * @new: new entry to be added
+ * @n: new entry to be added
  * @head: list head to add it before
  *
  * Insert a new entry before the specified head.
  * This is useful for implementing queues.
  */
-void list_add_tail(struct list_head *new, struct list_head *head);
+void list_add_tail(struct list_head *n, struct list_head *head);
 
 /**
  * list_del - deletes entry from list.
@@ -57,11 +57,11 @@ void list_del(struct list_head *entry);
 /**
  * list_replace - replace old entry by new one
  * @old : the element to be replaced
- * @new : the new element to insert
+ * @n : the new element to insert
  *
  * If @old was empty, it will be overwritten.
  */
-void list_replace(struct list_head *old, struct list_head *new);
+void list_replace(struct list_head *old, struct list_head *n);
 
 /**
  * list_is_last - tests whether @list is the last entry in list @head

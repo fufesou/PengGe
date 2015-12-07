@@ -43,8 +43,8 @@ namespace GuiClient
 		m_plePasswd = new QLineEdit(this);
         m_plePasswd->setEchoMode(QLineEdit::Password);
 
-		m_pbtnRegister = new Common::CWordsButton(tr("register"), this);
-		m_pbtnRetrievePasswd = new Common::CWordsButton(tr("retrieve password"), this);
+        m_pbtnRegister = new GuiCommon::CWordsButton(tr("register"), this);
+        m_pbtnRetrievePasswd = new GuiCommon::CWordsButton(tr("retrieve password"), this);
         m_pbtnLogin = new QPushButton(tr("login"), this);
 
 		pMainLayout->addWidget(plbIndividuation, 0, 0, 6, 10);

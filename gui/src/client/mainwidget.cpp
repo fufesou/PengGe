@@ -4,25 +4,28 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  ���� 2015-12-03 21:05:01 �й���׼ʱ��
+ * @modified  Tue 2015-12-08 00:35:09 (+0800)
  */
 
 #include  <QGridLayout>
 
+#include    "guimacros.h"
 #include    "mainwidget.h"
+#include    "displayiteminfo.h"
 
 namespace GuiClient
 {
     CMainWidget::CMainWidget(QWidget* vParent)
         : QWidget(vParent)
     {
-        this->setGeometry(600, 100, 200, 600);
+        initWidget();
+        setGeometry(600, 100, 200, 600);
     }
 
-    void CMainWidget::initWidgets()
+    void CMainWidget::initWidget()
     {
         QGridLayout* pMainLayout = new QGridLayout(this);
-        this->setLayout(pMainLayout);
+        setLayout(pMainLayout);
 
         m_pSelfInfoWidget = new QWidget(this);
         pMainLayout->addWidget(m_pSelfInfoWidget, 0, 0, 2, 1);

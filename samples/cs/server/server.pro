@@ -27,7 +27,8 @@ SOURCES += \
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs_win
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcsd_win
-else:unix: LIBS += -L$$PWD/../../../build/lib/ -lpgcs_unix
+else:unix:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs_unix
+else:unix:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcsd_unix
 
 win32 {
     LIBS += -lwsock32 -lwinmm -lws2_32

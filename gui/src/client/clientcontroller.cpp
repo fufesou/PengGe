@@ -4,12 +4,40 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Sun 2015-12-06 13:21:14 (+0800)
+ * @modified  Tue 2015-12-08 01:01:59 (+0800)
  */
 
 #include  <QWidget>
 
-#include    "../common/guimacros.h"
+#ifdef WIN32
+#include  <winsock2.h>
+#include  <windows.h>
+#else
+#include  <sys/socket.h>
+#include  <netinet/in.h>
+#include  <arpa/inet.h>
+#endif
+
+#ifndef _MSC_VER  /* *nix */
+#include  <semaphore.h>
+#endif
+
+#include    "common/cstypes.h"
+#include    "common/config_macros.h"
+#include    "common/macros.h"
+#include    "common/list.h"
+#include    "common/lightthread.h"
+#include    "common/bufarray.h"
+#include    "common/sock_types.h"
+#include    "common/sock_wrap.h"
+#include    "common/utility_wrap.h"
+#include    "common/clearlist.h"
+#include    "cs/msgpool.h"
+#include    "cs/msgpool_dispatch.h"
+#include    "cs/client.h"
+#include    "am/client_account.h"
+
+#include    "guimacros.h"
 #include    "clientcontroller.h"
 #include    "loginwindow.h"
 #include    "logingwidget.h"
@@ -17,37 +45,55 @@
 
 namespace GuiClient
 {
-
     CController::ELoginStatus CController::m_loginStatus = CController::eLoginInit;
 
-    CController::CController()
+    CController::CController(const char* vServerIP, unsigned short vServerPort)
         : m_pLoginWidget(new CLoginWindow)
         , m_pLogingWidget(new CLogingWidget)
         , m_pMainWidget(new CMainWidget)
+        , m_pCSClient(NULL)
+        , m_pServerAddr(NULL)
     {
-        m_pLoginWidget->hide();
-        m_pLogingWidget->hide();
-        m_pMainWidget->hide();
+        if (initClient(vServerIP, vServerPort))
+        {
+            m_pLoginWidget->hide();
+            m_pLogingWidget->hide();
+            m_pMainWidget->hide();
 
-        bool bIsLoginConOK = connect(m_pLoginWidget, SIGNAL(login()), this, SLOT(login()));
-        Q_ASSERT(bIsLoginConOK);
+            bool bIsLoginConOK = connect(m_pLoginWidget, SIGNAL(login()), this, SLOT(login()));
+            Q_ASSERT(bIsLoginConOK);
+        }
     }
 
     CController::~CController()
     {
+        csclearlist_clear();
+        free(m_pCSClient);
+        free(m_pServerAddr);
+
         SAFE_DEL(m_pLoginWidget);
         SAFE_DEL(m_pLogingWidget);
         SAFE_DEL(m_pMainWidget);
     }
 
-    void CController::showLogin()
+    bool CController::initClient(const char* vServerIP, unsigned short vServerPort)
     {
-        m_pLoginWidget->show();
+        m_pCSClient = (struct csclient*)malloc(sizeof(struct csclient));
+        m_pServerAddr = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
+
+        cssock_envinit();
+        csclient_init(m_pCSClient, SOCK_DGRAM, NULL);
+        
+        m_pServerAddr->sin_family = AF_INET;
+        m_pServerAddr->sin_port = htons(vServerPort);
+        m_pServerAddr->sin_addr.s_addr = inet_addr(vServerIP);
+
+        csclient_msgpool_dispatch_init(m_pCSClient);
     }
 
-    void CController::login(const QString& vUserInfo, const QString& vPasswd)
+    void CController::showLogin(const QString& vUserInfo, const QString& vPasswd)
     {
-        m_pLoginWidget->hide();
+        m_pLoginWidget->show();
         m_pLogingWidget->show();
     }
 

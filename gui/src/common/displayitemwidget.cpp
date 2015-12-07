@@ -4,6 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-06
+ * @modified  Tue 2015-12-08 00:41:37 (+0800)
  */
 
 #include  <QLabel>

@@ -4,13 +4,18 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  ���� 2015-12-03 21:04:40 �й���׼ʱ��
+ * @modified  Tue 2015-12-08 00:35:43 (+0800)
  */
 
 #ifndef _MAINWIDGET_H
 #define _MAINWIDGET_H
 
 #include  <QWidget>
+
+namespace GuiCommon
+{
+    QT_FORWARD_DECLARE_CLASS(CDisplayItemInfo)
+}
 
 namespace GuiClient
 {
@@ -21,8 +26,11 @@ namespace GuiClient
     public:
         explicit CMainWidget(QWidget* vParent = 0);
 
+    signals:
+        void beginChat(const GuiCommon::CDisplayItemInfo& vPeerInfo);
+
     private:
-        void initWidgets(void);
+        void initWidget(void);
 
     private:
         QWidget* m_pSelfInfoWidget;
