@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-17
- * @modified  Sun 2015-12-06 18:19:12 (+0800)
+ * @modified  Mon 2015-12-07 20:23:30 (+0800)
  */
 
 #include  <malloc.h>
@@ -13,36 +13,13 @@
 #include    "common/macros.h"
 #include    "common/bufarray.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-static void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc);
-static char* CS_CALLBACK s_pull_item(struct array_buf* buf);
-static char* CS_CALLBACK s_push_item(struct array_buf* buf, char* item);
-static void CS_CALLBACK s_clear_buf(struct array_buf* buf);
-static int CS_CALLBACK s_get_num_contained_items(const struct array_buf* buf);
-
-#ifdef __cplusplus
-}
-#endif
-
 void init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
-{
-    s_init_buf(buf, numitem, lenitem, nmalloc);
-}
-
-void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
 {
     int i = 0;
 
     buf->head = 0;
     buf->len_item = TO_MULTIPLE_OF(lenitem, 512);
     buf->num_item = TO_MULTIPLE_OF(numitem, 4) + 1;
-    buf->pull_item = s_pull_item;
-    buf->push_item = s_push_item;
-    buf->clear_buf = s_clear_buf;
-    buf->get_num_contained_item = s_get_num_contained_items;
 
     buf->data = (char**)calloc(buf->num_item, sizeof(char*));
     for (i=0; i<buf->num_item; ++i) {
@@ -64,7 +41,7 @@ void s_init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)
     }
 }
 
-char* s_pull_item(struct array_buf* buf)
+char* pull_item(struct array_buf* buf)
 {
     char* item = NULL;
 #ifdef _CHECK_ARGS
@@ -82,7 +59,7 @@ char* s_pull_item(struct array_buf* buf)
     return item;
 }
 
-char* s_push_item(struct array_buf* buf, char* item)
+char* push_item(struct array_buf* buf, char* item)
 {
     int ahead_tail = ((buf->tail + 1) == buf->num_item) ?
                             0 : (buf->tail + 1);
@@ -103,7 +80,7 @@ char* s_push_item(struct array_buf* buf, char* item)
     return item;
 }
 
-void s_clear_buf(struct array_buf* buf)
+void clear_buf(struct array_buf* buf)
 {
     int itrhead = buf->head;
     int itrtail = buf->tail;
@@ -115,7 +92,7 @@ void s_clear_buf(struct array_buf* buf)
     free(buf->data);
 }
 
-static int s_get_num_contained_items(const struct array_buf* buf)
+int get_num_contained_items(const struct array_buf* buf)
 {
     int num = buf->tail + buf->num_item - buf->head;
     return (num > buf->num_item) ? (num - buf->num_item) : num;

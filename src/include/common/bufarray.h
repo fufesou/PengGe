@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-17
- * @modified  Sun 2015-12-06 18:24:27 (+0800)
+ * @modified  Mon 2015-12-07 20:20:54 (+0800)
  */
 
 #ifndef  BUFARRAY_H
@@ -48,36 +48,7 @@ struct array_buf {
      * *data holds the buffered data.
      */
     char** data;
-
-    /**
-     * @brief  pull_item fetch the earliest item in array_buf object.
-     *
-     * @param buf is the array_buf object that hold data.
-     *
-     * @return data to handle.
-     */
-    char* (CS_CALLBACK *pull_item)(struct array_buf* buf);
-    /**
-     * @brief  push_item will push item in array_buf object.
-     *
-     * @param buf is the array_buf object that will accept item data.
-     * @param item is the data to form new item of buf.
-     *
-     * @return two difference values.
-     * NULL if push_item failed.
-     * item if push_item succeed.
-     */
-    char* (CS_CALLBACK *push_item)(struct array_buf* buf, char* item);
-    /**
-     * @brief clear_buf does some clear work for the array_buf object.
-     *
-     * @param buf is the struct array_buf object that will be clear.
-     */
-    void (CS_CALLBACK *clear_buf)(struct array_buf* buf);
-
-    int (CS_CALLBACK *get_num_contained_item)(const struct array_buf* buf);
 };
-
 
 /**
  * @brief  init_buf initialize struct array_buf*.
@@ -98,6 +69,33 @@ struct array_buf {
  */
 void init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc);
 
+/**
+ * @brief  pull_item fetch the earliest item in array_buf object.
+ *
+ * @param buf is the array_buf object that hold data.
+ *
+ * @return data to handle.
+ */
+char* pull_item(struct array_buf* buf);
+/**
+ * @brief  push_item will push item in array_buf object.
+ *
+ * @param buf is the array_buf object that will accept item data.
+ * @param item is the data to form new item of buf.
+ *
+ * @return two difference values.
+ * NULL if push_item failed.
+ * item if push_item succeed.
+ */
+char* push_item(struct array_buf* buf, char* item);
+/**
+ * @brief clear_buf does some clear work for the array_buf object.
+ *
+ * @param buf is the struct array_buf object that will be clear.
+ */
+void clear_buf(struct array_buf* buf);
+
+int get_num_contained_items(const struct array_buf* buf);
 
 #ifdef __cplusplus
 }

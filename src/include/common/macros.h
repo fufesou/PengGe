@@ -32,15 +32,15 @@
 #endif                  /* WIN32 */
 
 #ifdef WIN32
-#ifdef CS_DLL
-#ifdef CS_BUILDING_LIB
+#ifdef PGCS_DLL
+#ifdef PGCS_BUILDING_LIB
 #define CS_API __declspec( dllexport )
 #else
 #define CS_API __declspec( dllimport )
-#endif                  /* CS_BUILDING_LIB */
-#else                   /* !CS_DLL */
+#endif                  /* PGCS_BUILDING_LIB */
+#else                   /* !PGCS_DLL */
 #define CS_API extern
-#endif                  /* CS_DLL */
+#endif                  /* PGCS_DLL */
 #else
 #define CS_API extern   /* *nix */
 #endif                  /* WIN32 */
