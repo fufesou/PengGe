@@ -7,6 +7,7 @@ CONFIG(debug, release|debug):
 DEFINES +=  _DEBUG
 
 INCLUDEPATH += 	../../../src/include
+INCLUDEPATH += $$PWD/../../../build/include
 
 HEADERS += \
     ../../../src/include/common/clearlist.h \
@@ -23,6 +24,10 @@ HEADERS += \
 SOURCES += \
     main.c
 
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs_win
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcsd_win
+else:unix: LIBS += -L$$PWD/../../../build/lib/ -lpgcs_unix
+
 win32 {
     LIBS += -lwsock32 -lWinmm -lWs2_32
 }
@@ -34,16 +39,3 @@ unix {
 RESOURCES += \
     data.qrc
 
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/release/ -lpgcs
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/lib/debug/ -lpgcs
-else:unix: LIBS += -L$$PWD/../../../build/lib/ -lpgcs
-
-INCLUDEPATH += $$PWD/../../../build/include
-DEPENDPATH += $$PWD/../../../build/include
-
-win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../build/lib/release/libpgcs.a
-else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../build/lib/debug/libpgcs.a
-else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/../../../build/lib/release/pgcs.lib
-else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/../../../build/lib/debug/pgcs.lib
-else:unix: PRE_TARGETDEPS += $$PWD/../../../build/lib/libpgcs.a

@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "cs\server\server.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "cs\client\client.vcproj", "{4FDA74CC-206B-4B20-A80F-207B811392C5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pgcs", "lib\pgcs.vcproj", "{DEEB340C-CDC6-4ADA-B6C2-4CB1B01DA05D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{4FDA74CC-206B-4B20-A80F-207B811392C5}.Debug|Win32.Build.0 = Debug|Win32
 		{4FDA74CC-206B-4B20-A80F-207B811392C5}.Release|Win32.ActiveCfg = Release|Win32
 		{4FDA74CC-206B-4B20-A80F-207B811392C5}.Release|Win32.Build.0 = Release|Win32
+		{DEEB340C-CDC6-4ADA-B6C2-4CB1B01DA05D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DEEB340C-CDC6-4ADA-B6C2-4CB1B01DA05D}.Debug|Win32.Build.0 = Debug|Win32
+		{DEEB340C-CDC6-4ADA-B6C2-4CB1B01DA05D}.Release|Win32.ActiveCfg = Release|Win32
+		{DEEB340C-CDC6-4ADA-B6C2-4CB1B01DA05D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

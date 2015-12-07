@@ -1,21 +1,24 @@
-TARGET = pgcs
+CONFIG(debug, release|debug):
+
+win32:CONFIG(release, debug|release): TARGET = pgcs_win
+else:win32:CONFIG(debug, debug|release): TARGET= pgcsd_win
+unix:CONFIG(release, debug|release): TARGET = pgcs_unix
+else:unix:CONFIG(debug, debug|release): TARGET= pgcsd_unix
+
 TEMPLATE = lib
 CONFIG += staticlib
 
-CONFIG(debug, release|debug):
 
 DEFINES +=  _DEBUG
-DEFINES += PGCS_DLL PGCS_BUILDING_LIB
-
 
 INCLUDEPATH += 	../../src/include
 
 win32 {
-    LIBS += -lwsock32 -lWinmm -lWs2_32
+#    LIBS += -lwsock32 -lWinmm -lWs2_32
 }
 
 unix {
-    LIBS += -pthread
+#    LIBS += -pthread
 }
 
 HEADERS += \

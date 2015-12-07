@@ -9,6 +9,10 @@
  * @modified  Sun 2015-12-06 15:14:15 (+0800)
  */
 
+#ifdef _MSC_VER 
+#pragma comment(lib, "../../../build/lib/pgcsd.lib")
+#endif
+
 #ifdef WIN32
 #include  <winsock2.h>
 #include  <windows.h>
