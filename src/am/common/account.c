@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sun 2015-12-06 18:04:16 (+0800)
+ * @modified  Tue 2015-12-08 21:22:55 (+0800)
  */
 
 #include  <stdlib.h>
@@ -134,4 +134,26 @@ uint32_t s_findmethod_unsorted(const char* methodname)
         }
     }
     return INVALID_METHOD_ID;
+}
+
+int am_set_react(const char* methodname, pfunc_react func_react)
+{
+    uint32_t method_index = am_method_getid(methodname);
+    if (method_index == INVALID_METHOD_ID) {
+        return 0;
+    }
+    s_methodarr[method_index].react = func_react;
+
+    return 1;
+}
+
+int am_set_reply(const char* methodname, pfunc_reply func_reply)
+{
+    uint32_t method_index = am_method_getid(methodname);
+    if (method_index == INVALID_METHOD_ID) {
+        return 0;
+    }
+    s_methodarr[method_index].reply = func_reply;
+
+    return 1;
 }

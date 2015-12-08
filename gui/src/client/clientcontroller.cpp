@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Tue 2015-12-08 01:01:59 (+0800)
+ * @modified  Tue 2015-12-08 22:44:03 (+0800)
  */
 
 #include  <QWidget>
@@ -42,6 +42,25 @@
 #include    "loginwindow.h"
 #include    "logingwidget.h"
 #include    "mainwidget.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern char g_succeed;
+extern char g_fail;
+
+static int CS_CALLBACK s_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int CS_CALLBACK s_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int CS_CALLBACK s_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int CS_CALLBACK s_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int CS_CALLBACK s_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int CS_CALLBACK s_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int CS_CALLBACK s_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+
+#ifdef __cplusplus
+}
+#endif
 
 namespace GuiClient
 {
@@ -89,6 +108,8 @@ namespace GuiClient
         m_pServerAddr->sin_addr.s_addr = inet_addr(vServerIP);
 
         csclient_msgpool_dispatch_init(m_pCSClient);
+
+        return true;
     }
 
     void CController::showLogin(const QString& vUserInfo, const QString& vPasswd)
@@ -123,3 +144,8 @@ namespace GuiClient
         delete this;
     }
 }
+
+
+/****************************************************
+ **                react functions                **
+ ***************************************************/

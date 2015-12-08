@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sun 2015-12-06 18:03:46 (+0800)
+ * @modified  Tue 2015-12-08 22:06:22 (+0800)
  */
 
 #ifdef WIN32
@@ -267,7 +267,7 @@ int am_account_changegrade_request(
 
 
 /**************************************************
- **             the reply block                 **
+ **              the react block                 **
  **************************************************/
 /**
  * @brief  am_account_create_react This is the first message returned from server. And this message is just a notification message.

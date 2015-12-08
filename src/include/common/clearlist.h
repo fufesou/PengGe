@@ -21,7 +21,7 @@ struct list_clear_t {
     struct clear_item_t clear_item;
 };
 
-#ifdef __cplustplust
+#ifdef __cplusplus
 extern "C" {
 #endif
 

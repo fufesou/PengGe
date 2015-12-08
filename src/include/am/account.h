@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
- * @modified  Sun 2015-12-06 18:22:38 (+0800)
+ * @modified  Tue 2015-12-08 21:18:49 (+0800)
  */
 
 #ifndef _ACCOUNT_H
@@ -83,6 +83,28 @@ const struct account_method_t* am_method_get(uint32_t methodid);
  * @sa am_method_sort
  */
 uint32_t am_method_getid(const char* methodname);
+
+/**
+ * @brief  am_set_react This function will set the react function of client.
+ *
+ * @param methodname The method signature, such as "account_create", "account_login", etc.
+ * @param func_react The react callback function.
+ *
+ * @return   1 if callback function is set, 0 if callback function is not set(
+ * if methodname is not valid).
+ */
+CS_API int am_set_react(const char* methodname, pfunc_react func_react);
+
+/**
+ * @brief  am_set_reply This function will set the react function of client.
+ *
+ * @param methodname The method signature, such as "account_create", "account_login", etc.
+ * @param func_reply The reply callback function.
+ *
+ * @return   1 if callback function is set, 0 if callback function is not set(
+ * if methodname is not valid).
+ */
+CS_API int am_set_reply(const char* methodname, pfunc_reply func_reply);
 
 #ifdef __cplusplus
 }
