@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Sun 2015-12-06 18:23:22 (+0800)
+ * @modified  Tue 2015-12-08 22:53:30 (+0800)
  */
 
 #ifndef _MSGPOOL_DISPATCH
@@ -26,7 +26,7 @@ extern "C"
 #endif
 
 typedef int (CS_CALLBACK *pfunc_msgprocess_t)(char* inmsg, char* outmsg, uint32_t* outmsglen);
-typedef int (CS_CALLBACK *pfunc_msgprocess_af_t)(cssock_t handle, void* outmsg);
+typedef int (CS_CALLBACK *pfunc_msgprocess_af_t)(char* userdata, char* msg);
 
 struct csmsgpool_dispatch
 {

@@ -50,13 +50,7 @@ extern "C" {
 extern char g_succeed;
 extern char g_fail;
 
-static int CS_CALLBACK s_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
-static int CS_CALLBACK s_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
-static int CS_CALLBACK s_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
-static int CS_CALLBACK s_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
-static int CS_CALLBACK s_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
-static int CS_CALLBACK s_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
-static int CS_CALLBACK s_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int CS_CALLBACK s_account_msg_dispatch(char* unused, char* msg);
 
 #ifdef __cplusplus
 }
@@ -101,13 +95,13 @@ namespace GuiClient
         m_pServerAddr = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
 
         cssock_envinit();
-        csclient_init(m_pCSClient, SOCK_DGRAM, NULL);
+        csclient_init(m_pCSClient, SOCK_DGRAM);
         
         m_pServerAddr->sin_family = AF_INET;
         m_pServerAddr->sin_port = htons(vServerPort);
         m_pServerAddr->sin_addr.s_addr = inet_addr(vServerIP);
 
-        csclient_msgpool_dispatch_init(m_pCSClient);
+        csclient_msgpool_dispatch_init(NULL, s_account_msg_dispatch);
 
         return true;
     }
@@ -145,7 +139,7 @@ namespace GuiClient
     }
 }
 
-
-/****************************************************
- **                react functions                **
- ***************************************************/
+int s_account_msg_dispatch(char* unused, char* msg)
+{
+    return 0;
+}

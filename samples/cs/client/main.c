@@ -64,14 +64,14 @@ int main(int argc, char* argv[])
 	}
 
 	cssock_envinit();
-    csclient_init(&udpclient, SOCK_DGRAM, NULL);
+    csclient_init(&udpclient, SOCK_DGRAM);
 
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons((unsigned short)atoi(argv[2]));
     serveraddr.sin_addr.s_addr = inet_addr(argv[1]);
 
 
-    csclient_msgpool_dispatch_init(&udpclient);
+    csclient_msgpool_dispatch_init(NULL, NULL);
 #define TEST_FILE_INPUT
 
 #ifdef TEST_FILE_INPUT

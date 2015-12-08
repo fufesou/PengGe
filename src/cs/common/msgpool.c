@@ -61,7 +61,7 @@ static void s_clearpool(struct csmsgpool* pool);
 #endif
 
 
-void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc, void* pargs)
+void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, csthread_proc_t proc, void* pargs)
 {
 #ifdef _CHECK_ARGS
     if (pool == NULL || pfunc == NULL) return 0;
@@ -69,8 +69,9 @@ void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum
     pool->len_item = itemlen;
     pool->num_item = itemnum;
     pool->num_thread = threadnum;
-    pool->socket = socket;
     pool->threadexit = 0;
+
+    cs_memcpy(pool->userdata, sizeof(pool->userdata), userdata, size_userdata);
 
     s_initpool(pool, proc, pargs);
 }

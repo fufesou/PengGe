@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-28
- * @modified  Sun 2015-12-06 18:17:16 (+0800)
+ * @modified  Tue 2015-12-08 23:46:56 (+0800)
  */
 
 #ifdef WIN32
@@ -62,7 +62,8 @@ void s_csserver_clear(void* serv);
 static void s_init_msgpool_dispatch(struct csserver* serv);
 static void s_clear_msgpool_dispatch(void* unused);
 
-static int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int s_msg_process(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int s_msg_process_af(char* userdata, char* msg);
 
 #ifdef __cplusplus
 }
@@ -203,15 +204,16 @@ void s_init_msgpool_dispatch(struct csserver* serv)
     csmsgpool_dispatch_init(&s_msgpool_dispatch);
 
     s_msgpool_dispatch.prompt = "server msgpool_dispatch:";
-    s_msgpool_dispatch.process_msg = s_msg_dispatch;
-    s_msgpool_dispatch.process_af_msg = csserver_send;
+    s_msgpool_dispatch.process_msg = s_msg_process;
+    s_msgpool_dispatch.process_af_msg = s_msg_process_af;
 
     cspool_init(
                 &s_msgpool_dispatch.pool_unprocessed,           /**> struct csmsgpool* pool */
                 MAX_MSG_LEN + sizeof(struct csmsg_header),      /**> int itemlen            */
                 SERVER_POOL_NUM_ITEM,                           /**> int itemnum            */
                 NUM_THREAD,                                     /**> int threadnum          */
-                serv->hsock,                                    /**> cssock_t socket        */
+                (char*)(&serv->hsock),                       	/** char* userdatsa         */
+                sizeof(serv->hsock),							/** size_t size_userdata    */
                 csmsgpool_process,                              /**> csthread_proc_t proc   */
                 (void*)&s_msgpool_dispatch);                    /**> void* pargs            */
 
@@ -220,9 +222,12 @@ void s_init_msgpool_dispatch(struct csserver* serv)
                 MAX_MSG_LEN + sizeof(struct csmsg_header),
                 SERVER_POOL_NUM_ITEM,
                 NUM_THREAD,
-                serv->hsock,
+                (char*)(&serv->hsock),
+                sizeof(serv->hsock),
                 csmsgpool_process_af,
                 (void*)&s_msgpool_dispatch);
+
+    csclearlist_add(s_clear_msgpool_dispatch, NULL);
 }
 
 void s_clear_msgpool_dispatch(void* unused)
@@ -245,7 +250,7 @@ void s_clear_msgpool_dispatch(void* unused)
  *
  * @return   
  */
-int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int s_msg_process(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     int ret = 0;
     uint32_t id_process = -1;
@@ -275,4 +280,9 @@ int s_msg_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
     *outmsglen += sizeof(uint32_t);
     ((struct csmsg_header*)outmsg)->numbytes = htonl(*outmsglen);
     return ret;
+}
+
+int s_msg_process_af(char* userdata, char* msg)
+{
+    return csserver_send(*(cssock_t*)userdata, msg);
 }

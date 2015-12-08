@@ -130,7 +130,7 @@ void* csmsgpool_process_af(void* pool_dispath)
 
         outmsg = cspool_pullitem(pool_proced, &pool_proced->filled_buf);
 
-        msgpool_dispatch->process_af_msg(pool_proced->socket, outmsg);
+        msgpool_dispatch->process_af_msg(pool_proced->userdata, outmsg);
         cssleep(200);
 
         cspool_pushitem(pool_proced, &pool_proced->empty_buf, outmsg);

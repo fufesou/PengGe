@@ -54,8 +54,6 @@ struct csclient
     char recvbuf[MAX_MSG_LEN];
     uint32_t len_recvdata;      /**< len_recvdata gives the length of data received. */
     uint32_t size_recvbuf;      /**< size_recvbuf is used for mallocing recvbuf. */
-
-    int (CS_CALLBACK *pfunc_process_react)(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
  };
 
 
@@ -76,7 +74,7 @@ struct csclient
  *
  * @sa cssock_block cssock_open
  */
-CS_API void csclient_init(struct csclient* cli, int tcpudp, pfunc_msgprocess_t pfunc_msgprocess);
+CS_API void csclient_init(struct csclient* cli, int tcpudp);
 
 /**
  * @brief  csclient_clear  There may be some clear works after communication,
@@ -143,7 +141,7 @@ CS_API void csclient_udp_once(struct csclient* cli, const struct sockaddr* serva
  */
 CS_API ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
-CS_API void csclient_msgpool_dispatch_init(struct csclient* cli);
+CS_API void csclient_msgpool_dispatch_init(pfunc_msgprocess_t func_msgprocess, pfunc_msgprocess_af_t func_msgprocess_af);
 
 #ifdef __cplusplus
 }

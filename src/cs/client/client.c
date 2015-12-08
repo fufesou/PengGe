@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Sun 2015-12-06 18:09:15 (+0800)
+ * @modified  Tue 2015-12-08 23:50:07 (+0800)
  */
 
 #ifdef WIN32
@@ -86,13 +86,12 @@ static int s_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
 #endif
 
 
-void csclient_init(struct csclient* cli, int tcpudp, pfunc_msgprocess_t pfunc_msgprocess)
+void csclient_init(struct csclient* cli, int tcpudp)
 {
     int error;
     int nonblocking = 1;
 
     cli->prompt = s_cli_prompt;
-    cli->pfunc_process_react = (pfunc_msgprocess == NULL) ? s_react_dispatch : pfunc_msgprocess;
 
     /*
      * @par code to be added
@@ -210,24 +209,37 @@ void s_msgpool_append(char* data, ssize_t numbytes)
     }
 }
 
-void csclient_msgpool_dispatch_init(struct csclient* cli)
+void csclient_msgpool_dispatch_init(pfunc_msgprocess_t func_msgprocess, pfunc_msgprocess_af_t func_msgprocess_af)
 {   
     const int threadnum = 1; 
 
     csmsgpool_dispatch_init(&s_msgpool_dispatch);
 
     s_msgpool_dispatch.prompt = "client msgpool_dispatch:";
-    s_msgpool_dispatch.process_msg = cli->pfunc_process_react;
-    s_msgpool_dispatch.process_af_msg = 0;
+    s_msgpool_dispatch.process_msg = (func_msgprocess == NULL) ? s_react_dispatch : func_msgprocess;
+    s_msgpool_dispatch.process_af_msg = func_msgprocess_af;
 
     cspool_init(
                 &s_msgpool_dispatch.pool_unprocessed,       /** struct csmsgpool* pool  */
                 MAX_MSG_LEN + sizeof(struct csmsg_header),  /** int itemlen             */
                 SERVER_POOL_NUM_ITEM,                       /** int itemnum             */
                 threadnum,                                  /** int threadnum           */
-                cli->hsock,                                 /** cssock_t socket         */
+                0,					                       	/** char* userdatsa         */
+                0,											/** size_t size_userdata    */
                 csmsgpool_process,                          /** csthread_proc_t proc    */
                 (void*)&s_msgpool_dispatch);                /** void* pargs             */
+
+    if (func_msgprocess_af != NULL) {
+        cspool_init(
+                    &s_msgpool_dispatch.pool_processed,
+                    MAX_MSG_LEN + sizeof(struct csmsg_header),
+                    SERVER_POOL_NUM_ITEM,
+                    NUM_THREAD,
+                    0,
+                    0,
+                    csmsgpool_process_af,
+                    (void*)&s_msgpool_dispatch);
+    }
 
     csclearlist_add(s_clear_msgpool_dispatch, NULL);
 }

@@ -28,23 +28,14 @@ struct csmsgpool {
     struct array_buf filled_buf;
     struct array_buf empty_buf;
 
-    /**
-     * @brief socket
-     */
-    cssock_t socket;
-
-    /**
-     * @brief hmutex
-     */
+    /** hmutex */
     csmutex_t hmutex;
 
-    /**
-     * @brief hthread
-     */
+    /** hthread */
     csthread_t* hthread;
 
-    /**
-     * @brief threadexit threadexit is used to make thread exit normally.
+    /** threadexit threadexit is used to make thread exit normally.
+     *
      * If threadexit is 1, thread will exit;
      * if threadexit is 0, thread keep on running.
      *
@@ -63,18 +54,20 @@ struct csmsgpool {
      */
     int threadexit;
 
-    /**
-     * @brief hsem_filled Be careful, csmsgpool call cssem_wait() and cssem_post() by default.
+    /** hsem_filled Be careful, csmsgpool call cssem_wait() and cssem_post() by default.
      */
     cssem_t hsem_filled;
 
-    /**
-     * @brief use_sem_in_pool 1 turn on semaphore wait or post, 0 turn off.
+    /** use_sem_in_pool 1 turn on semaphore wait or post, 0 turn off.
      *
      * @note use_sem_in_pool only works in cspool_pulldata and cspool_pushdata.
      * user shoud call semaphore wait and post explicit while calling cspool_pullitem and cspool_pushitem.
      */
     int use_sem_in_pool;
+
+    /** userdata The retain space for user data.
+     */
+    char userdata[16];
 };
 
 /**
@@ -83,10 +76,12 @@ struct csmsgpool {
  * @param itemlen length for each buffer item.
  * @param itemnum number of buffer items.
  * @param threadnum number of threads that the buffer contains.
+ * @param userdata if NULL, nothing will be done, else the user data is copied to pool's userdata.
+ * @param size_userdata the size of user data.
  * @param pfunc the initial operation that each thread will operate once created.
  * @param pargs this args of pfunc.
  */
-void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, cssock_t socket, csthread_proc_t proc, void* pargs);
+void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, csthread_proc_t proc, void* pargs);
 
 /**
  * @brief  cspool_clear This function will do some clear works such as free memory.
