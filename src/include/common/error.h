@@ -11,7 +11,7 @@
 #define _ERROR_H
 
 typedef size_t cserr_t;
-typedef void (CS_CALLBACK *cserr_clear_func)(void);
+typedef void (CS_CALLBACK *perr_clear_func_t)(void);
 
 #ifdef __cplusplus
 extern "C"
@@ -36,7 +36,7 @@ void csfatal(const char* format, ...);
  * @brief  csfatal_ext This function will print error message, clear socket
  * environment and exit.
  * If errop is cserr_exit, exit(*(cserr_t*)data) will be called.
- * if errop is cserr_clear, ((cserr_clear_func)data)() will be called.
+ * if errop is cserr_clear, ((perr_clear_func_t)data)() will be called.
  *
  * @param data 
  * @param errop

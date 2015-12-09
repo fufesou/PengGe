@@ -38,16 +38,16 @@ DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
 
-typedef int (CS_CALLBACK *pfunc_react)(char*, char*, __inout uint32_t*);
-typedef int (CS_CALLBACK *pfunc_reply)(char*, const void*, uint32_t, char*, __inout uint32_t*);
+typedef int (CS_CALLBACK *pfunc_react_t)(char*, char*, __inout uint32_t*);
+typedef int (CS_CALLBACK *pfunc_reply_t)(char*, const void*, uint32_t, char*, __inout uint32_t*);
 
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.
  */
 struct account_method_t { 
     const char* methodname;
-    pfunc_reply reply;
-    pfunc_react react;
+    pfunc_reply_t reply;
+    pfunc_react_t react;
 };
 
 /**
@@ -93,7 +93,7 @@ uint32_t am_method_getid(const char* methodname);
  * @return   1 if callback function is set, 0 if callback function is not set(
  * if methodname is not valid).
  */
-CS_API int am_set_react(const char* methodname, pfunc_react func_react);
+CS_API int am_set_react(const char* methodname, pfunc_react_t func_react);
 
 /**
  * @brief  am_set_reply This function will set the react function of client.
@@ -104,7 +104,7 @@ CS_API int am_set_react(const char* methodname, pfunc_react func_react);
  * @return   1 if callback function is set, 0 if callback function is not set(
  * if methodname is not valid).
  */
-CS_API int am_set_reply(const char* methodname, pfunc_reply func_reply);
+CS_API int am_set_reply(const char* methodname, pfunc_reply_t func_reply);
 
 #ifdef __cplusplus
 }

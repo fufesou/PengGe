@@ -19,13 +19,13 @@ extern "C"
     typedef void* csmutex_t;
     typedef void* cssem_t;
     typedef void* csthread_t;
-    typedef unsigned int (__stdcall *csthread_proc_t)(void*);
+    typedef unsigned int (__stdcall *pthread_proc_t)(void*);
 
 #else
     typedef pthread_mutex_t csmutex_t;
     typedef sem_t cssem_t;
     typedef pthread_t csthread_t;
-    typedef void* (CS_CALLBACK *csthread_proc_t)(void*);
+    typedef void* (CS_CALLBACK *pthread_proc_t)(void*);
 #endif
 
 
@@ -41,7 +41,7 @@ extern "C"
  *
  * @return   
  */
-int csthread_create(csthread_proc_t proc, void* pargs, csthread_t* handle);
+int csthread_create(pthread_proc_t proc, void* pargs, csthread_t* handle);
 
 /**
  * @brief  csthread_exit 

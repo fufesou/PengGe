@@ -46,7 +46,7 @@ extern "C" {
  * 3. semaphare
  * 4. threads
  */
-static void s_initpool(struct csmsgpool* pool, csthread_proc_t proc, void* pargs);
+static void s_initpool(struct csmsgpool* pool, pthread_proc_t proc, void* pargs);
 
 /**
  * @brief  s_clearpool This function will do some clear works such as free memory.
@@ -61,7 +61,7 @@ static void s_clearpool(struct csmsgpool* pool);
 #endif
 
 
-void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, csthread_proc_t proc, void* pargs)
+void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, pthread_proc_t proc, void* pargs)
 {
 #ifdef _CHECK_ARGS
     if (pool == NULL || pfunc == NULL) return 0;
@@ -81,7 +81,7 @@ void cspool_clear(struct csmsgpool* pool)
     s_clearpool(pool);
 }
 
-void s_initpool(struct csmsgpool* pool, csthread_proc_t proc, void* pargs)
+void s_initpool(struct csmsgpool* pool, pthread_proc_t proc, void* pargs)
 {
     const int init_fillednum = 0;
     int num_items;

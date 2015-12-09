@@ -81,7 +81,7 @@ struct csmsgpool {
  * @param pfunc the initial operation that each thread will operate once created.
  * @param pargs this args of pfunc.
  */
-void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, csthread_proc_t proc, void* pargs);
+void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, pthread_proc_t proc, void* pargs);
 
 /**
  * @brief  cspool_clear This function will do some clear works such as free memory.

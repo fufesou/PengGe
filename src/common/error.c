@@ -69,7 +69,7 @@ void s_cserr_operation(void* data, enum cserr_op errop)
     errop &= (~cserr_exit);
     switch (errop) {
         case cserr_clear:
-            ((cserr_clear_func)data)();
+            ((perr_clear_func_t)data)();
             break;
 
         default:

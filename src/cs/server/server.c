@@ -208,14 +208,14 @@ void s_init_msgpool_dispatch(struct csserver* serv)
     s_msgpool_dispatch.process_af_msg = s_msg_process_af;
 
     cspool_init(
-                &s_msgpool_dispatch.pool_unprocessed,           /**> struct csmsgpool* pool */
-                MAX_MSG_LEN + sizeof(struct csmsg_header),      /**> int itemlen            */
-                SERVER_POOL_NUM_ITEM,                           /**> int itemnum            */
-                NUM_THREAD,                                     /**> int threadnum          */
-                (char*)(&serv->hsock),                       	/** char* userdatsa         */
-                sizeof(serv->hsock),							/** size_t size_userdata    */
-                csmsgpool_process,                              /**> csthread_proc_t proc   */
-                (void*)&s_msgpool_dispatch);                    /**> void* pargs            */
+                &s_msgpool_dispatch.pool_unprocessed,           /**< struct csmsgpool* pool */
+                MAX_MSG_LEN + sizeof(struct csmsg_header),      /**< int itemlen            */
+                SERVER_POOL_NUM_ITEM,                           /**< int itemnum            */
+                NUM_THREAD,                                     /**< int threadnum          */
+                (char*)(&serv->hsock),                       	/**< char* userdatsa        */
+                sizeof(serv->hsock),							/**< size_t size_userdat    */
+                csmsgpool_process,                              /**< pthread_proc_t proc    */
+                (void*)&s_msgpool_dispatch);                    /**< void* pargs            */
 
     cspool_init(
                 &s_msgpool_dispatch.pool_processed,

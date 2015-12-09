@@ -48,7 +48,7 @@ extern "C"
 /**************************************************
  **            WIN32: the thread block           **
  **************************************************/
-int csthread_create(csthread_proc_t proc, void* pargs, csthread_t* handle)
+int csthread_create(pthread_proc_t proc, void* pargs, csthread_t* handle)
 {
     *handle = (void*)_beginthreadex(NULL, 0, proc, pargs, 0, NULL);
     while ((long)(*handle) == 1L) {
@@ -218,7 +218,7 @@ int cssem_destroy(cssem_t* handle)
 /**************************************************
  **             UNIX: the thread block           **
  **************************************************/
-int csthread_create(csthread_proc_t proc, void* pargs, csthread_t* handle)
+int csthread_create(pthread_proc_t proc, void* pargs, csthread_t* handle)
 {
     return pthread_create(handle, NULL, proc, pargs);
 }

@@ -136,7 +136,7 @@ uint32_t s_findmethod_unsorted(const char* methodname)
     return INVALID_METHOD_ID;
 }
 
-int am_set_react(const char* methodname, pfunc_react func_react)
+int am_set_react(const char* methodname, pfunc_react_t func_react)
 {
     uint32_t method_index = am_method_getid(methodname);
     if (method_index == INVALID_METHOD_ID) {
@@ -147,7 +147,7 @@ int am_set_react(const char* methodname, pfunc_react func_react)
     return 1;
 }
 
-int am_set_reply(const char* methodname, pfunc_reply func_reply)
+int am_set_reply(const char* methodname, pfunc_reply_t func_reply)
 {
     uint32_t method_index = am_method_getid(methodname);
     if (method_index == INVALID_METHOD_ID) {

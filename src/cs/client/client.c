@@ -220,14 +220,14 @@ void csclient_msgpool_dispatch_init(pfunc_msgprocess_t func_msgprocess, pfunc_ms
     s_msgpool_dispatch.process_af_msg = func_msgprocess_af;
 
     cspool_init(
-                &s_msgpool_dispatch.pool_unprocessed,       /** struct csmsgpool* pool  */
-                MAX_MSG_LEN + sizeof(struct csmsg_header),  /** int itemlen             */
-                SERVER_POOL_NUM_ITEM,                       /** int itemnum             */
-                threadnum,                                  /** int threadnum           */
-                0,					                       	/** char* userdatsa         */
-                0,											/** size_t size_userdata    */
-                csmsgpool_process,                          /** csthread_proc_t proc    */
-                (void*)&s_msgpool_dispatch);                /** void* pargs             */
+                &s_msgpool_dispatch.pool_unprocessed,       /**< struct csmsgpool* pool  */
+                MAX_MSG_LEN + sizeof(struct csmsg_header),  /**< int itemlen             */
+                SERVER_POOL_NUM_ITEM,                       /**< int itemnum             */
+                threadnum,                                  /**< int threadnum           */
+                0,					                       	/**< char* userd<>tsa        */
+                0,											/**< size_t size_userdata    */
+                csmsgpool_process,                          /**< pthread_proc_t proc     */
+                (void*)&s_msgpool_dispatch);                /**< void* pargs             */
 
     if (func_msgprocess_af != NULL) {
         cspool_init(

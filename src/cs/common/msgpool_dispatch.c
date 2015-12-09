@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Sun 2015-12-06 18:15:42 (+0800)
+ * @modified  周三 2015-12-09 09:50:40 中国标准时间
  */
 
 #ifdef WIN32
@@ -86,8 +86,13 @@ void* csmsgpool_process(void* pool_dispath)
 
         printf("recv- thread id: %d, process message: %s.\n", csthread_getpid(), msgbuf + sizeof(struct csmsg_header));
 
-        outmsglen = pool_proced->len_item;
-        msgpool_dispatch->process_msg(msgbuf, outmsg, &outmsglen);
+        /** If 'process_af_msg' is not valid, outmsg buffer is unused in 'process_msg' */
+        if (msgpool_dispatch->process_af_msg != 0) {
+            outmsglen = pool_proced->len_item;
+            msgpool_dispatch->process_msg(msgbuf, outmsg, &outmsglen);
+        } else {
+            msgpool_dispatch->process_msg(msgbuf, NULL, NULL);
+        }
 
         cspool_pushitem(pool_unproc, &pool_unproc->empty_buf, msgbuf);
 

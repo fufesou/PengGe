@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Wed 2015-12-09 00:31:24 (+0800)
+ * @modified  周三 2015-12-09 10:24:25 中国标准时间
  */
 
 #ifdef WIN32
@@ -297,11 +297,15 @@ int am_account_changegrade_request(
 int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
 {
     if (inmsg[0] == g_succeed) {
-        csprintf(outmsg, *outmsglen, "account_create%d%c", 1, g_succeed);
         printf("client: create account succeed, please wait for a moment to receiving the random telcode, then revify it.\n");
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_create%d%c", 1, g_succeed);
+        }
     } else if (inmsg[0] == g_fail){
-        csprintf(outmsg, *outmsglen, "account_create%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
         fprintf(stderr, "client: account_create fail, %s\n", inmsg + 1);
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_create%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+        }
         return 1;
     } else {
         fprintf(stderr, "client: account_create - unkown message.\n");
@@ -356,20 +360,26 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
         fprintf(stdout, "client: account_verify succeed");
 
         if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
-            csprintf(
+            fprintf(stdout, ", additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
+            if (outmsg != NULL) {
+                csprintf(
                         outmsg,
                         *outmsglen,
                         "account_verify%d%c%s",
                         1 + (int)strlen(inmsg + 1 + sizeof(struct account_basic_t)) + 1,
                         g_succeed, inmsg + 1 + sizeof(struct account_basic_t));
-            fprintf(stdout, ", additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
+            }
         } else {
-            csprintf(outmsg, *outmsglen, "account_verify%d%c", 1, g_succeed);
             fprintf(stdout, ".\n");
+            if (outmsg != NULL) {
+                csprintf(outmsg, *outmsglen, "account_verify%d%c", 1, g_succeed);
+            }
         }
     } else if (inmsg[0] == g_fail){
-        csprintf(outmsg, *outmsglen, "account_verify%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
         fprintf(stderr, "client: account_verify fail, %s\n", inmsg + 1);
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_verify%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+        }
         return 1;
     } else {
         fprintf(stderr, "client: account_verify - unkown message.\n");
@@ -428,19 +438,23 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
         fprintf(stdout, "client: login succeed.\n");
 
         if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
-            csprintf(
+            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
+            if (outmsg != NULL) {
+                csprintf(
                         outmsg,
                         *outmsglen,
                         "account_login%d%c%s",
                         1 + (int)strlen(inmsg + 1 + sizeof(struct account_basic_t)) + 1,
                         g_succeed, inmsg + 1 + sizeof(struct account_basic_t));
-            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
-        } else {
-            csprintf(outmsg, *outmsglen, "account_login%d%c", 1, g_succeed);
+            }
+        } else if (outmsg != NULL) {
+                csprintf(outmsg, *outmsglen, "account_login%d%c", 1, g_succeed);
         }
     } else if (inmsg[0] == g_fail){
-        csprintf(outmsg, *outmsglen, "account_login%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
         fprintf(stderr, "client: account_login fail, %s\n", inmsg + 1);
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_login%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+        }
         return 1;
     } else {
         fprintf(stderr, "client: account_login - unkown message.\n");
@@ -492,19 +506,23 @@ int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
     if (inmsg[0] == g_succeed) {
         fprintf(stdout, "client: logout succeed.\n");
         if (inmsg[1] != 0) {
-            csprintf(
+            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
+            if (outmsg != NULL) {
+                csprintf(
                         outmsg,
                         *outmsglen,
                         "account_logout%d%c%s",
-                        1 + (int)strlen(inmsg + 1) + 1,
+                        (int)strlen(inmsg) + 1,
                         g_succeed, inmsg + 1);
-            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
-        } else {
+            }
+        } else if (outmsg != NULL) {
             csprintf(outmsg, *outmsglen, "account_logout%d%c", 1, g_succeed);
         }
     } else if (inmsg[0] == g_fail){
-        csprintf(outmsg, *outmsglen, "account_logout%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
         fprintf(stderr, "client: account_logout fail, %s\n", inmsg + 1);
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_logout%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+        }
         return 1;
     } else {
         fprintf(stderr, "client: account_logout - unkown message.\n");
@@ -566,19 +584,23 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
         fprintf(stdout, "client: account_changeusername succeed.\n");
 
         if (inmsg[1] != 0) {
-            csprintf(
+            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
+            if (outmsg != NULL) {
+                csprintf(
                         outmsg,
                         *outmsglen,
                         "account_changeusername%d%c%s",
-                        1 + (int)strlen(inmsg + 1) + 1,
+                        (int)strlen(inmsg) + 1,
                         g_succeed, inmsg + 1);
-            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
-        } else {
+            }
+        } else if (outmsg != NULL) {
             csprintf(outmsg, *outmsglen, "account_changeusername%d%c", 1, g_succeed);
         }
     } else if (inmsg[0] == g_fail){
-        csprintf(outmsg, *outmsglen, "account_changeusername%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
         fprintf(stderr, "client: account_changeusername fail, %s\n", inmsg + 1);
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_changeusername%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+        }
         return 1;
     } else {
         fprintf(stderr, "client: account_changeusername - unkown message.\n");
@@ -639,19 +661,23 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
         fprintf(stdout, "client: account_changepasswd succeed.\n");
 
         if (inmsg[1] != 0) {
-            csprintf(
+            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
+            if (outmsg != NULL) {
+                csprintf(
                         outmsg,
                         *outmsglen,
                         "account_changepasswd%d%c%s",
-                        1 + (int)strlen(inmsg + 1) + 1,
+                        (int)strlen(inmsg) + 1,
                         g_succeed, inmsg + 1);
-            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
-        } else {
+            }
+        } else if (outmsg != NULL) {
             csprintf(outmsg, *outmsglen, "account_changepasswd%d%c", 1, g_succeed);
         }
     } else if (inmsg[0] == g_fail){
-        csprintf(outmsg, *outmsglen, "account_changepasswd%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
         fprintf(stderr, "client: account_changepasswd fail, %s\n", inmsg + 1);
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_changepasswd%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+        }
         return 1;
     } else {
         fprintf(stderr, "client: account_changepasswd - unkown message.\n");
@@ -703,19 +729,23 @@ int am_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* ou
         fprintf(stdout, "client: account_changegrade succeed.\n");
 
         if (inmsg[1] != 0) {
-            csprintf(
+            if (outmsg != NULL) {
+                csprintf(
                         outmsg,
                         *outmsglen,
                         "account_changegrade%d%c%s",
-                        1 + (int)strlen(inmsg + 1) + 1,
+                        (int)strlen(inmsg) + 1,
                         g_succeed, inmsg + 1);
+            }
             fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
-        } else {
+        } else if (outmsg != NULL) {
             csprintf(outmsg, *outmsglen, "account_changegrade%d%c", 1, g_succeed);
         }
-    } else if (inmsg[0] == g_fail){
-        csprintf(outmsg, *outmsglen, "account_changegrade%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+    } else if (inmsg[0] == g_fail) {
         fprintf(stderr, "client: account_changegrade fail, %s\n", inmsg + 1);
+        if (outmsg != NULL) {
+            csprintf(outmsg, *outmsglen, "account_changegrade%d%c%s", 1 + (int)strlen(inmsg + 1) + 1, g_fail, inmsg + 1);
+        }
         return 1;
     } else {
         fprintf(stderr, "client: account_changegrade - unkown message.\n");
