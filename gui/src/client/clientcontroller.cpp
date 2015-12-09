@@ -4,9 +4,10 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Tue 2015-12-08 22:44:03 (+0800)
+ * @modified  Wed 2015-12-09 23:29:36 (+0800)
  */
 
+#include  <QDebug>
 #include  <QWidget>
 
 #ifdef WIN32
@@ -51,10 +52,40 @@ extern char g_succeed;
 extern char g_fail;
 
 static int CS_CALLBACK s_account_msg_dispatch(char* unused, char* msg);
+static void s_process_create_react(uint32_t msglen, const char* msg);
+static void s_process_verify_react(uint32_t msglen, const char* msg);
+static void s_process_login_react(uint32_t msglen, const char* msg);
+static void s_process_logout_react(uint32_t msglen, const char* msg);
+static void s_process_changeusername_react(uint32_t msglen, const char* msg);
+static void s_process_changepasswd_react(uint32_t msglen, const char* msg);
+static void s_process_changegrade_react(uint32_t msglen, const char* msg);
+
+static struct
+{
+    const char* methodname;
+    void (* process_react)(uint32_t msglen, const char* msg);
+} s_namefunc[] = {
+    {"account_create", s_process_create_react},
+    {"account_verify", s_process_verify_react},
+    {"account_login", s_process_login_react},
+    {"account_logout", s_process_logout_react},
+    {"account_changeusername", s_process_changeusername_react},
+    {"account_changepasswd", s_process_changepasswd_react},
+    {"account_changegrade", s_process_changegrade_react}
+};
 
 #ifdef __cplusplus
 }
 #endif
+
+static void s_process_create_request(const QString& vUserNumber, const QString& vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_verify_request(const QString& vTel, const QString& vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changeusername_request(const QString& vPasswd, const QString& vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changepasswd_request(const QString& vPasswd, const QString& vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+
 
 namespace GuiClient
 {
@@ -139,7 +170,115 @@ namespace GuiClient
     }
 }
 
+
+/*********************************************************
+ **                 request client msg                  **
+ ********************************************************/
+void s_process_create_request(const QString& vUserNumber, const QString& vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+{
+
+}
+
+void s_process_verify_request(const QString& vTel, const QString& vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+{
+
+}
+
+void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+{
+    vClient->len_senddata = vClient->size_senbuf;
+    if (am_account_login_request(vUserInfo.toUtf8().constData(),
+                                 vPasswd.toUtf8().constData(),
+                                 vClient->sendbuf,
+                                 &vClient->len_senddata) == 0) {
+    } else {
+        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+    }
+}
+
+void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vServerAddr)
+{
+
+}
+
+void s_process_changeusername_request(const QString& vPasswd, const QString& vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+{
+
+}
+
+void s_process_changepasswd_request(const QString& vPasswd, const QString& vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+{
+
+}
+
+void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+{
+}
+
+/*********************************************************
+ **                  react client msg                   **
+ ********************************************************/
 int s_account_msg_dispatch(char* unused, char* msg)
 {
+    int i = 0;
+    int num_funcs = NUM_ARR(s_namefunc);
+    uint32_t namelen = 0;
+
+    (unused);
+
+    for (; i<num_funcs; ++i) {
+        namelen = strlen(s_namefunc[i].methodname);
+        if (memcmp(msg, s_namefunc[i].methodname, namelen)) {
+            s_namefunc[i].process_react(*(uint32_t*)(msg + namelen), msg + namelen + sizeof(uint32_t));
+        }
+    }
+
     return 0;
 }
+
+void s_process_create_react(uint32_t msglen, const char* msg)
+{
+    (void)msglen;
+    if (msg[0] == g_succeed) {
+    } else if (msg[0] == g_fail) {
+    } else {
+    }
+}
+
+void s_process_verify_react(uint32_t msglen, const char* msg)
+{
+    (void)msglen;
+    if (msg[0] == g_succeed) {
+    } else if (msg[0] == g_fail) {
+    } else {
+    }
+}
+
+void s_process_login_react(uint32_t msglen, const char* msg)
+{
+    (void)msglen;
+    if (msg[0] == g_succeed) {
+        GuiClient::CLogingWidget::setLoginStatus(GuiCommon::eSucceed);
+    } else if (msg[0] == g_fail) {
+        GuiClient::CLogingWidget::setLoginStatus(GuiCommon::eFail);
+    } else {
+        qDebug() << "login: unkown message.";
+    }
+}
+
+void s_process_logout_react(uint32_t msglen, const char* msg)
+{
+}
+
+void s_process_changeusername_react(uint32_t msglen, const char* msg)
+{
+}
+
+void s_process_changepasswd_react(uint32_t msglen, const char* msg)
+{
+}
+
+void s_process_changegrade_react(uint32_t msglen, const char* msg)
+{
+}
+
