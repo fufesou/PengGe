@@ -19,7 +19,7 @@
 
 namespace GuiClient
 {
-    GuiCommon::ELoginStatus CLogingWidget::s_loginStatus = GuiCommon::eLoging;
+    GuiCommon::ERequestStatus CLogingWidget::s_loginStatus = GuiCommon::eRequesting;
 
     CLogingWidget::CLogingWidget(int vTimeoutSec, int vIntervalMsec, QWidget* vParent)
         : QWidget(vParent)
@@ -62,7 +62,7 @@ namespace GuiClient
 
     void CLogingWidget::updateProgressBar()
     {
-        while (s_loginStatus == GuiCommon::eLoging)
+        while (s_loginStatus == GuiCommon::eRequesting)
         {
             ++m_elapsedTimes;
             if ((m_elapsedTimes * m_interval) < m_timeoutSec)
@@ -80,7 +80,7 @@ namespace GuiClient
 
     void CLogingWidget::beginLogin()
     {
-        s_loginStatus = GuiCommon::eLoging;
+        s_loginStatus = GuiCommon::eRequesting;
         m_elapsedTimes = 0;
         m_pTimer->setInterval(m_interval);
         m_pTimer->start();

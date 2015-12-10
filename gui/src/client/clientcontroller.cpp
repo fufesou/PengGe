@@ -111,9 +111,9 @@ namespace GuiClient
 
             bool bIsLogingStatusConOK = connect(
                         m_pLogingWidget,
-                        SIGNAL(loginEnd(const GuiCommon::ELoginStatus&)),
+                        SIGNAL(loginEnd(const GuiCommon::ERequestStatus&)),
                         this,
-                        SLOT(endLogin(const GuiCommon::ELoginStatus&)));
+                        SLOT(endLogin(const GuiCommon::ERequestStatus&)));
             Q_ASSERT(bIsLogingStatusConOK);
         }
 
@@ -158,7 +158,7 @@ namespace GuiClient
         dynamic_cast<CLogingWidget*>(m_pLogingWidget)->beginLogin();
     }
 
-    void CController::endLogin(const GuiCommon::ELoginStatus& vStatus)
+    void CController::endLogin(const GuiCommon::ERequestStatus& vStatus)
     {
         m_pLogingWidget->hide();
 

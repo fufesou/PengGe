@@ -18,13 +18,13 @@ namespace GuiCommon
      */
     enum EMsgSendRecv { eSend, eRecv };
 
-    /** enum ELoginStatus is used to describe the status of login. */
-    enum ELoginStatus
+    /** enum ERequestStatus is used to describe the status of requests. */
+    enum ERequestStatus
     {
-        eLoging,        /**< the status is set while login is in process */
-        eTimeout,       /**< login timeout */
-        eFail,         /**< the 'user info' or 'passwd' is incorrect. */
-        eSucceed,      /**< succeed login. */
+        eRequesting,    /**< the status is set while request is in process */
+        eTimeout,       /**< request timeout */
+        eFail,         	/**< the information is incorrect */
+        eSucceed,      	/**< succeed . */
     };
 }
 

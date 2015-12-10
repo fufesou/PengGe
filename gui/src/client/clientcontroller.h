@@ -46,7 +46,7 @@ namespace GuiClient
         bool initClient(const char* vServerIP, unsigned short vServerPort);
 
     private slots:
-        void endLogin(const GuiCommon::ELoginStatus& vStatus);
+        void endLogin(const GuiCommon::ERequestStatus& vStatus);
 
     private:
         QWidget* m_pLoginWidget;

@@ -28,13 +28,13 @@ namespace GuiClient
     public:
         explicit CLogingWidget(int vTimeoutMsec = 30*1000, int vIntervalMsec = 300, QWidget* vParent = 0);
 
-        static void setLoginStatus(GuiCommon::ELoginStatus vStatus) { s_loginStatus = vStatus; }
+        static void setLoginStatus(GuiCommon::ERequestStatus vStatus) { s_loginStatus = vStatus; }
 
         void beginLogin(void);
 
     signals:
         void cancelLogin(void);
-        void loginEnd(const GuiCommon::ELoginStatus& voStatus);
+        void loginEnd(const GuiCommon::ERequestStatus& voStatus);
 
     private:
         void initWidget(void);
@@ -53,7 +53,7 @@ namespace GuiClient
         QPushButton* m_pbtnCancel;
         QProgressBar* m_ppbProgress;
 
-        static GuiCommon::ELoginStatus s_loginStatus;
+        static GuiCommon::ERequestStatus s_loginStatus;
     };
 }
 
