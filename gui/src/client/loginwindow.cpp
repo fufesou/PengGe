@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-02
- * @modified  Thu 2015-12-03 00:31:16 (+0800)
+ * @modified  Thu 2015-12-10 18:54:28 (+0800)
  */
 
 #include  <QPushButton>
@@ -38,25 +38,36 @@ namespace GuiClient
                     "}");
 
 		m_plbPhoto = new QLabel(tr("photo here"), this);
-		m_pleUserNumber = new QLineEdit(this);
-        m_pleUserNumber->setPlaceholderText(tr("enter your user number"));
+		m_pleUserInfo = new QLineEdit(this);
+        m_pleUserInfo->setMinimumWidth(250);
+        m_pleUserInfo->setPlaceholderText(tr("enter your user number"));
 		m_plePasswd = new QLineEdit(this);
+        m_plePasswd->setMinimumWidth(250);
         m_plePasswd->setEchoMode(QLineEdit::Password);
 
-        m_pbtnRegister = new GuiCommon::CWordsButton(tr("register"), this);
-        m_pbtnRetrievePasswd = new GuiCommon::CWordsButton(tr("retrieve password"), this);
         m_pbtnLogin = new QPushButton(tr("login"), this);
+        m_pbtnLogin->setMinimumWidth(100);
+        m_pbtnRegister = new QPushButton(tr("register"), this);
+        m_pbtnRegister->setMinimumWidth(100);
+        m_pbtnRetrievePasswd = new QPushButton(tr("retrieve password"), this);
+        m_pbtnRetrievePasswd->setMinimumWidth(100);
+
 
 		pMainLayout->addWidget(plbIndividuation, 0, 0, 6, 10);
 
-		pMainLayout->addWidget(m_plbPhoto, 6, 0, 2, 3);
-        pMainLayout->addWidget(m_pleUserNumber, 6, 3, 1, 5);
-        pMainLayout->addWidget(m_plePasswd, 7, 3, 1, 5);
-        pMainLayout->addWidget(m_pbtnRegister, 6, 9, 1, 1);
-        pMainLayout->addWidget(m_pbtnRetrievePasswd, 7, 9, 1, 1);
-        pMainLayout->addWidget(m_pbtnLogin, 9, 3, 1, 6);
+        pMainLayout->addWidget(m_plbPhoto, 6, 0, 2, 2, Qt::AlignLeft);
+        pMainLayout->addWidget(m_pleUserInfo, 6, 2, 1, 5, Qt::AlignLeft);
+        pMainLayout->addWidget(m_plePasswd, 7, 2, 1, 5, Qt::AlignLeft);
+        pMainLayout->addWidget(m_pbtnLogin, 6, 7, 1, 2, Qt::AlignLeft);
+        pMainLayout->addWidget(m_pbtnRegister, 8, 2, 1, 2, Qt::AlignLeft);
+        pMainLayout->addWidget(m_pbtnRetrievePasswd, 8, 6, 1, 2, Qt::AlignLeft);
 
-        bool bIsLoginConOK = connect(m_pbtnLogin, SIGNAL(clicked(bool)), this, SIGNAL(login()));
+        bool bIsLoginConOK = connect(m_pbtnLogin, SIGNAL(clicked(bool)), this, SLOT(beginLogin()));
         Q_ASSERT(bIsLoginConOK);
+    }
+
+    void CLoginWindow::beginLogin()
+    {
+        emit login(m_pleUserInfo->text(), m_plePasswd->text());
     }
 }

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Wed 2015-12-09 23:29:36 (+0800)
+ * @modified  Thu 2015-12-10 18:50:14 (+0800)
  */
 
 #include  <QDebug>
@@ -89,8 +89,6 @@ static void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade
 
 namespace GuiClient
 {
-    CController::ELoginStatus CController::m_loginStatus = CController::eLoginInit;
-
     CController::CController(const char* vServerIP, unsigned short vServerPort)
         : m_pLoginWidget(new CLoginWindow)
         , m_pLogingWidget(new CLogingWidget)
@@ -104,9 +102,22 @@ namespace GuiClient
             m_pLogingWidget->hide();
             m_pMainWidget->hide();
 
-            bool bIsLoginConOK = connect(m_pLoginWidget, SIGNAL(login()), this, SLOT(login()));
+            bool bIsLoginConOK = connect(
+                        m_pLoginWidget,
+                        SIGNAL(login(const QString&, const QString&)),
+                        this,
+                        SLOT(showLogin(const QString&, const QString&)));
             Q_ASSERT(bIsLoginConOK);
+
+            bool bIsLogingStatusConOK = connect(
+                        m_pLogingWidget,
+                        SIGNAL(loginEnd(const GuiCommon::ELoginStatus&)),
+                        this,
+                        SLOT(endLogin(const GuiCommon::ELoginStatus&)));
+            Q_ASSERT(bIsLogingStatusConOK);
         }
+
+        m_pLoginWidget->show();
     }
 
     CController::~CController()
@@ -139,27 +150,35 @@ namespace GuiClient
 
     void CController::showLogin(const QString& vUserInfo, const QString& vPasswd)
     {
+        s_process_login_request(vUserInfo, vPasswd, m_pCSClient, m_pServerAddr);
         m_pLoginWidget->show();
+        m_pLoginWidget->hide();
+
         m_pLogingWidget->show();
+        dynamic_cast<CLogingWidget*>(m_pLogingWidget)->beginLogin();
     }
 
-    void CController::succeedLogin()
+    void CController::endLogin(const GuiCommon::ELoginStatus& vStatus)
     {
-        m_loginStatus = eLoginSucceed;
         m_pLogingWidget->hide();
-        m_pMainWidget->show();
-    }
 
-    void CController::failLogin()
-    {
-        m_loginStatus = eLoginFail;
-        m_pLogingWidget->hide();
-        m_pLoginWidget->show();
+        if (vStatus == GuiCommon::eTimeout)
+        {
+            qDebug() << "login: timeout";
+            m_pLoginWidget->show();
+        }
+        else if (vStatus == GuiCommon::eFail)
+        {
+            qDebug() << "login: error user info or passwd";
+            m_pLogingWidget->show();
+        } else if (vStatus == GuiCommon::eSucceed)
+        {
+            m_pMainWidget->show();
+        }
     }
 
     void CController::logout()
     {
-        m_loginStatus = eLogout;
         m_pMainWidget->hide();
         m_pLoginWidget->show();
     }

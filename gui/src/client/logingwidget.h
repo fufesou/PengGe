@@ -14,6 +14,7 @@
 
 #include  "guitypes.h"
 
+QT_FORWARD_DECLARE_CLASS(QTimer)
 QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
 QT_FORWARD_DECLARE_CLASS(QProgressBar)
@@ -25,7 +26,7 @@ namespace GuiClient
         Q_OBJECT
 
     public:
-        explicit CLogingWidget(int vTimeoutMsec = 10*1000, QWidget* vParent = 0);
+        explicit CLogingWidget(int vTimeoutMsec = 30*1000, int vIntervalMsec = 300, QWidget* vParent = 0);
 
         static void setLoginStatus(GuiCommon::ELoginStatus vStatus) { s_loginStatus = vStatus; }
 
@@ -37,9 +38,17 @@ namespace GuiClient
 
     private:
         void initWidget(void);
+        void initTimer(void);
+
+    private slots:
+        void updateProgressBar();
 
     private:
         int m_timeoutSec;
+        int m_elapsedTimes;
+        int m_interval;
+        QTimer* m_pTimer;
+
         QLabel* m_plbScene;
         QPushButton* m_pbtnCancel;
         QProgressBar* m_ppbProgress;
