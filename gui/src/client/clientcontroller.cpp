@@ -4,10 +4,11 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Thu 2015-12-10 18:50:14 (+0800)
+ * @modified  Tue 2015-12-15 19:44:20 (+0800)
  */
 
 #include  <QDebug>
+#include  <QLabel>
 #include  <QWidget>
 
 #ifdef WIN32
@@ -40,8 +41,8 @@
 
 #include    "guimacros.h"
 #include    "clientcontroller.h"
-#include    "loginwindow.h"
-#include    "logingwidget.h"
+#include    "loginwidget.h"
+#include    "loginingwidget.h"
 #include    "mainwidget.h"
 
 #ifdef __cplusplus
@@ -90,8 +91,12 @@ static void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade
 namespace GuiClient
 {
     CController::CController(const char* vServerIP, unsigned short vServerPort)
-        : m_pLoginWidget(new CLoginWindow)
-        , m_pLogingWidget(new CLogingWidget)
+        : m_pLoginWidget(new CLoginWidget(this))
+        , m_pLoginingWidget(new CLoginingWidget(this))
+        , m_pRegisterWidget(new CRegisterWidget(this))
+        , m_pRegisteringWidget(new CRegisteringWidget(this))
+        , m_pVerifyWidget(new CVerifyWidget(this))
+        , m_pVerifyingWidget(new CVerifyingWidget(this))
         , m_pMainWidget(new CMainWidget)
         , m_pCSClient(NULL)
         , m_pServerAddr(NULL)
@@ -99,19 +104,23 @@ namespace GuiClient
         if (initClient(vServerIP, vServerPort))
         {
             m_pLoginWidget->hide();
-            m_pLogingWidget->hide();
+            m_pLoginingWidget->hide();
+            m_pRegisterWidget->hide();
+            m_pRegisteringWidget->hide();
+            m_pVerifyWidget->hide();
+            m_pVerifyingWidget->hide();
             m_pMainWidget->hide();
 
             bool bIsLoginConOK = connect(
                         m_pLoginWidget,
-                        SIGNAL(login(const QString&, const QString&)),
+                        SIGNAL(request(const QString&, const QString&)),
                         this,
                         SLOT(showLogin(const QString&, const QString&)));
             Q_ASSERT(bIsLoginConOK);
 
             bool bIsLogingStatusConOK = connect(
-                        m_pLogingWidget,
-                        SIGNAL(loginEnd(const GuiCommon::ERequestStatus&)),
+                        m_pLoginingWidget,
+                        SIGNAL(requestEnd(const GuiCommon::ERequestStatus&)),
                         this,
                         SLOT(endLogin(const GuiCommon::ERequestStatus&)));
             Q_ASSERT(bIsLogingStatusConOK);
@@ -127,7 +136,11 @@ namespace GuiClient
         free(m_pServerAddr);
 
         SAFE_DEL(m_pLoginWidget);
-        SAFE_DEL(m_pLogingWidget);
+        SAFE_DEL(m_pLoginingWidget);
+        SAFE_DEL(m_pRegisterWidget);
+        SAFE_DEL(m_pRegisteringWidget);
+        SAFE_DEL(m_pVerifyWidget);
+        SAFE_DEL(m_pVerifyingWidget);
         SAFE_DEL(m_pMainWidget);
     }
 
@@ -151,16 +164,26 @@ namespace GuiClient
     void CController::showLogin(const QString& vUserInfo, const QString& vPasswd)
     {
         s_process_login_request(vUserInfo, vPasswd, m_pCSClient, m_pServerAddr);
-        m_pLoginWidget->show();
         m_pLoginWidget->hide();
+        m_pLoginingWidget->show();
+        dynamic_cast<CLoginingWidget*>(m_pLoginingWidget)->beginRequest();
+    }
 
-        m_pLogingWidget->show();
-        dynamic_cast<CLogingWidget*>(m_pLogingWidget)->beginLogin();
+    void CController::showRegister(const QString& vUserNum, const QString& vTelNum)
+    {
+        s_process_create_request(vUserNum, vTelNum);
+        m_pRegisterWidget->hide();
+        m_pReqisteringWidget->show();
+        dynamic_cast<CRegisteringWidget*>(m_pRegisteringWidget)->beginRequest();
+    }
+
+    void CController::showVerify(const QString& vTelNum, const QString& vRandCode)
+    {
     }
 
     void CController::endLogin(const GuiCommon::ERequestStatus& vStatus)
     {
-        m_pLogingWidget->hide();
+        m_pLoginingWidget->hide();
 
         if (vStatus == GuiCommon::eTimeout)
         {
@@ -170,7 +193,7 @@ namespace GuiClient
         else if (vStatus == GuiCommon::eFail)
         {
             qDebug() << "login: error user info or passwd";
-            m_pLogingWidget->show();
+            m_pLoginingWidget->show();
         } else if (vStatus == GuiCommon::eSucceed)
         {
             m_pMainWidget->show();
@@ -277,9 +300,9 @@ void s_process_login_react(uint32_t msglen, const char* msg)
 {
     (void)msglen;
     if (msg[0] == g_succeed) {
-        GuiClient::CLogingWidget::setLoginStatus(GuiCommon::eSucceed);
+        GuiClient::CLoginingWidget::setRequestStatus(GuiCommon::eSucceed);
     } else if (msg[0] == g_fail) {
-        GuiClient::CLogingWidget::setLoginStatus(GuiCommon::eFail);
+        GuiClient::CLoginingWidget::setRequestStatus(GuiCommon::eFail);
     } else {
         qDebug() << "login: unkown message.";
     }

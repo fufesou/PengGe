@@ -18,11 +18,15 @@ INCLUDEPATH += $$PWD/../../../build/include
 
 SOURCES += \
     main.cpp \
-    loginwindow.cpp \
-    ../common/wordsbutton.cpp \
     mainwidget.cpp \
     clientcontroller.cpp \
-    logingwidget.cpp \
+    requestwidget.cpp \
+    requestingwidget.cpp \
+    loginwidget.cpp \
+    loginingwidget.cpp \
+    registerwidget.cpp \
+    registeringwidget.cpp \
+    ../common/wordsbutton.cpp \
     ../common/chatwidget.cpp \
     ../common/displayiteminfo.cpp \
     ../common/displayitemwidget.cpp \
@@ -30,11 +34,15 @@ SOURCES += \
     ../common/selfinfowidget.cpp
 
 HEADERS  += \
-    loginwindow.h \
-    ../common/wordsbutton.h \
     mainwidget.h \
     clientcontroller.h \
-    logingwidget.h \
+    requestwidget.h \
+    requestingwidget.h \
+    loginwidget.h \
+    loginingwidget.h \
+    registerwidget.h \
+    registerwidget.h \
+    ../common/wordsbutton.h \
     ../common/chatwidget.h \
     ../common/guimacros.h \
     ../common/guitypes.h \

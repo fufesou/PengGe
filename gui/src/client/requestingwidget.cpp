@@ -1,10 +1,10 @@
 /**
- * @file logingwidget.cpp
+ * @file requestingwidget.cpp
  * @brief  
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
- * @date 2015-12-03
- * @modified  Wed 2015-12-09 23:28:29 (+0800)
+ * @date 2015-12-11
+ * @modified  Tue 2015-12-15 19:40:26 (+0800)
  */
 
 #include  <QDebug>
@@ -15,15 +15,15 @@
 #include  <QVBoxLayout>
 
 #include    "guimacros.h"
-#include    "logingwidget.h"
+#include    "requestingwidget.h"
 
 namespace GuiClient
 {
-    GuiCommon::ERequestStatus CLogingWidget::s_loginStatus = GuiCommon::eRequesting;
+    GuiCommon::ERequestStatus CRequestingWidget::s_requestStatus = GuiCommon::eRequesting;
 
-    CLogingWidget::CLogingWidget(int vTimeoutSec, int vIntervalMsec, QWidget* vParent)
+    CRequestingWidget::CRequestingWidget(QWidget* vParent, int vTimeoutMsec, int vIntervalMsec)
         : QWidget(vParent)
-        , m_timeoutSec(vTimeoutSec)
+        , m_timeoutMsec(vTimeoutMsec)
         , m_interval(vIntervalMsec)
         , m_pTimer(NULL)
     {
@@ -34,7 +34,7 @@ namespace GuiClient
         setFixedSize(500, 400);
     }
 
-    void CLogingWidget::initWidget()
+    void CRequestingWidget::initWidget()
     {
         QVBoxLayout* pMainLayout = new QVBoxLayout(this);
         setLayout(pMainLayout);
@@ -43,47 +43,42 @@ namespace GuiClient
         pMainLayout->addWidget(m_plbScene);
 
         m_ppbProgress = new QProgressBar(this);
-        m_ppbProgress->setRange(0, m_timeoutSec);
+        m_ppbProgress->setRange(0, m_timeoutMsec);
         pMainLayout->addWidget(m_ppbProgress);
-
-        m_pbtnCancel = new QPushButton(tr("cancel"), this);
-        pMainLayout->addWidget(m_pbtnCancel);
-
-        bool VARIABLE_IS_NOT_USED bIsCancelConOK = connect(m_pbtnCancel, SIGNAL(clicked()), this, SIGNAL(cancelLogin()));
-        Q_ASSERT(bIsCancelConOK);
     }
 
-    void CLogingWidget::initTimer()
+    void CRequestingWidget::initTimer()
     {
         m_pTimer = new QTimer(this);
         bool VARIABLE_IS_NOT_USED bIsTimerConOK = connect(m_pTimer, SIGNAL(timeout()), this, SLOT(updateProgressBar()));
         Q_ASSERT(bIsTimerConOK);
     }
 
-    void CLogingWidget::updateProgressBar()
+    void CRequestingWidget::updateProgressBar()
     {
-        while (s_loginStatus == GuiCommon::eRequesting)
+        while (s_requestStatus == GuiCommon::eRequesting)
         {
             ++m_elapsedTimes;
-            if ((m_elapsedTimes * m_interval) < m_timeoutSec)
+            if ((m_elapsedTimes * m_interval) < m_timeoutMsec)
             {
                 m_ppbProgress->setValue(m_elapsedTimes * m_interval);
             }
             else
             {
-                s_loginStatus = GuiCommon::eTimeout;
+                s_requestStatus = GuiCommon::eTimeout;
             }
         }
         m_pTimer->stop();
-        emit loginEnd(s_loginStatus);
+        emit requestEnd(s_requestStatus);
     }
 
-    void CLogingWidget::beginLogin()
+    void CRequestingWidget::beginRequest()
     {
-        s_loginStatus = GuiCommon::eRequesting;
+        s_requestStatus = GuiCommon::eRequesting;
         m_elapsedTimes = 0;
         m_pTimer->setInterval(m_interval);
         m_pTimer->start();
         qDebug() << m_pTimer->interval();
     }
+
 }
