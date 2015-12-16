@@ -4,19 +4,19 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Tue 2015-12-15 19:35:46 (+0800)
+ * @modified  Wed 2015-12-16 20:44:22 (+0800)
  */
 
 #ifndef _CLIENTCONTROLLER_H
 #define _CLIENTCONTROLLER_H
 
 #include  <QObject>
+#include  <QMap>
 
 #include    "guitypes.h"
 
-QT_FORWARD_DECLARE_CLASS(QWidget)
-
 QT_FORWARD_DECLARE_STRUCT(csclient)
+QT_FORWARD_DECLARE_CLASS(QWidget)
 
 namespace GuiClient
 {
@@ -40,26 +40,27 @@ namespace GuiClient
     public slots:
         void logout(void);
         void exit(void);
-        void showLogin(const QString& vUserInfo, const QString& vPasswd);
-        void showRegister(const QString& vUserNum, const QString& vTelNum);
-        void showVerify(const QString& vTelNum, const QString& vRandCode);
+        void showLogin(void);
+        void showRegister(void);
+        void showVerify(void);
+        void showLogining(const QString& vUserInfo, const QString& vPasswd);
+        void showRegistering(const QString& vUserNum, const QString& vTelNum);
+        void showVerifying(const QString& vTelNum, const QString& vRandCode);
 
     private:
+        void showWidget(const QString& vSigWidget);
+        void initWidgets(void);
+        void insertWidgets(void);
+        void hideAllWidgets(void);
         bool initClient(const char* vServerIP, unsigned short vServerPort);
 
     private slots:
-        void endLogin(const GuiCommon::ERequestStatus& vStatus);
-        void endRegister(const GuiCommon::ERequestStatus& vStatus);
-        void endVerify(const GuiCommon::ERequestStatus& vStatus);
+        void endLogining(const GuiCommon::ERequestStatus& vStatus);
+        void endRegistering(const GuiCommon::ERequestStatus& vStatus);
+        void endVerifying(const GuiCommon::ERequestStatus& vStatus);
 
     private:
-        QWidget* m_pLoginWidget;
-        QWidget* m_pLoginingWidget;
-        QWidget* m_pRegisterWidget;
-        QWidget* m_pRegisteringWidget;
-        QWidget* m_pVerifyWidget;
-        QWidget* m_pVerifyingWidget;
-        QWidget* m_pMainWidget;
+        QMap<QString, QWidget*> m_mapWidget;
 
         struct csclient* m_pCSClient;
         struct sockaddr_in* m_pServerAddr;

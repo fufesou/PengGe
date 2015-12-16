@@ -24,8 +24,8 @@ namespace GuiClient
         explicit CLoginWidget(QWidget* vParent = 0);
 
     signals:
-        void registerAccount(void);
-        void retrievePasswd(void);
+        void switch2Register(void);
+        void switch2Retrieve(void);
 
     private:
         void initWidget(void);

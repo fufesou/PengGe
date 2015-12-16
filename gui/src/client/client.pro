@@ -26,6 +26,8 @@ SOURCES += \
     loginingwidget.cpp \
     registerwidget.cpp \
     registeringwidget.cpp \
+    verifywidget.cpp \
+    verifyingwidget.cpp \
     ../common/wordsbutton.cpp \
     ../common/chatwidget.cpp \
     ../common/displayiteminfo.cpp \
@@ -41,7 +43,9 @@ HEADERS  += \
     loginwidget.h \
     loginingwidget.h \
     registerwidget.h \
-    registerwidget.h \
+    registeringwidget.h \
+    verifywidget.h \
+    verifyingwidget.h \
     ../common/wordsbutton.h \
     ../common/chatwidget.h \
     ../common/guimacros.h \

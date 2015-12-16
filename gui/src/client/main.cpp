@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     GuiClient::CController clientController(argv[1], atoi(argv[2]));
+    (void)clientController;
 
     return app.exec();
 }

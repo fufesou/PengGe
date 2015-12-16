@@ -45,10 +45,10 @@ namespace GuiClient
 
         pMainLayout->addLayout(pBtnsLayout);
 
-        bool VARIABLE_IS_NOT_USED bIsRegisterConOK = connect(m_pbtnRegister, SIGNAL(clicked(bool)), this, SIGNAL(registerAccount()));
+        bool VARIABLE_IS_NOT_USED bIsRegisterConOK = connect(m_pbtnRegister, SIGNAL(clicked(bool)), this, SIGNAL(switch2Register()));
         Q_ASSERT(bIsRegisterConOK);
 
-        bool VARIABLE_IS_NOT_USED bIsRetrieveConOK = connect(m_pbtnRetrievePasswd, SIGNAL(clicked(bool)), this, SIGNAL(retrievePasswd()));
+        bool VARIABLE_IS_NOT_USED bIsRetrieveConOK = connect(m_pbtnRetrievePasswd, SIGNAL(clicked(bool)), this, SIGNAL(switch2Retrieve()));
         Q_ASSERT(bIsRetrieveConOK);
     }
 }

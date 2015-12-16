@@ -4,15 +4,15 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-15
- * @modified  Tue 2015-12-15 19:41:32 (+0800)
+ * @modified  Wed 2015-12-16 23:10:55 (+0800)
  */
 
 #include    "registeringwidget.h"
 
 namespace GuiClient
 {
-    CRegisterWidget::CRegisterWidget(QWidget* vParent, int vTimeoutMsec, int vIntervalMsec)
-        : CRequestingWidget(vTimeoutMsec, vIntervalMsec, vParent)
+    CRegisteringWidget::CRegisteringWidget(QWidget* vParent, int vTimeoutMsec, int vIntervalMsec)
+        : CRequestingWidget(vParent, vTimeoutMsec, vIntervalMsec)
     {
     }
 }

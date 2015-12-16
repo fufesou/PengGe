@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-15
- * @modified  Tue 2015-12-15 19:42:00 (+0800)
+ * @modified  Wed 2015-12-16 23:10:49 (+0800)
  */
 
 #ifndef _REGISTERINGWIDGET_H
@@ -14,12 +14,12 @@
 
 namespace GuiClient
 {
-    class CRegisterWidget : public CRequestingWidget
+    class CRegisteringWidget : public CRequestingWidget
     {
         Q_OBJECT
 
     public:
-        explicit CRegisterWidget(QWidget* vParent = 0, int vTimeoutMsec = 30*1000, int vIntervalMsec = 300);
+        explicit CRegisteringWidget(QWidget* vParent = 0, int vTimeoutMsec = 30*1000, int vIntervalMsec = 300);
     };
 }
 

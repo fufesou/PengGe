@@ -12,7 +12,7 @@
 namespace GuiClient
 {
     CLoginingWidget::CLoginingWidget(QWidget* vParent, int vTimeoutMsec, int vIntervalMsec)
-        : CRequestingWidget(vTimeoutMsec, vIntervalMsec, vParent)
+        : CRequestingWidget(vParent, vTimeoutMsec, vIntervalMsec)
     {
     }
 }

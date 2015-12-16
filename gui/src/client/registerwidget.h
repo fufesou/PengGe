@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-15
- * @modified  Tue 2015-12-15 19:21:54 (+0800)
+ * @modified  Wed 2015-12-16 23:06:45 (+0800)
  */
 
 #ifndef _REGISTERWIDGET_H
@@ -22,13 +22,14 @@ namespace GuiClient
         explicit CRegisterWidget(QWidget* vParent = 0);
 
     signals:
-        void registerAccount(void);
-        void verifyAccount(void);
+        void switch2Login(void);
+        void switch2Verify(void);
 
     private:
         void initWidget(void);
 
     private:
+        QPushButton* m_pbtnLogin;
         QPushButton* m_pbtnVerify;
     };
 }

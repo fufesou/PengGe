@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Tue 2015-12-15 19:44:20 (+0800)
+ * @modified  Wed 2015-12-16 20:45:47 (+0800)
  */
 
 #include  <QDebug>
@@ -43,6 +43,10 @@
 #include    "clientcontroller.h"
 #include    "loginwidget.h"
 #include    "loginingwidget.h"
+#include    "registerwidget.h"
+#include    "registeringwidget.h"
+#include    "verifywidget.h"
+#include    "verifyingwidget.h"
 #include    "mainwidget.h"
 
 #ifdef __cplusplus
@@ -90,43 +94,26 @@ static void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade
 
 namespace GuiClient
 {
+    static QString s_sigMainWidget("MainWidget");
+    static QString s_sigLoginWidget("LoginWidget");
+    static QString s_sigLoginingWidget("LoginingWidget");
+    static QString s_sigRegisterWidget("RegisterWidget");
+    static QString s_sigRegisteringWidget("RegisteringWidget");
+    static QString s_sigVerifyWidget("VerifyWidget");
+    static QString s_sigVerifyingWidget("VerifyingWidget");
+
     CController::CController(const char* vServerIP, unsigned short vServerPort)
-        : m_pLoginWidget(new CLoginWidget(this))
-        , m_pLoginingWidget(new CLoginingWidget(this))
-        , m_pRegisterWidget(new CRegisterWidget(this))
-        , m_pRegisteringWidget(new CRegisteringWidget(this))
-        , m_pVerifyWidget(new CVerifyWidget(this))
-        , m_pVerifyingWidget(new CVerifyingWidget(this))
-        , m_pMainWidget(new CMainWidget)
-        , m_pCSClient(NULL)
+        : m_pCSClient(NULL)
         , m_pServerAddr(NULL)
     {
         if (initClient(vServerIP, vServerPort))
         {
-            m_pLoginWidget->hide();
-            m_pLoginingWidget->hide();
-            m_pRegisterWidget->hide();
-            m_pRegisteringWidget->hide();
-            m_pVerifyWidget->hide();
-            m_pVerifyingWidget->hide();
-            m_pMainWidget->hide();
-
-            bool bIsLoginConOK = connect(
-                        m_pLoginWidget,
-                        SIGNAL(request(const QString&, const QString&)),
-                        this,
-                        SLOT(showLogin(const QString&, const QString&)));
-            Q_ASSERT(bIsLoginConOK);
-
-            bool bIsLogingStatusConOK = connect(
-                        m_pLoginingWidget,
-                        SIGNAL(requestEnd(const GuiCommon::ERequestStatus&)),
-                        this,
-                        SLOT(endLogin(const GuiCommon::ERequestStatus&)));
-            Q_ASSERT(bIsLogingStatusConOK);
+            initWidgets();
         }
-
-        m_pLoginWidget->show();
+        else
+        {
+            Q_ASSERT(0);
+        }
     }
 
     CController::~CController()
@@ -135,13 +122,112 @@ namespace GuiClient
         free(m_pCSClient);
         free(m_pServerAddr);
 
-        SAFE_DEL(m_pLoginWidget);
-        SAFE_DEL(m_pLoginingWidget);
-        SAFE_DEL(m_pRegisterWidget);
-        SAFE_DEL(m_pRegisteringWidget);
-        SAFE_DEL(m_pVerifyWidget);
-        SAFE_DEL(m_pVerifyingWidget);
-        SAFE_DEL(m_pMainWidget);
+        foreach (QWidget* pWidget, m_mapWidget) {
+            SAFE_DEL(pWidget);
+        }
+    }
+
+    void CController::initWidgets()
+    {
+        insertWidgets();
+        hideAllWidgets();
+        showWidget(s_sigLoginWidget);
+    }
+
+    void CController::insertWidgets()
+    {
+        QWidget* pMainWidget = new CMainWidget();
+        m_mapWidget.insert(s_sigMainWidget, pMainWidget);
+
+        QWidget* pLoginWidget = new CLoginWidget();
+        bool VARIABLE_IS_NOT_USED bIsLoginConOK = connect(
+                                pLoginWidget,
+                                SIGNAL(request(const QString&, const QString&)),
+                                this,
+                                SLOT(showLogining(const QString&, const QString&)));
+        Q_ASSERT(bIsLoginConOK);
+        bool VARIABLE_IS_NOT_USED bIsLogin2RegisterConOK = connect(
+                                pLoginWidget,
+                                SIGNAL(switch2Register()),
+                                this,
+                                SLOT(showRegister()));
+        Q_ASSERT(bIsLogin2RegisterConOK);
+        m_mapWidget.insert(s_sigLoginWidget, pLoginWidget);
+
+        QWidget* pLoginingWidget = new CLoginingWidget();
+        bool VARIABLE_IS_NOT_USED bIsLogingStatusConOK = connect(
+                                pLoginingWidget,
+                                SIGNAL(requestEnd(const GuiCommon::ERequestStatus&)),
+                                this,
+                                SLOT(endLogining(const GuiCommon::ERequestStatus&)));
+        Q_ASSERT(bIsLogingStatusConOK);
+        m_mapWidget.insert(s_sigLoginingWidget, pLoginingWidget);
+
+        QWidget* pRegisterWidget = new CRegisterWidget();
+        bool VARIABLE_IS_NOT_USED bIsRegisterConOK = connect(
+                    pRegisterWidget,
+                    SIGNAL(request(const QString&, const QString&)),
+                    this,
+                    SLOT(showRegistering(const QString&, const QString&)));
+        Q_ASSERT(bIsRegisterConOK);
+        bool VARIABLE_IS_NOT_USED bIsRegister2LoginConOK = connect(
+                    pRegisterWidget,
+                    SIGNAL(switch2Login()),
+                    this,
+                    SLOT(showLogin()));
+        Q_ASSERT(bIsRegister2LoginConOK);
+        bool VARIABLE_IS_NOT_USED bIsRegister2VerifyConOK = connect(
+                    pRegisterWidget,
+                    SIGNAL(switch2Verify()),
+                    this,
+                    SLOT(showVerify()));
+        Q_ASSERT(bIsRegister2VerifyConOK);
+        m_mapWidget.insert(s_sigRegisterWidget, pRegisterWidget);
+
+        QWidget* pRegisteringWidget = new CRegisteringWidget();
+        bool VARIABLE_IS_NOT_USED bIsReigsteringConOK = connect(
+                    pRegisteringWidget,
+                    SIGNAL(requestEnd(const GuiCommon::ERequestStatus&)),
+                    this,
+                    SLOT(endRegistering(const GuiCommon::ERequestStatus&)));
+        Q_ASSERT(bIsReigsteringConOK);
+        m_mapWidget.insert(s_sigRegisteringWidget, pRegisteringWidget);
+
+        QWidget* pVerifyWidget = new CVerifyWidget();
+                bool VARIABLE_IS_NOT_USED bIsVerifyConOK = connect(
+                    pVerifyWidget,
+                    SIGNAL(request(const QString&, const QString&)),
+                    this,
+                    SLOT(showVerifying(const QString&, const QString&)));
+        Q_ASSERT(bIsVerifyConOK);
+        bool VARIABLE_IS_NOT_USED bIsVerify2Login = connect(
+                    pVerifyWidget,
+                    SIGNAL(switch2Login()),
+                    this,
+                    SLOT(showLogin()));
+        Q_ASSERT(bIsVerify2Login);
+        m_mapWidget.insert(s_sigVerifyWidget, pVerifyWidget);
+
+        QWidget* pVerifyingWidget = new CVerifyingWidget();
+                bool VARIABLE_IS_NOT_USED bIsVerifyingConOK = connect(
+                    pVerifyingWidget,
+                    SIGNAL(requestEnd(const GuiCommon::ERequestStatus&)),
+                    this,
+                    SLOT(endVerifying(const GuiCommon::ERequestStatus&)));
+        Q_ASSERT(bIsVerifyingConOK);
+        m_mapWidget.insert(s_sigVerifyingWidget, pVerifyingWidget);
+    }
+
+    void CController::hideAllWidgets()
+    {
+        foreach (QWidget* pWidget, m_mapWidget) {
+            pWidget->hide();
+        }
+    }
+
+    void CController::showWidget(const QString& vSigWidget)
+    {
+        m_mapWidget.value(vSigWidget)->show();
     }
 
     bool CController::initClient(const char* vServerIP, unsigned short vServerPort)
@@ -161,49 +247,98 @@ namespace GuiClient
         return true;
     }
 
-    void CController::showLogin(const QString& vUserInfo, const QString& vPasswd)
+#define SHOW_DEF(sig) \
+    void CController::show##sig() \
+    { \
+        hideAllWidgets(); \
+        showWidget(s_sig##sig##Widget); \
+    }
+
+    SHOW_DEF(Login)
+    SHOW_DEF(Register)
+    SHOW_DEF(Verify)
+
+#undef SHOW_DEF
+
+    void CController::showLogining(const QString& vUserInfo, const QString& vPasswd)
     {
+        hideAllWidgets();
+        showWidget(s_sigLoginingWidget);
         s_process_login_request(vUserInfo, vPasswd, m_pCSClient, m_pServerAddr);
-        m_pLoginWidget->hide();
-        m_pLoginingWidget->show();
-        dynamic_cast<CLoginingWidget*>(m_pLoginingWidget)->beginRequest();
+        dynamic_cast<CLoginingWidget*>(m_mapWidget[s_sigLoginingWidget])->beginRequest();
     }
 
-    void CController::showRegister(const QString& vUserNum, const QString& vTelNum)
+    void CController::showRegistering(const QString& vUserNum, const QString& vTelNum)
     {
-        s_process_create_request(vUserNum, vTelNum);
-        m_pRegisterWidget->hide();
-        m_pReqisteringWidget->show();
-        dynamic_cast<CRegisteringWidget*>(m_pRegisteringWidget)->beginRequest();
+        hideAllWidgets();
+        showWidget(s_sigRegisteringWidget);
+        s_process_create_request(vUserNum, vTelNum, m_pCSClient, m_pServerAddr);
+        dynamic_cast<CRegisteringWidget*>(m_mapWidget[s_sigRegisteringWidget])->beginRequest();
     }
 
-    void CController::showVerify(const QString& vTelNum, const QString& vRandCode)
+    void CController::showVerifying(const QString& vTelNum, const QString& vRandCode)
     {
+        hideAllWidgets();
+        showWidget(s_sigVerifyingWidget);
+        s_process_verify_request(vTelNum, vRandCode, m_pCSClient, m_pServerAddr);
+        dynamic_cast<CVerifyingWidget*>(m_mapWidget[s_sigVerifyingWidget])->beginRequest();
     }
 
-    void CController::endLogin(const GuiCommon::ERequestStatus& vStatus)
+    void CController::endLogining(const GuiCommon::ERequestStatus& vStatus)
     {
-        m_pLoginingWidget->hide();
+        hideAllWidgets();
 
         if (vStatus == GuiCommon::eTimeout)
         {
             qDebug() << "login: timeout";
-            m_pLoginWidget->show();
+            showWidget(s_sigLoginWidget);
         }
         else if (vStatus == GuiCommon::eFail)
         {
             qDebug() << "login: error user info or passwd";
-            m_pLoginingWidget->show();
+            showWidget(s_sigLoginWidget);
         } else if (vStatus == GuiCommon::eSucceed)
         {
-            m_pMainWidget->show();
+            showWidget(s_sigMainWidget);
         }
+    }
+
+    void CController::endRegistering(const GuiCommon::ERequestStatus& vStatus)
+    {
+        hideAllWidgets();
+
+        if (vStatus == GuiCommon::eTimeout)
+        {
+            qDebug() << "login: timeout";
+            showWidget(s_sigVerifyWidget);
+        }
+        else if (vStatus == GuiCommon::eFail)
+        {
+            qDebug() << "login: error user info or passwd";
+        }
+        showWidget(s_sigRegisterWidget);
+    }
+
+    void CController::endVerifying(const GuiCommon::ERequestStatus& vStatus)
+    {
+        hideAllWidgets();
+
+        if (vStatus == GuiCommon::eTimeout)
+        {
+            qDebug() << "login: timeout";
+            showWidget(s_sigLoginWidget);
+        }
+        else if (vStatus == GuiCommon::eFail)
+        {
+            qDebug() << "login: error user info or passwd";
+        }
+        showWidget(s_sigVerifyWidget);
     }
 
     void CController::logout()
     {
-        m_pMainWidget->hide();
-        m_pLoginWidget->show();
+        hideAllWidgets();
+        showWidget(s_sigLoginWidget);
     }
 
     void CController::exit()
@@ -218,19 +353,33 @@ namespace GuiClient
  ********************************************************/
 void s_process_create_request(const QString& vUserNumber, const QString& vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
-
+    vClient->len_senddata = vClient->size_senbuf;
+    if (am_account_create_request(vUserNumber.toLatin1().constData(),
+                                 vTel.toLatin1().constData(),
+                                 vClient->sendbuf,
+                                 &vClient->len_senddata) == 0) {
+    } else {
+        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+    }
 }
 
 void s_process_verify_request(const QString& vTel, const QString& vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
-
+    vClient->len_senddata = vClient->size_senbuf;
+    if (am_account_login_request(vTel.toLatin1().constData(),
+                                 vRandCode.toLatin1().constData(),
+                                 vClient->sendbuf,
+                                 &vClient->len_senddata) == 0) {
+    } else {
+        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+    }
 }
 
 void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
-    if (am_account_login_request(vUserInfo.toUtf8().constData(),
-                                 vPasswd.toUtf8().constData(),
+    if (am_account_login_request(vUserInfo.toLatin1().constData(),
+                                 vPasswd.toLatin1().constData(),
                                  vClient->sendbuf,
                                  &vClient->len_senddata) == 0) {
     } else {
