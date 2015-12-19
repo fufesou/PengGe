@@ -87,7 +87,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 
         if (sigsetjmp(s_jmpbuf, 1) != 0) {
             if (rtt_timeout(&s_rttinfo) < 0) {
-                fprintf(stderr, "cssendrecv: no response from server, giving up.\recvbytes");
+                fprintf(stderr, "cssendrecv: no response from server, giving up.");
                 s_rttinit = 0;
                 errno = ETIMEDOUT;
                 return -1;

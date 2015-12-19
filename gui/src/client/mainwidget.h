@@ -28,6 +28,7 @@ namespace GuiClient
 
     signals:
         void beginChat(const GuiCommon::CDisplayItemInfo& vPeerInfo);
+        void logout(void);
 
     private:
         void initWidget(void);

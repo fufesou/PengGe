@@ -7,6 +7,7 @@
  * @modified  Tue 2015-12-08 00:35:09 (+0800)
  */
 
+#include  <QPushButton>
 #include  <QGridLayout>
 
 #include    "guimacros.h"
@@ -35,5 +36,12 @@ namespace GuiClient
 
         m_pCtrlItemsWidget = new QWidget(this);
         pMainLayout->addWidget(m_pCtrlItemsWidget, 8, 0, 2, 1);
+        QGridLayout* pCtrlWidgetLayout = new QGridLayout();
+        m_pCtrlItemsWidget->setLayout(pCtrlWidgetLayout);
+        QPushButton* pbtnLogout = new QPushButton(tr("logout"), m_pCtrlItemsWidget);
+        pCtrlWidgetLayout->addWidget(pbtnLogout, 0, 0, 1, 1, Qt::AlignLeft);
+
+        bool VARIABLE_IS_NOT_USED bIsLogoutConOK = connect(pbtnLogout, SIGNAL(clicked(bool)), this, SIGNAL(logout()));
+        Q_ASSERT(bIsLogoutConOK);
     }
 }

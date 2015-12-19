@@ -221,7 +221,7 @@ void csclient_msgpool_dispatch_init(pfunc_msgprocess_t func_msgprocess, pfunc_ms
                 MAX_MSG_LEN + sizeof(struct csmsg_header),  /* int itemlen             */
                 SERVER_POOL_NUM_ITEM,                       /* int itemnum             */
                 threadnum,                                  /* int threadnum           */
-                0,					                       	/* char* userd<>tsa        */
+                0,					                       	/* char* userdata          */
                 0,											/* size_t size_userdata    */
                 csmsgpool_process,                          /* pthread_proc_t proc     */
                 (void*)&s_msgpool_dispatch);                /* void* pargs             */
@@ -231,7 +231,7 @@ void csclient_msgpool_dispatch_init(pfunc_msgprocess_t func_msgprocess, pfunc_ms
                     &s_msgpool_dispatch.pool_processed,
                     MAX_MSG_LEN + sizeof(struct csmsg_header),
                     SERVER_POOL_NUM_ITEM,
-                    NUM_THREAD,
+                    threadnum,
                     0,
                     0,
                     csmsgpool_process_af,

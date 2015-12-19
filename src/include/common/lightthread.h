@@ -39,20 +39,20 @@ extern "C"
  * @param pargs
  * @handle the thread handle
  *
- * @return   
+ * @return  On success, returns 0; or, win: return -1, *nix: error number.
  */
-int csthread_create(pthread_proc_t proc, void* pargs, csthread_t* handle);
+CS_API int csthread_create(pthread_proc_t proc, void* pargs, csthread_t* handle);
 
 /**
  * @brief  csthread_exit 
  */
-void csthread_exit(void);
+CS_API void csthread_exit(void);
 /**
  * @brief  csthread_wait_terminate 
  *
  * @param handle
  */
-void csthread_wait_terminate(csthread_t handle);
+CS_API void csthread_wait_terminate(csthread_t handle);
 
 /**
  * @brief  csthreadN_wait_terminate 
@@ -60,21 +60,21 @@ void csthread_wait_terminate(csthread_t handle);
  * @param handle
  * @param count
  */
-void csthreadN_wait_terminate(csthread_t* handle, int count);
+CS_API void csthreadN_wait_terminate(csthread_t* handle, int count);
 
 /**
  * @brief  csthread_getpid 
  *
  * @return   
  */
-unsigned int csthread_getpid(void);
+CS_API unsigned int csthread_getpid(void);
 
 /**
  * @brief  cssleep 
  *
  * @param msec
  */
-void cssleep(unsigned int msec);
+CS_API void cssleep(unsigned int msec);
 
 
 /**************************************************
@@ -85,14 +85,14 @@ void cssleep(unsigned int msec);
  *
  * @return   NULL if failed; valid mutex handle if succes.
  */
-csmutex_t csmutex_create(void);
+CS_API csmutex_t csmutex_create(void);
 
 /**
  * @brief  csmutex_destroy 
  *
  * @param handle
  */
-void csmutex_destroy(csmutex_t* handle);
+CS_API void csmutex_destroy(csmutex_t* handle);
 
 /**
  * @brief  csmutex_lock 
@@ -101,7 +101,7 @@ void csmutex_destroy(csmutex_t* handle);
  *
  * @return  0 if OK; -1 if failed.
  */
-int csmutex_lock(csmutex_t* handle);
+CS_API int csmutex_lock(csmutex_t* handle);
 
 /**
  * @brief  csmutex_try_lock This function returns zero if a lock on the mutex object referenced by mutex is acquired.
@@ -115,24 +115,24 @@ int csmutex_lock(csmutex_t* handle);
  * 2. -1, if timeout.
  * 3. others error code.
  */
-int csmutex_try_lock(csmutex_t* handle, unsigned int msec);
+CS_API int csmutex_try_lock(csmutex_t* handle, unsigned int msec);
 
 /**
  * @brief  csmutex_unlock This function unlock the numtex.
  *
  * @param handle handle specify the mutex.
  */
-void csmutex_unlock(csmutex_t* handle);
+CS_API void csmutex_unlock(csmutex_t* handle);
 
 
 /**************************************************
  **             the semophare block              **
  **************************************************/
-int cssem_create(int value_init, int value_max, cssem_t* handle);
+CS_API int cssem_create(int value_init, int value_max, cssem_t* handle);
 #ifdef WIN32
-int cssem_wait(cssem_t* handle);
-int cssem_post(cssem_t* handle);
-int cssem_destroy(cssem_t* handle);
+CS_API int cssem_wait(cssem_t* handle);
+CS_API int cssem_post(cssem_t* handle);
+CS_API int cssem_destroy(cssem_t* handle);
 #else
     #define cssem_wait sem_wait
     #define cssem_post sem_post

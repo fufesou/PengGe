@@ -138,6 +138,12 @@ namespace GuiClient
     {
         QWidget* pMainWidget = new CMainWidget();
         m_mapWidget.insert(s_sigMainWidget, pMainWidget);
+        bool VARIABLE_IS_NOT_USED bIsLogoutOK = connect(
+                    pMainWidget,
+                    SIGNAL(logout()),
+                    this,
+                    SLOT(logout()));
+        Q_ASSERT(bIsLogoutOK);
 
         QWidget* pLoginWidget = new CLoginWidget();
         bool VARIABLE_IS_NOT_USED bIsLoginConOK = connect(
@@ -341,6 +347,7 @@ namespace GuiClient
 
     void CController::logout()
     {
+        s_process_logout_request(m_pCSClient, m_pServerAddr);
         hideAllWidgets();
         showWidget(s_sigLoginWidget);
     }
@@ -355,6 +362,10 @@ namespace GuiClient
 /*********************************************************
  **                 request client msg                  **
  ********************************************************/
+#define SEND_COMMON \
+    csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr)); \
+    return;
+
 void s_process_create_request(const QString& vUserNumber, const QString& vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
@@ -362,8 +373,7 @@ void s_process_create_request(const QString& vUserNumber, const QString& vTel, s
                                  vTel.toLatin1().constData(),
                                  vClient->sendbuf,
                                  &vClient->len_senddata) == 0) {
-        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
-        return;
+        SEND_COMMON
     }
     qDebug() << "cannot handle create request";
 }
@@ -375,8 +385,7 @@ void s_process_verify_request(const QString& vTel, const QString& vRandCode, str
                                  vRandCode.toLatin1().constData(),
                                  vClient->sendbuf,
                                  &vClient->len_senddata) == 0) {
-        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
-        return;
+        SEND_COMMON
     }
     qDebug () << "cannot handle verify request";
 }
@@ -388,8 +397,7 @@ void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, s
                                  vPasswd.toLatin1().constData(),
                                  vClient->sendbuf,
                                  &vClient->len_senddata) == 0) {
-        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
-        return;
+        SEND_COMMON
     }
     qDebug() << "cannot handle login request";
 }
@@ -398,8 +406,7 @@ void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vSer
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_logout_request(vClient->sendbuf, &vClient->len_senddata) == 0) {
-        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
-        return;
+        SEND_COMMON
     }
     qDebug() << "cannot handle logout request";
 }
@@ -411,8 +418,7 @@ void s_process_changeusername_request(const QString& vPasswd, const QString& vNe
                                           vNewUsername.toLatin1().data(),
                                           vClient->sendbuf,
                                           &vClient->len_senddata) == 0) {
-        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
-        return;
+        SEND_COMMON
     }
     qDebug() << "cannot handle logout request";
 }
@@ -424,8 +430,7 @@ void s_process_changepasswd_request(const QString& vPasswd, const QString& vNewP
                                         vNewPasswd.toLatin1().data(),
                                         vClient->sendbuf,
                                         &vClient->len_senddata) == 0) {
-        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
-        return;
+        SEND_COMMON
     }
     qDebug() << "cannot handle logout request";
 }
@@ -437,11 +442,11 @@ void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade, struc
                                        vGrade,
                                        vClient->sendbuf,
                                        &vClient->len_senddata) == 0) {
-        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
-        return;
+        SEND_COMMON
     }
     qDebug() << "cannot handle logout request";
 }
+#undef SEND_COMMON
 
 /*********************************************************
  **                  react client msg                   **

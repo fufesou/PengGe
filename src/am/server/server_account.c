@@ -234,9 +234,8 @@ void s_account_tmp_clear(void)
     csmutex_lock(&s_mutex_tmp);
     while (delnode != (&s_list_tmp)) {
         node_tmp = container_of(delnode, struct list_account_tmp_t, listnode);
-        free(node_tmp->account_tmp.randcode);
-        free(delnode);
         delnode = delnode->next;
+        s_account_tmp_remove(node_tmp);
     }
 
     s_list_tmp.prev = &s_list_tmp;
@@ -247,6 +246,7 @@ void s_account_tmp_clear(void)
 void s_account_tmp_remove(struct list_account_tmp_t* list_tmp)
 {
     list_del(&list_tmp->listnode);
+    free(list_tmp->account_tmp.randcode);
     free(list_tmp);
 }
 
