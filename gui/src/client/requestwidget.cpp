@@ -56,7 +56,6 @@ namespace GuiClient
 
 		m_pleSecondInfo = new QLineEdit(this);
         m_pleSecondInfo->setMinimumWidth(250);
-        m_pleSecondInfo->setEchoMode(QLineEdit::Password);
         pSecondInfoLayout->addWidget(m_pleSecondInfo);
         pMainLayout->addLayout(pSecondInfoLayout);
 

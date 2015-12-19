@@ -63,7 +63,8 @@ RESOURCES += \
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs_win
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcsd_win
-else:unix:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs_unix
+# else:unix:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs_unix
+else:unix:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../samples/build-pgcs-Desktop_Qt_5_5_1_GCC_64bit-Debug/lib/ -lpgcs_unix
 else:unix:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcsd_unix
 
 win32 {

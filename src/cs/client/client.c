@@ -193,16 +193,13 @@ void s_msgpool_append(char* data, ssize_t numbytes)
     struct csmsgpool* recvpool = &s_msgpool_dispatch.pool_unprocessed;
 
     if (numbytes > 0) {
-        /*
-         * @brief block untile one buffer avaliable.
-         */
+        /** block untile one buffer avaliable. */
         while ((buf = cspool_pullitem(recvpool, &recvpool->empty_buf)) == NULL)
                 ;
 
         cs_memcpy(buf, recvpool->len_item, data, numbytes + sizeof(struct csmsg_header));
 
-        /*
-         * @brief Push to pool will succeed in normal case. There is no need to test the return value.
+        /** Push to pool will succeed in normal case. There is no need to test the return value.
          */
         cspool_pushitem(recvpool, &recvpool->filled_buf, buf);
         cssem_post(&recvpool->hsem_filled);

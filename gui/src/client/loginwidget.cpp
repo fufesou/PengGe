@@ -9,6 +9,7 @@
 
 #include  <QLabel>
 #include  <QPushButton>
+#include  <QLineEdit>
 #include  <QHBoxLayout>
 #include  <QVBoxLayout>
 
@@ -32,6 +33,8 @@ namespace GuiClient
         m_plbSecondInfo->setText(tr("password:"));
         m_plbFirstInfo->setFixedWidth(180);
         m_plbSecondInfo->setFixedWidth(180);
+
+        m_pleSecondInfo->setEchoMode(QLineEdit::Password);
 
         m_pbtnRequest->setText(tr("login"));
         m_pbtnRequest->setMinimumWidth(100);

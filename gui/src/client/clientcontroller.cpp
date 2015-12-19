@@ -309,14 +309,16 @@ namespace GuiClient
 
         if (vStatus == GuiCommon::eTimeout)
         {
-            qDebug() << "login: timeout";
-            showWidget(s_sigVerifyWidget);
+            qDebug() << "register: timeout";
+            showWidget(s_sigRegisterWidget);
         }
         else if (vStatus == GuiCommon::eFail)
         {
-            qDebug() << "login: error user info or passwd";
+            qDebug() << "register: fail";
+            showWidget(s_sigRegisterWidget);
+        } else if (vStatus == GuiCommon::eSucceed) {
+            showWidget(s_sigVerifyWidget);
         }
-        showWidget(s_sigRegisterWidget);
     }
 
     void CController::endVerifying(const GuiCommon::ERequestStatus& vStatus)
@@ -325,14 +327,16 @@ namespace GuiClient
 
         if (vStatus == GuiCommon::eTimeout)
         {
-            qDebug() << "login: timeout";
-            showWidget(s_sigLoginWidget);
+            qDebug() << "verify: timeout";
+            showWidget(s_sigVerifyWidget);
         }
         else if (vStatus == GuiCommon::eFail)
         {
-            qDebug() << "login: error user info or passwd";
+            qDebug() << "verify: error user info or passwd";
+            showWidget(s_sigVerifyWidget);
+        } else if (vStatus == GuiCommon::eSucceed) {
+            showWidget(s_sigMainWidget);
         }
-        showWidget(s_sigVerifyWidget);
     }
 
     void CController::logout()
@@ -358,21 +362,23 @@ void s_process_create_request(const QString& vUserNumber, const QString& vTel, s
                                  vTel.toLatin1().constData(),
                                  vClient->sendbuf,
                                  &vClient->len_senddata) == 0) {
-    } else {
         csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+        return;
     }
+    qDebug() << "cannot handle create request";
 }
 
 void s_process_verify_request(const QString& vTel, const QString& vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
-    if (am_account_login_request(vTel.toLatin1().constData(),
+    if (am_account_verify_request(vTel.toLatin1().constData(),
                                  vRandCode.toLatin1().constData(),
                                  vClient->sendbuf,
                                  &vClient->len_senddata) == 0) {
-    } else {
         csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+        return;
     }
+    qDebug () << "cannot handle verify request";
 }
 
 void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
@@ -382,28 +388,59 @@ void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, s
                                  vPasswd.toLatin1().constData(),
                                  vClient->sendbuf,
                                  &vClient->len_senddata) == 0) {
-    } else {
         csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+        return;
     }
+    qDebug() << "cannot handle login request";
 }
 
 void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
-
+    vClient->len_senddata = vClient->size_senbuf;
+    if (am_account_logout_request(vClient->sendbuf, &vClient->len_senddata) == 0) {
+        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+        return;
+    }
+    qDebug() << "cannot handle logout request";
 }
 
 void s_process_changeusername_request(const QString& vPasswd, const QString& vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
-
+    vClient->len_senddata = vClient->size_senbuf;
+    if (am_account_changeusername_request(vPasswd.toLatin1().data(),
+                                          vNewUsername.toLatin1().data(),
+                                          vClient->sendbuf,
+                                          &vClient->len_senddata) == 0) {
+        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+        return;
+    }
+    qDebug() << "cannot handle logout request";
 }
 
 void s_process_changepasswd_request(const QString& vPasswd, const QString& vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
-
+    vClient->len_senddata = vClient->size_senbuf;
+    if (am_account_changepasswd_request(vPasswd.toLatin1().data(),
+                                        vNewPasswd.toLatin1().data(),
+                                        vClient->sendbuf,
+                                        &vClient->len_senddata) == 0) {
+        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+        return;
+    }
+    qDebug() << "cannot handle logout request";
 }
 
 void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
+    vClient->len_senddata = vClient->size_senbuf;
+    if (am_account_changegrade_request(vPasswd.toLatin1().data(),
+                                       vGrade,
+                                       vClient->sendbuf,
+                                       &vClient->len_senddata) == 0) {
+        csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr));
+        return;
+    }
+    qDebug() << "cannot handle logout request";
 }
 
 /*********************************************************
@@ -415,11 +452,11 @@ int s_account_msg_dispatch(char* unused, char* msg)
     int num_funcs = NUM_ARR(s_namefunc);
     uint32_t namelen = 0;
 
-    (unused);
+    (void)unused;
 
     for (; i<num_funcs; ++i) {
         namelen = strlen(s_namefunc[i].methodname);
-        if (memcmp(msg, s_namefunc[i].methodname, namelen)) {
+        if (memcmp(msg, s_namefunc[i].methodname, namelen) == 0) {
             s_namefunc[i].process_react(*(uint32_t*)(msg + namelen), msg + namelen + sizeof(uint32_t));
         }
     }
@@ -431,45 +468,40 @@ void s_process_create_react(uint32_t msglen, const char* msg)
 {
     (void)msglen;
     if (msg[0] == g_succeed) {
+        GuiClient::CLoginingWidget::setRequestStatus(GuiCommon::eSucceed);
     } else if (msg[0] == g_fail) {
+        GuiClient::CLoginingWidget::setRequestStatus(GuiCommon::eFail);
     } else {
+        qDebug() << "react: unkown message.";
     }
 }
 
 void s_process_verify_react(uint32_t msglen, const char* msg)
 {
-    (void)msglen;
-    if (msg[0] == g_succeed) {
-    } else if (msg[0] == g_fail) {
-    } else {
-    }
+    s_process_create_react(msglen, msg);
 }
 
 void s_process_login_react(uint32_t msglen, const char* msg)
 {
-    (void)msglen;
-    if (msg[0] == g_succeed) {
-        GuiClient::CLoginingWidget::setRequestStatus(GuiCommon::eSucceed);
-    } else if (msg[0] == g_fail) {
-        GuiClient::CLoginingWidget::setRequestStatus(GuiCommon::eFail);
-    } else {
-        qDebug() << "login: unkown message.";
-    }
+    s_process_create_react(msglen, msg);
 }
 
 void s_process_logout_react(uint32_t msglen, const char* msg)
 {
+    s_process_create_react(msglen, msg);
 }
 
 void s_process_changeusername_react(uint32_t msglen, const char* msg)
 {
+    s_process_create_react(msglen, msg);
 }
 
 void s_process_changepasswd_react(uint32_t msglen, const char* msg)
 {
+    s_process_create_react(msglen, msg);
 }
 
 void s_process_changegrade_react(uint32_t msglen, const char* msg)
 {
+    s_process_create_react(msglen, msg);
 }
-
