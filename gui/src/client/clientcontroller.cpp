@@ -40,6 +40,7 @@
 #include    "am/client_account.h"
 
 #include    "guimacros.h"
+#include    "guithread.h"
 #include    "clientcontroller.h"
 #include    "loginwidget.h"
 #include    "loginingwidget.h"
@@ -103,11 +104,13 @@ namespace GuiClient
     static QString s_sigVerifyingWidget("VerifyingWidget");
 
     CController::CController(const char* vServerIP, unsigned short vServerPort)
-        : m_pCSClient(NULL)
+        : m_pSendThread(new GuiCommon::CGuiThread(this))
+        , m_pCSClient(NULL)
         , m_pServerAddr(NULL)
     {
         if (initClient(vServerIP, vServerPort))
         {
+            m_pSendThread->setFixedArgs(m_pCSClient, m_pServerAddr);
             initWidgets();
         }
         else
@@ -270,7 +273,9 @@ namespace GuiClient
     {
         hideAllWidgets();
         showWidget(s_sigLoginingWidget);
-        s_process_login_request(vUserInfo, vPasswd, m_pCSClient, m_pServerAddr);
+        // s_process_login_request(vUserInfo, vPasswd, m_pCSClient, m_pServerAddr);
+        m_pSendThread->setArgs((void*)s_process_login_request, &vUserInfo, &vPasswd);
+        m_pSendThread->run();
         dynamic_cast<CLoginingWidget*>(m_mapWidget[s_sigLoginingWidget])->beginRequest();
     }
 
@@ -278,7 +283,9 @@ namespace GuiClient
     {
         hideAllWidgets();
         showWidget(s_sigRegisteringWidget);
-        s_process_create_request(vUserNum, vTelNum, m_pCSClient, m_pServerAddr);
+        // s_process_create_request(vUserNum, vTelNum, m_pCSClient, m_pServerAddr);
+        m_pSendThread->setArgs((void*)s_process_create_request, &vUserNum, &vTelNum);
+        m_pSendThread->run();
         dynamic_cast<CRegisteringWidget*>(m_mapWidget[s_sigRegisteringWidget])->beginRequest();
     }
 
@@ -286,7 +293,9 @@ namespace GuiClient
     {
         hideAllWidgets();
         showWidget(s_sigVerifyingWidget);
-        s_process_verify_request(vTelNum, vRandCode, m_pCSClient, m_pServerAddr);
+        // s_process_verify_request(vTelNum, vRandCode, m_pCSClient, m_pServerAddr);
+        m_pSendThread->setArgs((void*)s_process_verify_request, &vTelNum, &vRandCode);
+        m_pSendThread->run();
         dynamic_cast<CVerifyingWidget*>(m_mapWidget[s_sigVerifyingWidget])->beginRequest();
     }
 

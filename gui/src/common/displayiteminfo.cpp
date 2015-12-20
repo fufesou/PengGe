@@ -30,11 +30,11 @@ namespace GuiCommon
 
     QTextStream& CDisplayItemInfo::writeStream(QTextStream& vOutStream) const
     {
-        vOutStream << m_name << m_portraitPath << m_simpleInfo;
+        return vOutStream << " " << m_name << " " << m_portraitPath << " " << m_simpleInfo;
     }
 
     QTextStream& CDisplayItemInfo::readStream(QTextStream& vInStream)
     {
-        vInStream >> m_name >> m_portraitPath >> m_simpleInfo;
+        return vInStream >> m_name >> m_portraitPath >> m_simpleInfo;
     }
 }

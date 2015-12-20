@@ -11,6 +11,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = GuiClient
 TEMPLATE = app
 
+CONFIG += c++11
+
 INCLUDEPATH += ../common
 INCLUDEPATH += 	$$PWD/../../../src/include
 INCLUDEPATH += $$PWD/../../../build/include
@@ -46,6 +48,7 @@ HEADERS  += \
     registeringwidget.h \
     verifywidget.h \
     verifyingwidget.h \
+    ../common/guithread.h \
     ../common/wordsbutton.h \
     ../common/chatwidget.h \
     ../common/guimacros.h \

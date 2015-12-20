@@ -18,6 +18,11 @@
 QT_FORWARD_DECLARE_STRUCT(csclient)
 QT_FORWARD_DECLARE_CLASS(QWidget)
 
+namespace GuiCommon
+{
+    QT_FORWARD_DECLARE_CLASS(CGuiThread)
+}
+
 namespace GuiClient
 {
     class CController : public QObject
@@ -62,6 +67,7 @@ namespace GuiClient
     private:
         QMap<QString, QWidget*> m_mapWidget;
 
+        GuiCommon::CGuiThread* m_pSendThread;
         struct csclient* m_pCSClient;
         struct sockaddr_in* m_pServerAddr;
     };
