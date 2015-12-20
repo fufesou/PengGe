@@ -56,12 +56,10 @@ namespace GuiClient
 
     void CRequestingWidget::updateProgressBar()
     {
-        while (s_requestStatus == GuiCommon::eRequesting)
+        ++m_elapsedTimes;
+        if (s_requestStatus == GuiCommon::eRequesting)
         {
-            ++m_elapsedTimes;
-            qDebug() << m_elapsedTimes;
-            // if ((m_elapsedTimes * m_interval) < m_timeoutMsec)
-            if ((m_elapsedTimes * 300) < 30*1000)
+            if ((m_elapsedTimes * m_interval) < m_timeoutMsec)
             {
                 m_ppbProgress->setValue(m_elapsedTimes * m_interval);
             }
@@ -70,18 +68,18 @@ namespace GuiClient
                 s_requestStatus = GuiCommon::eTimeout;
             }
         }
-        m_pTimer->stop();
-        emit requestEnd(s_requestStatus);
+        else
+        {
+           m_pTimer->stop();
+           emit requestEnd(s_requestStatus);
+        }
     }
 
     void CRequestingWidget::beginRequest()
     {
         s_requestStatus = GuiCommon::eRequesting;
         m_elapsedTimes = 0;
-        // m_pTimer->setInterval(m_interval);
-        m_pTimer->setInterval(300);
+        m_pTimer->setInterval(m_interval);
         m_pTimer->start();
-        qDebug() << m_pTimer->interval();
     }
-
 }

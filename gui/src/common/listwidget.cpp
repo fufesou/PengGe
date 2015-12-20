@@ -4,9 +4,12 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-06
- * @modified  Tue 2015-12-08 00:42:42 (+0800)
+ * @modified  Sun 2015-12-20 16:32:32 (+0800)
  */
 
+#include  <QDebug>
+#include  <QFile>
+#include  <QTextStream>
 #include  <QStandardItemModel>
 
 #include    "listwidget.h"
@@ -15,10 +18,17 @@
 
 namespace GuiCommon
 {
-    CListWidget::CListWidget(QWidget* vParent)
+    CListWidget::CListWidget(const QString& vAccountFile, QWidget* vParent)
         : QListView(vParent)
+        , m_accountFile(vAccountFile)
     {
         initWidget();
+        updateFriendList();
+    }
+
+    CListWidget::~CListWidget()
+    {
+        updateAccountFile();
     }
 
     void CListWidget::initWidget()
@@ -27,9 +37,54 @@ namespace GuiCommon
         setModel(m_pItemModel);
 
         addItem(QSharedPointer<CDisplayItemInfo>(
-                    new CDisplayItemInfo(tr("peer name"), tr("D:/project/Qt/Test/TestListView/strawberry_128px.png"), tr("simple info"))));
+                    new CDisplayItemInfo(tr("peer name"), tr(":/img/aa12.jpg"), tr("simple info"))));
         addItem(QSharedPointer<CDisplayItemInfo>(
-            new CDisplayItemInfo(tr("peer name 2"), tr("D:/project/Qt/Test/TestListView/strawberry_128px.png"), tr("simple info2"))));
+            new CDisplayItemInfo(tr("peer name 2"), tr(":/img/aa12.jpg"), tr("simple info2"))));
+    }
+
+    bool CListWidget::updateFriendList()
+    {
+        clearFriendList();
+
+        QFile inFile(m_accountFile);
+        if (!inFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+            qDebug() << "cannot read file " << m_accountFile;
+            return false;
+        }
+        QTextStream inStream(&inFile);
+
+        while (!inStream.atEnd())
+        {
+            QSharedPointer<CDisplayItemInfo> pNewItemInfo(new CDisplayItemInfo(inStream));
+            m_friendList.push_back(pNewItemInfo);
+            addItem(pNewItemInfo);
+        }
+
+        return true;
+    }
+
+    bool CListWidget::updateAccountFile() const
+    {
+        QFile outFile(m_accountFile);
+        if (!outFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        {
+            qDebug() << "cannot write file " << m_accountFile;
+            return false;
+        }
+        QTextStream outStream;
+
+        foreach (QSharedPointer<CDisplayItemInfo> item, m_friendList)
+        {
+            item->writeStream(outStream);
+        }
+
+        return true;
+    }
+
+    void CListWidget::clearFriendList()
+    {
+        initWidget();
     }
 
     void CListWidget::addItem(QSharedPointer<CDisplayItemInfo> vNewItem)

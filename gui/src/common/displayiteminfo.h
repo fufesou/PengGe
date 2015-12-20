@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-06
- * @modified  Tue 2015-12-08 00:41:30 (+0800)
+ * @modified  Sun 2015-12-20 16:17:16 (+0800)
  */
 
 #ifndef DISPLAYITEMINFO_H
@@ -12,14 +12,20 @@
 
 #include  <QString>
 
+QT_FORWARD_DECLARE_CLASS(QTextStream)
+
 namespace GuiCommon
 {
     class CDisplayItemInfo
     {
     public:
-        CDisplayItemInfo(const QString& vName, const QString& vPortraitPath, const QString& vSimpleInfo);
-
         static void setCurMaxItemID(unsigned int vID) { s_id = vID; }
+
+        explicit CDisplayItemInfo(QTextStream& vInStream);
+        explicit CDisplayItemInfo(const QString& vName, const QString& vPortraitPath = ":/img/aa9.jpg", const QString& vSimpleInfo = QString(""));
+
+        QTextStream& writeStream(QTextStream& vOutStream) const;
+        QTextStream& readStream(QTextStream& vInStream);
 
         QString& fetchName() { return m_name; }
         QString& fetchPortraitPath() { return m_portraitPath; }

@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-06
- * @modified  Tue 2015-12-08 00:42:50 (+0800)
+ * @modified  Sun 2015-12-20 13:17:56 (+0800)
  */
 
 #ifndef LISTWIDGET_H
@@ -24,14 +24,23 @@ namespace GuiCommon
         Q_OBJECT
 
     public:
-        explicit CListWidget(QWidget* vParent = 0);
+        explicit CListWidget(const QString& vAccountFile, QWidget* vParent = 0);
+        ~CListWidget();
+
+        void addItem(QSharedPointer<CDisplayItemInfo> vNewItem);
+        bool updateFriendList(void);
+
+        bool updateAccountFile(void) const;
+
+        void clearFriendList(void);
 
     private:
         void initWidget(void);
-        void addItem(QSharedPointer<CDisplayItemInfo> vNewItem);
 
     private:
+        QString m_accountFile;
         QStandardItemModel* m_pItemModel;
+        QList<QSharedPointer<CDisplayItemInfo> > m_friendList;
     };
 }
 

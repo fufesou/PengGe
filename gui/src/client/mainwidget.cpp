@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
- * @modified  Tue 2015-12-08 00:35:09 (+0800)
+ * @modified  Sun 2015-12-20 16:37:15 (+0800)
  */
 
 #include  <QPushButton>
@@ -13,6 +13,7 @@
 #include    "guimacros.h"
 #include    "mainwidget.h"
 #include    "displayiteminfo.h"
+#include    "listwidget.h"
 
 namespace GuiClient
 {
@@ -31,7 +32,7 @@ namespace GuiClient
         m_pSelfInfoWidget = new QWidget(this);
         pMainLayout->addWidget(m_pSelfInfoWidget, 0, 0, 2, 1);
 
-        m_pMainDisplayWidget = new QWidget(this);
+        m_pMainDisplayWidget = new GuiCommon::CListWidget(QString("tmp.txt"), this);
         pMainLayout->addWidget(m_pMainDisplayWidget, 2, 0, 6, 1);
 
         m_pCtrlItemsWidget = new QWidget(this);
