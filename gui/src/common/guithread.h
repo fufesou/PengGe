@@ -49,7 +49,8 @@ namespace GuiCommon
             setArgs(vFunc, vTail...);
         }
 
-        void run()
+    protected:
+        void run(void) Q_DECL_OVERRIDE
         {
             if (m_pfunc == NULL)
             {
@@ -64,13 +65,13 @@ namespace GuiCommon
             if (m_vecArgs.size() == 1)
             {
 
-                ((void (*)(struct csclient*, struct sockaddr_in*, const QString&))m_pfunc)
-                        (m_pclient, m_pservaddr, *m_vecArgs[0]);
+                ((void (*)(QString, struct csclient*, struct sockaddr_in*))m_pfunc)
+                        (m_vecArgs[0], m_pclient, m_pservaddr);
             }
             if (m_vecArgs.size() == 2)
             {
-                ((void (*)(struct csclient*, struct sockaddr_in*, const QString&, const QString&))m_pfunc)
-                        (m_pclient, m_pservaddr, *m_vecArgs[0], *m_vecArgs[1]);
+                ((void (*)(QString, QString, struct csclient*, struct sockaddr_in*))m_pfunc)
+                        (m_vecArgs[0], m_vecArgs[1], m_pclient, m_pservaddr);
             }
             m_pfunc = NULL;
             m_vecArgs.clear();
@@ -80,7 +81,7 @@ namespace GuiCommon
         void* m_pfunc;
         struct csclient* m_pclient;
         struct sockaddr_in* m_pservaddr;
-        QVector<const QString*> m_vecArgs;
+        QVector<QString> m_vecArgs;
     };
 }
 

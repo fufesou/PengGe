@@ -84,13 +84,13 @@ static struct
 }
 #endif
 
-static void s_process_create_request(const QString& vUserNumber, const QString& vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_verify_request(const QString& vTel, const QString& vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_create_request(QString vUserNumber, QString vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_verify_request(QString vTel, QString vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_login_request(QString vUserInfo, QString vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
 static void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_changeusername_request(const QString& vPasswd, const QString& vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_changepasswd_request(const QString& vPasswd, const QString& vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changeusername_request(QString vPasswd, QString vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changepasswd_request(QString vPasswd, QString vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changegrade_request(QString vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr);
 
 
 namespace GuiClient
@@ -274,8 +274,8 @@ namespace GuiClient
         hideAllWidgets();
         showWidget(s_sigLoginingWidget);
         // s_process_login_request(vUserInfo, vPasswd, m_pCSClient, m_pServerAddr);
-        m_pSendThread->setArgs((void*)s_process_login_request, &vUserInfo, &vPasswd);
-        m_pSendThread->run();
+        m_pSendThread->setArgs((void*)s_process_login_request, vUserInfo, vPasswd);
+        m_pSendThread->start();
         dynamic_cast<CLoginingWidget*>(m_mapWidget[s_sigLoginingWidget])->beginRequest();
     }
 
@@ -284,8 +284,8 @@ namespace GuiClient
         hideAllWidgets();
         showWidget(s_sigRegisteringWidget);
         // s_process_create_request(vUserNum, vTelNum, m_pCSClient, m_pServerAddr);
-        m_pSendThread->setArgs((void*)s_process_create_request, &vUserNum, &vTelNum);
-        m_pSendThread->run();
+        m_pSendThread->setArgs((void*)s_process_create_request, vUserNum, vTelNum);
+        m_pSendThread->start();
         dynamic_cast<CRegisteringWidget*>(m_mapWidget[s_sigRegisteringWidget])->beginRequest();
     }
 
@@ -294,8 +294,8 @@ namespace GuiClient
         hideAllWidgets();
         showWidget(s_sigVerifyingWidget);
         // s_process_verify_request(vTelNum, vRandCode, m_pCSClient, m_pServerAddr);
-        m_pSendThread->setArgs((void*)s_process_verify_request, &vTelNum, &vRandCode);
-        m_pSendThread->run();
+        m_pSendThread->setArgs((void*)s_process_verify_request, vTelNum, vRandCode);
+        m_pSendThread->start();
         dynamic_cast<CVerifyingWidget*>(m_mapWidget[s_sigVerifyingWidget])->beginRequest();
     }
 
@@ -375,7 +375,7 @@ namespace GuiClient
     csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr)); \
     return;
 
-void s_process_create_request(const QString& vUserNumber, const QString& vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_create_request(QString vUserNumber, QString vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_create_request(vUserNumber.toLatin1().constData(),
@@ -387,7 +387,7 @@ void s_process_create_request(const QString& vUserNumber, const QString& vTel, s
     qDebug() << "cannot handle create request";
 }
 
-void s_process_verify_request(const QString& vTel, const QString& vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_verify_request(QString vTel, QString vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_verify_request(vTel.toLatin1().constData(),
@@ -399,7 +399,7 @@ void s_process_verify_request(const QString& vTel, const QString& vRandCode, str
     qDebug () << "cannot handle verify request";
 }
 
-void s_process_login_request(const QString& vUserInfo, const QString& vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_login_request(QString vUserInfo, QString vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_login_request(vUserInfo.toLatin1().constData(),
@@ -420,7 +420,7 @@ void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vSer
     qDebug() << "cannot handle logout request";
 }
 
-void s_process_changeusername_request(const QString& vPasswd, const QString& vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_changeusername_request(QString vPasswd, QString vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_changeusername_request(vPasswd.toLatin1().data(),
@@ -432,7 +432,7 @@ void s_process_changeusername_request(const QString& vPasswd, const QString& vNe
     qDebug() << "cannot handle logout request";
 }
 
-void s_process_changepasswd_request(const QString& vPasswd, const QString& vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_changepasswd_request(QString vPasswd, QString vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_changepasswd_request(vPasswd.toLatin1().data(),
@@ -444,7 +444,7 @@ void s_process_changepasswd_request(const QString& vPasswd, const QString& vNewP
     qDebug() << "cannot handle logout request";
 }
 
-void s_process_changegrade_request(const QString& vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_changegrade_request(QString vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_changegrade_request(vPasswd.toLatin1().data(),
