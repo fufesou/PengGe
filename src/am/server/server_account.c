@@ -388,7 +388,7 @@ int s_account_created(const char* tel)
  *
  * @return  0 if succeed, 1 if fail. 
  */
-int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
 {
     char* randcode = NULL;
     char* tel = strchr(inmsg, '\0') + 1;
@@ -446,7 +446,7 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
  *
  * @note Verifying mutliple times is allowed here.
  */
-int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
 {
     struct account_data_t account;
     struct account_basic_t account_basic;
@@ -536,7 +536,7 @@ err:
  * @warning Consider of efficience, this function dose not prevent the same host from loging in the same account.
  * This may lead to heavy list if the user maliciously continually log in the same account.
  */
-int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
 {
     int login_status = 0;
     struct account_data_t account;
@@ -606,7 +606,7 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
  *
  * @return   
  */
-int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
 {
     const char* msg_account_not_found = "account is not loged in.";
     const char* msg_outmsg = "invalid outmsg argument.";
@@ -681,7 +681,7 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
  *
  * @return   
  */
-int am_account_changeusername_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_changeusername_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
 {
     const char* passwd = NULL;
     const char* username_new = NULL;
@@ -744,7 +744,7 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
  *
  * @return   
  */
-int am_account_changepasswd_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_changepasswd_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
 {
     const char* passwd_old = NULL;
     const char* passwd_new = NULL;
@@ -804,7 +804,7 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
  *
  * @return   
  */
-int am_account_changegrade_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_changegrade_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
 {
     const char* passwd = NULL;
     struct account_data_t* account_login = NULL;

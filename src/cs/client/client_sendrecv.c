@@ -4,18 +4,27 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
- * @modified  Sun 2015-12-06 18:11:54 (+0800)
+ * @modified  Wed 2015-12-23 22:15:40 (+0800)
  */
 
 #ifdef WIN32
+#include  <winsock2.h>
+#include  <windows.h>
+#include  <process.h>
+#else
+#include  <unistd.h>
+#include  <errno.h>
+#include  <sys/socket.h>
+#include  <arpa/inet.h>
+#include  <pthread.h>
+
+#define SOCKET_ERROR (-1)
+#endif
 
 #ifndef _MSC_VER /* *nix */
 #include  <semaphore.h>
 #endif
 
-#include  <winsock2.h>
-#include  <windows.h>
-#include  <process.h>
 #include  <stdio.h>
 #include  <string.h>
 #include    "common/cstypes.h"
@@ -53,7 +62,8 @@ static int s_recv_stat = RECV_RESEND;
 static cstimelong_t s_recvbegin;
 static int s_recvtimer;
 
-static csmutex_t s_mutex = 0;
+static int s_mutex_inited = 0;
+static csmutex_t s_mutex;
 static struct csmsg_header s_sendhdr;
 
 static int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes);
@@ -82,7 +92,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
 #endif
     }
 
-    if (!s_mutex) {
+    if (s_mutex_inited == 0) {
         s_sendrecv_init();
     }
 
@@ -168,7 +178,7 @@ int s_recv_elapsed(void)
 
 void s_sendrecv_init(void)
 {
-    if (s_mutex == 0) {
+    if (s_mutex_inited == 0) {
         s_mutex = csmutex_create();
     }
 
@@ -178,10 +188,5 @@ void s_sendrecv_init(void)
 void s_sendrecv_clear(void* unused)
 {
     (void)unused;
-    if (s_mutex != 0) {
-        csmutex_destroy(&s_mutex);
-        s_mutex = 0;
-    }
+    csmutex_destroy(&s_mutex);
 }
-
-#endif

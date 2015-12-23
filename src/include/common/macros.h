@@ -11,16 +11,16 @@
 #ifndef  MACROS_H
 #define  MACROS_H
 
-#ifndef __in
-#define __in
+#ifndef __csin
+#define __csin
 #endif
 
-#ifndef __out
-#define __out
+#ifndef __csout
+#define __csout
 #endif
 
-#ifndef __inout
-#define __inout
+#ifndef __csinout
+#define __csinout
 #endif
 
 // #define _CHECK_ARGS

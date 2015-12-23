@@ -295,7 +295,7 @@ int am_account_changegrade_request(
  *
  * @return   The return value has no meaning, and it always is 0.
  */
-int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_create_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     uint32_t len_result = 0;
     if (inmsg[0] == g_succeed) {
@@ -350,7 +350,7 @@ int am_account_create_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  *
  * @sa cs_memcpy
  */
-int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
    int ret = 1;
    uint32_t len_result = 0;
@@ -427,7 +427,7 @@ int am_account_verify_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  *
  * @sa cs_memcpy
  */
-int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
@@ -506,7 +506,7 @@ int am_account_login_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgle
  *
  * @sa cs_memcpy
  */
-int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_logout_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
@@ -573,7 +573,7 @@ int am_account_logout_react(char* inmsg, char* outmsg, __inout uint32_t* outmsgl
  *
  * @sa cs_memcpy
  */
-int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_changeusername_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
@@ -654,7 +654,7 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __inout uint32_t*
  *
  * @sa cs_memcpy
  */
-int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_changepasswd_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
@@ -731,7 +731,7 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __inout uint32_t* o
  *
  * @sa cs_memcpy
  */
-int am_account_changegrade_react(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int am_account_changegrade_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     uint32_t len_result = 0;
 

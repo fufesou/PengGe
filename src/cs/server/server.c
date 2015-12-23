@@ -62,7 +62,7 @@ void s_csserver_clear(void* serv);
 static void s_init_msgpool_dispatch(struct csserver* serv);
 static void s_clear_msgpool_dispatch(void* unused);
 
-static int s_msg_process(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int s_msg_process(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen);
 static int s_msg_process_af(char* userdata, char* msg);
 
 #ifdef __cplusplus
@@ -250,7 +250,7 @@ void s_clear_msgpool_dispatch(void* unused)
  *
  * @return   
  */
-int s_msg_process(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int s_msg_process(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     int ret = 0;
     uint32_t id_process = -1;

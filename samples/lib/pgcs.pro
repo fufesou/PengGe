@@ -64,8 +64,7 @@ SOURCES += \
     ../../src/cs/common/msgpool_dispatch.c \
     ../../src/cs/common/rtt.c \
     ../../src/cs/client/client.c \
-    ../../src/cs/client/unix_client_sendrecv.c \
-    ../../src/cs/client/win_client_sendrecv.c \
+    ../../src/cs/client/client_sendrecv.c \
     ../../src/cs/server/server.c \
     ../../src/am/common/account.c \
     ../../src/am/common/account_file.c \

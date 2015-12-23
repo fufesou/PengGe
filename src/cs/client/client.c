@@ -79,7 +79,7 @@ void s_clear_msgpool_dispatch(void* unused);
  * @param outmsg
  * @param outmsglen
  */
-static int s_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen);
+static int s_react_dispatch(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen);
 
 #ifdef __cplusplus
 }
@@ -135,7 +135,7 @@ void csclient_clear(void* cli)
      */
 }
 
-int s_react_dispatch(char* inmsg, char* outmsg, __inout uint32_t* outmsglen)
+int s_react_dispatch(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
     uint32_t id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
     return am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t), outmsg, outmsglen);

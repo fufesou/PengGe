@@ -372,7 +372,9 @@ namespace GuiClient
  **                 request client msg                  **
  ********************************************************/
 #define SEND_COMMON \
+    qDebug() << "send request begin."; \
     csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr)); \
+    qDebug() << "send request end."; \
     return;
 
 void s_process_create_request(QString vUserNumber, QString vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr)
