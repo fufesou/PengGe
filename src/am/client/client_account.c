@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
- * @modified  Sat 2015-12-19 13:48:20 (+0800)
+ * @modified  Fri 2015-12-25 01:26:47 (+0800)
  */
 
 #ifdef WIN32
@@ -23,6 +23,7 @@
 #include  <netinet/in.h>
 #endif
 
+#include  <assert.h>
 #include  <stdio.h>
 #include  <string.h>
 #include    "common/macros.h"
@@ -323,18 +324,27 @@ int am_account_create_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
  * @brief  am_account_verify_react 
  *
  * @param inmsg The format of outmsg here is: \n
- * -------------------------------------------------------------------------------------\n
- * | succeed(char) | account(struct account_basic_t) | ... |                            \n
- * -------------------------------------------------------------------------------------\n
+ * ---------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | ... |                        \n
+ * ---------------------------------------------------------------------------------\n
+ *  or \n
+ * ----------------------------------------------------------------------------------------------------------\n
+ * | succeed(char) | account(struct account_basic_t) | additional message | ... |                            \n
+ * ----------------------------------------------------------------------------------------------------------\n
+
  *  or \n
  * ----------------------------------------------------------------\n
  * | fail(char) | error message | ... |                            \n
  * ----------------------------------------------------------------\n
  *
  * @param outmsg the format of outmsg is: \n
- * ------------------------------------------------------------------------------------------------\n
- * | "account_verify"(char*) | msglen(uint32_t) | succeed(char) | ... |                            \n
- * ------------------------------------------------------------------------------------------------\n
+ * -------------------------------------------------------------------------------------------------------------\n
+ * | "account_verify"(char*) | msglen(uint32_t) | succeed(char) | account(struct account_basic_t) | ... |       \n
+ * -------------------------------------------------------------------------------------------------------------\n
+ *  or \n                                                        
+ * ---------------------------------------------------------------------------------------------------------------------------------\n
+ * | "account_login"(char*) | msglen(uint32_t) | succeed(char) | account(struct account_basic_t) | additional message | ... |       \n
+ * ---------------------------------------------------------------------------------------------------------------------------------\n
  *  or \n
  * -------------------------------------------------------------------------------------------------------------\n
  * | "account_verify"(char*) | msglen(uint32_t) | fail(char) | error message | ... |                            \n
@@ -352,8 +362,11 @@ int am_account_create_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
  */
 int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
 {
-   int ret = 1;
-   uint32_t len_result = 0;
+    int ret = 1;
+    uint32_t len_result = 0;
+    const char* sig_msg = "account_verify";
+    size_t len_sig = strlen(sig_msg);
+    size_t size_account = sizeof(struct account_basic_t);
 
     if (inmsg[0] == g_succeed) {
         if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
@@ -366,26 +379,31 @@ int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
 
         if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
             fprintf(stdout, ", additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
-            if (outmsg != NULL) {
-                len_result = 1 + (int)strlen(inmsg + 1 + sizeof(struct account_basic_t)) + 1;
-                csprintf(outmsg, *outmsglen, "account_verify%c%c%c%c%c%s", TO4C(len_result), g_succeed, inmsg + 1 + sizeof(struct account_basic_t));
-            }
+
+           len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
+            assert(*outmsglen > (len_sig + len_result));
+            cs_memcpy(
+                        outmsg + len_sig + sizeof(uint32_t) + size_account + 1, 
+                        *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
+                        inmsg + 1 + size_account,
+                        strlen(inmsg + 1 + size_account) + 1);
         } else {
-            fprintf(stdout, ".\n");
-            if (outmsg != NULL) {
-                len_result = 1;
-                csprintf(outmsg, *outmsglen, "account_verify%c%c%c%c%c", TO4C(len_result), g_succeed);
-            }
+            len_result = 1 + size_account;
+            assert(*outmsglen > (len_sig + len_result));
         }
+        cs_memcpy(outmsg, *outmsglen, sig_msg, len_sig);
+        *((uint32_t*)(outmsg + len_sig)) = len_result;
+        *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
+        cs_memcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: account_verify fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: %s fail, %s\n", sig_msg, inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "account_verify%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
+            csprintf(outmsg, *outmsglen, "%s%c%c%c%c%c%s", sig_msg, TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
-        fprintf(stderr, "client: account_verify - unkown message.\n");
+        fprintf(stderr, "client: %s - unkown message.\n", sig_msg);
         return -2;
     }
 
@@ -409,9 +427,13 @@ int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
  * ----------------------------------------------------------------\n
  *
  * @param outmsg the format of outmsg is: \n
- * -----------------------------------------------------------------------------------------------\n
- * | "account_login"(char*) | msglen(uint32_t) | succeed(char) | ... |                            \n
- * -----------------------------------------------------------------------------------------------\n
+ * ------------------------------------------------------------------------------------------------------------\n
+ * | "account_login"(char*) | msglen(uint32_t) | succeed(char) | account(struct account_basic_t) | ... |       \n
+ * ------------------------------------------------------------------------------------------------------------\n
+ *  or \n                                                        
+ * ---------------------------------------------------------------------------------------------------------------------------------\n
+ * | "account_login"(char*) | msglen(uint32_t) | succeed(char) | account(struct account_basic_t) | additional message | ... |       \n
+ * ---------------------------------------------------------------------------------------------------------------------------------\n
  *  or \n
  * ------------------------------------------------------------------------------------------------------------\n
  * | "account_login"(char*) | msglen(uint32_t) | fail(char) | error message | ... |                            \n
@@ -431,9 +453,12 @@ int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsg
 {
     int ret = 1;
     uint32_t len_result = 0;
+    const char* sig_msg = "account_login";
+    size_t len_sig = strlen(sig_msg);
+    size_t size_account = sizeof(struct account_basic_t);
 
     if (inmsg[0] == g_succeed) {
-        if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
+        if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, size_account))) != 0) {
             fprintf(stderr, "client: account_loginsuceed, but client cannot update account data.\n");
             return ret;
         }
@@ -442,29 +467,32 @@ int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsg
         fprintf(stdout, "client: login succeed.\n");
 
         if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
-            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
-            if (outmsg != NULL) {
-                len_result = 1 + (int)strlen(inmsg + 1 + sizeof(struct account_basic_t)) + 1;
-                csprintf(
-                            outmsg,
-                            *outmsglen,
-                            "account_login%c%c%c%c%c%s",
-                            TO4C(len_result),
-                            g_succeed, inmsg + 1 + sizeof(struct account_basic_t));
-            }
-        } else if (outmsg != NULL) {
-            len_result = 1;
-            csprintf(outmsg, *outmsglen, "account_login%c%c%c%c%c", TO4C(len_result), g_succeed);
+            fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + size_account);
+
+            len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
+            assert(*outmsglen > (len_sig + len_result));
+            cs_memcpy(
+                        outmsg + len_sig + sizeof(uint32_t) + size_account + 1, 
+                        *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
+                        inmsg + 1 + size_account,
+                        strlen(inmsg + 1 + size_account) + 1);
+        } else {
+            len_result = 1 + size_account;
+            assert(*outmsglen > (len_sig + len_result));
         }
+        cs_memcpy(outmsg, *outmsglen, sig_msg, len_sig);
+        *((uint32_t*)(outmsg + len_sig)) = len_result;
+        *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
+        cs_memcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
     } else if (inmsg[0] == g_fail){
-        fprintf(stderr, "client: account_login fail, %s\n", inmsg + 1);
+        fprintf(stderr, "client: %s fail, %s\n", sig_msg, inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "account_login%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
+            csprintf(outmsg, *outmsglen, "%s%c%c%c%c%c%s", sig_msg, TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
-        fprintf(stderr, "client: account_login - unkown message.\n");
+        fprintf(stderr, "client: %s - unkown message.\n", sig_msg);
         return -2;
     }
 
