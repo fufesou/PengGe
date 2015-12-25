@@ -71,7 +71,10 @@ win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../samples/build-pgcs-Desktop_Qt_5_4_2_MinGW_32bit-Debug/debug -lpgcsd_win
 else:unix:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcs_unix
 # else:unix:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../build/lib/ -lpgcsd_unix
-else:unix:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../samples/build-pgcs-Desktop_Qt_5_4_2_GCC_64bit-Debug/ -lpgcsd_unix
+else:unix:CONFIG(debug, debug|release): LIBS += \
+    -L$$PWD/../../../samples/build-pgcs-Desktop_Qt_5_5_1_GCC_64bit-Debug/ \
+    -L$$PWD/../../../samples/build-pgcs-Desktop_Qt_5_4_2_GCC_64bit-Debug/ \
+    -lpgcsd_unix
 
 win32 {
     LIBS += -lwsock32 -lWinmm -lWs2_32

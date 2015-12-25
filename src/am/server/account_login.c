@@ -108,7 +108,7 @@ struct account_login_t* am_login_find_tel(const struct list_head* node_head, con
 
     while (node_login != node_head) {
         login_data = container_of(node_login, struct list_login_t, listnode);
-        if (strncmp(login_data->account_sock.account.data_basic.tel, tel, strlen(tel))) {
+        if (!strncmp(login_data->account_sock.account.data_basic.tel, tel, strlen(tel))) {
             return &login_data->account_sock;
         }
         node_login = node_login->next;
