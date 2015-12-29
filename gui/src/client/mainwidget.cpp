@@ -14,6 +14,7 @@
 #include    "mainwidget.h"
 #include    "displayiteminfo.h"
 #include    "listwidget.h"
+#include    "selfinfowidget.h"
 
 namespace GuiClient
 {
@@ -29,10 +30,10 @@ namespace GuiClient
         QGridLayout* pMainLayout = new QGridLayout(this);
         setLayout(pMainLayout);
 
-        m_pSelfInfoWidget = new QWidget(this);
+        m_pSelfInfoWidget = new GuiCommon::CSelfInfoWidget(this);
         pMainLayout->addWidget(m_pSelfInfoWidget, 0, 0, 2, 1);
 
-        m_pMainDisplayWidget = new GuiCommon::CListWidget(QString("tmp.txt"), this);
+        m_pMainDisplayWidget = new GuiCommon::CListWidget(QString("../cli_account_data.txt"), this);
         pMainLayout->addWidget(m_pMainDisplayWidget, 2, 0, 6, 1);
 
         m_pCtrlItemsWidget = new QWidget(this);

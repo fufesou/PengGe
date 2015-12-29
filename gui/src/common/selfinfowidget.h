@@ -19,7 +19,7 @@ namespace GuiCommon
         Q_OBJECT
 
     public:
-        CSelfInfoWidget(QWidget* vParent = 0);
+        explicit CSelfInfoWidget(QWidget* vParent = 0);
         ~CSelfInfoWidget();
 
     private:

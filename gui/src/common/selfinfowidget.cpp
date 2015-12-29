@@ -33,14 +33,14 @@ namespace GuiCommon
 
         QGroupBox* pgrpSocketInfo = new QGroupBox(tr("socket info"), this);
         pMainLayout->addWidget(pgrpSocketInfo);
-        QHBoxLayout* pSockLayout = new QHBoxLayout(this);
+        QHBoxLayout* pSockLayout = new QHBoxLayout(pgrpSocketInfo);
         pgrpSocketInfo->setLayout(pSockLayout);
         pSockLayout->addWidget(new QLabel(tr("ip")));
         pSockLayout->addWidget(new QLabel(tr("port")));
 
         QGroupBox* pgrpUserInfo = new QGroupBox(tr("user info"), this);
         pMainLayout->addWidget(pgrpUserInfo);
-        QHBoxLayout* pUserLayout = new QHBoxLayout(this);
+        QHBoxLayout* pUserLayout = new QHBoxLayout(pgrpUserInfo);
         pgrpUserInfo->setLayout(pUserLayout);
         pUserLayout->addWidget(new QLabel(tr("user name")));
         pUserLayout->addWidget(new QLabel(tr("user grade")));

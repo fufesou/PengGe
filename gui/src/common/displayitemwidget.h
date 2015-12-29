@@ -27,6 +27,12 @@ namespace GuiCommon
     public:
         explicit CDisplayItemWidget(const QSharedPointer<CDisplayItemInfo>& vItemInfo, QWidget* vParent = 0);
 
+    signals:
+        void doubleClicked(const QSharedPointer<CDisplayItemInfo>& voItemInfo);
+
+    protected:
+        void mouseDoubleClickEvent(QMouseEvent* vEvent) Q_DECL_OVERRIDE;
+
     private:
         void initWidget(void);
 

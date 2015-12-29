@@ -42,4 +42,10 @@ namespace GuiCommon
         m_pbtnInfo = new QPushButton(tr("peer detail info"), this);
         pMainLayout->addWidget(m_pbtnInfo, 0, 4, 1, 1);
     }
+
+    void CDisplayItemWidget::mouseDoubleClickEvent(QMouseEvent* vEvent)
+    {
+        Q_UNUSED(vEvent);
+        emit doubleClicked(m_pItemInfo);
+    }
 }

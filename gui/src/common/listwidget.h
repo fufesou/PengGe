@@ -36,9 +36,14 @@ namespace GuiCommon
 
     private:
         void initWidget(void);
+        void clearChatListWidget(void);
+
+    private slots:
+        void showChatWidget(const QSharedPointer<CDisplayItemInfo>& vItemInfo);
 
     private:
-        QString m_accountFile;
+        QString 			m_accountFile;
+        QList<QWidget*> 	m_listChatWidget;
         QStandardItemModel* m_pItemModel;
         QList<QSharedPointer<CDisplayItemInfo> > m_friendList;
     };

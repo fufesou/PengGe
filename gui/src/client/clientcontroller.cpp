@@ -26,7 +26,7 @@
 
 #include    "common/cstypes.h"
 #include    "common/config_macros.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/list.h"
 #include    "common/lightthread.h"
 #include    "common/bufarray.h"

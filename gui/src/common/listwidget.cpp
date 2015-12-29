@@ -12,7 +12,9 @@
 #include  <QTextStream>
 #include  <QStandardItemModel>
 
+#include    "guimacros.h"
 #include    "listwidget.h"
+#include    "chatwidget.h"
 #include    "displayiteminfo.h"
 #include    "displayitemwidget.h"
 
@@ -28,6 +30,7 @@ namespace GuiCommon
 
     CListWidget::~CListWidget()
     {
+        clearChatListWidget();
         updateAccountFile();
     }
 
@@ -35,11 +38,6 @@ namespace GuiCommon
     {
         m_pItemModel = new QStandardItemModel(this);
         setModel(m_pItemModel);
-
-        addItem(QSharedPointer<CDisplayItemInfo>(
-                    new CDisplayItemInfo(tr("peer name"), tr(":/img/aa12.jpg"), tr("simple info"))));
-        addItem(QSharedPointer<CDisplayItemInfo>(
-            new CDisplayItemInfo(tr("peer name 2"), tr(":/img/aa12.jpg"), tr("simple info2"))));
     }
 
     bool CListWidget::updateFriendList()
@@ -57,8 +55,11 @@ namespace GuiCommon
         while (!inStream.atEnd())
         {
             QSharedPointer<CDisplayItemInfo> pNewItemInfo(new CDisplayItemInfo(inStream));
-            m_friendList.push_back(pNewItemInfo);
-            addItem(pNewItemInfo);
+            if (!pNewItemInfo->fetchName().isEmpty())
+            {
+                m_friendList.push_back(pNewItemInfo);
+                addItem(pNewItemInfo);
+            }
         }
 
         return true;
@@ -72,7 +73,7 @@ namespace GuiCommon
             qDebug() << "cannot write file " << m_accountFile;
             return false;
         }
-        QTextStream outStream;
+        QTextStream outStream(&outFile);
 
         foreach (QSharedPointer<CDisplayItemInfo> item, m_friendList)
         {
@@ -87,6 +88,14 @@ namespace GuiCommon
         initWidget();
     }
 
+    void CListWidget::clearChatListWidget()
+    {
+        foreach (QWidget* pWidget, m_listChatWidget)
+        {
+            delete pWidget;
+        }
+    }
+
     void CListWidget::addItem(QSharedPointer<CDisplayItemInfo> vNewItem)
     {
         QStandardItem *pItem = new QStandardItem();
@@ -95,5 +104,20 @@ namespace GuiCommon
         QModelIndex index = m_pItemModel->indexFromItem(pItem);
         CDisplayItemWidget* pNewItemWidget = new CDisplayItemWidget(vNewItem, this);
         setIndexWidget(index, pNewItemWidget);
+
+        bool VARIABLE_IS_NOT_USED bIsShowChatConOK = connect(
+                    pNewItemWidget,
+                    SIGNAL(doubleClicked(const QSharedPointer<CDisplayItemInfo>&)),
+                    this,
+                    SLOT(showChatWidget(const QSharedPointer<CDisplayItemInfo>&)));
+        Q_ASSERT(bIsShowChatConOK);
+    }
+
+    void CListWidget::showChatWidget(const QSharedPointer<CDisplayItemInfo>& vItemInfo)
+    {
+        CChatWidget* pNewChatWidget(new CChatWidget(vItemInfo));
+        pNewChatWidget->setGeometry(200, 200, 400, 500);
+        pNewChatWidget->show();
+        m_listChatWidget.push_back(pNewChatWidget);
     }
 }

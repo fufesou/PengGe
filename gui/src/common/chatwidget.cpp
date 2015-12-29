@@ -23,8 +23,9 @@
 
 namespace GuiCommon
 {
-    CChatWidget::CChatWidget(QWidget* vParent)
+    CChatWidget::CChatWidget(const QSharedPointer<CDisplayItemInfo>& vItemInfo, QWidget* vParent)
         : QWidget(vParent)
+        , m_pItemInfo(vItemInfo)
     {
         initWidget();
 
@@ -40,8 +41,8 @@ namespace GuiCommon
         QGridLayout* pMainLayout = new QGridLayout(this);
         setLayout(pMainLayout);
 
-        m_pListWidget = new QWidget(this);
-        pMainLayout->addWidget(m_pListWidget, 0, 0, 10, 2, Qt::AlignLeft);
+        m_pChatListWidget = new QWidget(this);
+        pMainLayout->addWidget(m_pChatListWidget, 0, 0, 10, 2, Qt::AlignLeft);
 
         m_pPeerInfoWidget = new QWidget(this);
         pMainLayout->addWidget(m_pPeerInfoWidget, 0, 2, 2, 8);
@@ -51,10 +52,10 @@ namespace GuiCommon
         pPeerInfoLayout->addWidget(new QLabel(tr("ip"), m_pPeerInfoWidget));
         pPeerInfoLayout->addWidget(new QLabel(tr("port"), m_pPeerInfoWidget));
 
-        m_pLogWidget = new QWidget(this);
-        m_pLogWidget->setLayout(new QVBoxLayout(this));
+        m_pChatLogWidget = new QWidget(this);
+        m_pChatLogWidget->setLayout(new QVBoxLayout(m_pChatLogWidget));
         QScrollArea* pLogArea = new QScrollArea(this);
-        pLogArea->setWidget(m_pLogWidget);
+        pLogArea->setWidget(m_pChatLogWidget);
         pLogArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         pLogArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         pMainLayout->addWidget(pLogArea, 2, 2, 5, 8);
@@ -91,7 +92,7 @@ namespace GuiCommon
 
     void CChatWidget::addMsg(const QString& vMsg, const QString& vSenderName, EMsgSendRecv vSendRecv)
     {
-        QLabel* pMsgItem = new QLabel(m_pLogWidget);
+        QLabel* pMsgItem = new QLabel(m_pChatLogWidget);
         QGridLayout* pMsgLayout = new QGridLayout(pMsgItem);
         pMsgItem->setLayout(pMsgLayout);
         QString strTime = QTime::currentTime().toString("HH:mm:ss");
@@ -102,8 +103,8 @@ namespace GuiCommon
         pMsgLayout->addWidget(new QLabel(vSenderName, pMsgItem), 1, 9, 1, 1, align);
         pMsgItem->setFixedHeight(60);
 
-        m_pLogWidget->setFixedHeight(m_pLogWidget->height() + pMsgItem->height());
-        m_pLogWidget->layout()->addWidget(pMsgItem);
+        m_pChatLogWidget->setFixedHeight(m_pChatLogWidget->height() + pMsgItem->height());
+        m_pChatLogWidget->layout()->addWidget(pMsgItem);
 
         m_psbLog->setMaximumHeight(this->height());
         m_psbLog->setSliderPosition(m_psbLog->maximum());

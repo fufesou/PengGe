@@ -11,6 +11,7 @@
 #define _CHATWIDGET_H
 
 #include  <QWidget>
+#include  <QSharedPointer>
 
 #include    "guitypes.h"
 
@@ -19,12 +20,14 @@ QT_FORWARD_DECLARE_CLASS(QScrollBar)
 
 namespace GuiCommon
 {
+    QT_FORWARD_DECLARE_CLASS(CDisplayItemInfo)
+
     class CChatWidget : public QWidget
     {
         Q_OBJECT
 
     public:
-        explicit CChatWidget(QWidget* vParent = 0);
+        explicit CChatWidget(const QSharedPointer<CDisplayItemInfo>& vItemInfo, QWidget* vParent = 0);
         virtual ~CChatWidget();
 
         void addMsg(const QString& vMsg, const QString& vSenderName, EMsgSendRecv vSendRecv);
@@ -39,11 +42,12 @@ namespace GuiCommon
         void sendButtonClicked();
 
     private:
-        QWidget* m_pListWidget;
+        QWidget* m_pChatListWidget;
         QWidget* m_pPeerInfoWidget;
-        QWidget* m_pLogWidget;
+        QWidget* m_pChatLogWidget;
         QScrollBar* m_psbLog;
         QTextEdit* m_pteInput;
+        QSharedPointer<CDisplayItemInfo> m_pItemInfo;
     };
 }
 

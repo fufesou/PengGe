@@ -1,0 +1,2 @@
+ wang :/img/aa12.jpg wang_info
+ li :/img/aa13.jpg li_info
