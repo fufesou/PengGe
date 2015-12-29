@@ -30,7 +30,7 @@
 #include  <string.h>
 #include  <fcntl.h>
 #include    "common/cstypes.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/list.h"
 #include    "common/error.h"
 #include    "common/sock_types.h"

@@ -25,7 +25,7 @@
 #include  <stdio.h>
 #include  <string.h>
 
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/lightthread.h"
 #include    "common/timespan.h"
 

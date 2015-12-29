@@ -31,7 +31,7 @@
 #include  <stdio.h>
 #include    "common/cstypes.h"
 #include    "common/config_macros.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/utility_wrap.h"
 #include    "common/error.h"
 #include    "common/bufarray.h"
@@ -116,7 +116,7 @@ ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes)
         fprintf(stdout, "server: peer shutdown, recvfrom() failed.\n");
         return 0;
     }
-    csmsg_copyaddr((struct csmsg_header*)inbuf, &cliaddr, addrlen);
+    csmsg_copyaddr((struct csmsg_header*)inbuf, &cliaddr, (uint8_t)addrlen);
 
 #ifdef _DEBUG
     {
@@ -154,7 +154,7 @@ int csserver_send(cssock_t handle, void* sendbuf)
     }
 #endif
 
-    sendbytes = sendto(handle, sendbuf, sizeof(struct csmsg_header) + msgdatalen, 0, &msghdr->addr, msghdr->addrlen);
+    sendbytes = sendto(handle, sendbuf, sizeof(struct csmsg_header) + msgdatalen, 0, &msghdr->addr, (cssocklen_t)msghdr->addrlen);
     if (sendbytes < 0) {
         fprintf(stderr, "server: sendto() fail, error code: %d.\n", cssock_get_last_error());
         return 1;
@@ -267,7 +267,7 @@ int s_msg_process(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
     ret = am_method_get(id_process)->reply(
                 inmsg + s_fixedlen,
                 &((struct csmsg_header*)inmsg)->addr,
-                ((struct csmsg_header*)inmsg)->addrlen,
+                (uint32_t)((struct csmsg_header*)inmsg)->addrlen,
                 outmsg + s_fixedlen,
                 outmsglen);
 

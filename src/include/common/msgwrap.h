@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  Sun 2015-12-06 18:25:09 (+0800)
+ * @modified  周二 2015-12-29 11:58:06 中国标准时间
  */
 
 #ifndef  MSGUNIT_H
@@ -21,7 +21,7 @@ extern "C" {
  * @brief  csmsg_header describe the header in pool item. csmsg_header is followed by the actual message data.
  *
  * @todo This message header shoud be devided into two parts: 1. used in this host 2. transmit between client and server.
- * 'addr' and 'addrlen' belong to the first part, 'header' and 'numbytes' belong to the second part.
+ * 'addr' and 'addrlen' belong to the first part, 'header', 'mflag' and 'numbytes' belong to the second part.
  */
 struct csmsg_header {
     /**
@@ -32,13 +32,18 @@ struct csmsg_header {
     /**
      * @brief addrlen addrlen is only used in current host. It will be updated inmmediately after receiving.
      */
-    uint32_t addrlen;
+    uint8_t addrlen;
 
     /**
      * @brief header 'header' will be transmit between client and server.
      * But as the server does not change this data, it is not necessary to change the data between host and net endian.
      */
     struct hdr header;
+
+    /**
+     * @brief  mflag specifies the flag of current message.
+     */
+    uint8_t mflag;
 
     /**
      * @brief numbytes numbytes will be transmit between client and server. Thus the conversion between host and net should be apply to it.
@@ -56,7 +61,7 @@ struct csmsg_header {
  *
  * @return   0 if succeed, 1 if fail.
  */
-int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int addrlen);
+int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, uint8_t addrlen);
 
 /**
  * @brief  csmsg_merge 

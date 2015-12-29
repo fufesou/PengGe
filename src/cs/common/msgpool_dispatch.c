@@ -23,7 +23,7 @@
 #endif
 
 #include  <stdio.h>
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/cstypes.h"
 #include    "common/bufarray.h"
 #include    "common/sock_types.h"

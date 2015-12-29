@@ -10,7 +10,7 @@
 #include  <stdlib.h>
 #include  <string.h>
 #include    "common/cstypes.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/config_macros.h"
 #include    "am/account.h"
 

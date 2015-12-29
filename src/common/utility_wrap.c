@@ -9,7 +9,7 @@
 
 #include  <memory.h>
 #include  <stdio.h>
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/error.h"
 #include    "common/utility_wrap.h"
 

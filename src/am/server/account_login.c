@@ -12,7 +12,7 @@
 #include  <string.h>
 #include    "common/cstypes.h"
 #include    "common/config_macros.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/list.h"
 #include    "common/utility_wrap.h"
 #include    "am/account.h"

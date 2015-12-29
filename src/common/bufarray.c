@@ -10,7 +10,7 @@
 #include  <malloc.h>
 #include  <string.h>
 #include  <stdio.h>
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/bufarray.h"
 
 void init_buf(struct array_buf* buf, int numitem, int lenitem, int nmalloc)

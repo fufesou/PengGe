@@ -10,7 +10,7 @@
 #include  <malloc.h>
 #include  <stdlib.h>
 
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/list.h"
 #include    "common/clearlist.h"
 

@@ -21,7 +21,7 @@
 #include  <malloc.h>
 #include  <string.h>
 #include    "common/cstypes.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/utility_wrap.h"
 #include    "common/bufarray.h"
 #include    "common/sock_types.h"

@@ -19,7 +19,7 @@
 #include  <assert.h>
 #include  <string.h>
 #include    "common/cstypes.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/utility_wrap.h"
 #include    "common/sock_types.h"
 #include    "common/lightthread.h"
@@ -28,9 +28,9 @@
 #include    "cs/msgpool.h"
 
 
-int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, int addrlen)
+int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, uint8_t addrlen)
 {
-    if (cs_memcpy(&msghdr->addr, sizeof(msghdr->addr), addr, addrlen) != 0) {
+    if (cs_memcpy(&msghdr->addr, sizeof(msghdr->addr), addr, (size_t)addrlen) != 0) {
         return 1;
     }
     msghdr->addrlen = addrlen;

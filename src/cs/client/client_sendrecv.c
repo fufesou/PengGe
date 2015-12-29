@@ -29,7 +29,7 @@
 #include  <string.h>
 #include    "common/cstypes.h"
 #include    "common/config_macros.h"
-#include    "common/macros.h"
+#include    "common/jxiot.h"
 #include    "common/timespan.h"
 #include    "common/list.h"
 #include    "common/clearlist.h"
@@ -100,7 +100,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
     rtt_newpack(&s_rttinfo);
     sendlen = sizeof(s_sendhdr.addr);
     cssock_getsockname(cli->hsock, &s_sendhdr.addr, &sendlen);
-    s_sendhdr.addrlen = htonl(sendlen);
+    s_sendhdr.addrlen = (uint8_t)sendlen;
 
     s_recv_stat = RECV_RESEND;
     while (RECV_RESEND == s_recv_stat) {
@@ -108,7 +108,13 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
         s_sendhdr.numbytes = htonl(cli->len_senddata);
         csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
 
-        if (SOCKET_ERROR == sendto(cli->hsock, outbuf, sizeof(struct csmsg_header) + ntohl(s_sendhdr.numbytes), 0, servaddr, addrlen)) {
+        if (SOCKET_ERROR == sendto(
+                    cli->hsock,
+                    outbuf,
+                    sizeof(struct csmsg_header) + ntohl(s_sendhdr.numbytes),
+                    0,
+                    servaddr,
+                    (cssocklen_t)addrlen)) {
             fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->prompt, cssock_get_last_error());
             return -2;
         }

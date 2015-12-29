@@ -30,7 +30,7 @@ HEADERS += \
     ../../src/include/common/error.h \
     ../../src/include/common/lightthread.h \
     ../../src/include/common/list.h \
-    ../../src/include/common/macros.h \
+    ../../src/include/common/jxiot.h \
     ../../src/include/common/msgwrap.h \
     ../../src/include/common/sock_types.h \
     ../../src/include/common/sock_wrap.h \
