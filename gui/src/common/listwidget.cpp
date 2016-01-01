@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-06
- * @modified  Sun 2015-12-20 16:32:32 (+0800)
+ * @modified  Fri 2016-01-01 11:25:35 (+0800)
  */
 
 #include  <QDebug>
@@ -115,7 +115,18 @@ namespace GuiCommon
 
     void CListWidget::showChatWidget(const QSharedPointer<CDisplayItemInfo>& vItemInfo)
     {
+        foreach (QWidget* pWidget, m_listChatWidget)
+        {
+            if (pWidget->windowTitle() == vItemInfo->getName())
+            {
+                pWidget->setGeometry(200, 200, 400, 500);
+                pWidget->show();
+                return;
+            }
+        }
+
         CChatWidget* pNewChatWidget(new CChatWidget(vItemInfo));
+        pNewChatWidget->setWindowTitle(vItemInfo->getName());
         pNewChatWidget->setGeometry(200, 200, 400, 500);
         pNewChatWidget->show();
         m_listChatWidget.push_back(pNewChatWidget);

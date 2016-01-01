@@ -27,6 +27,10 @@ namespace GuiCommon
         QTextStream& writeStream(QTextStream& vOutStream) const;
         QTextStream& readStream(QTextStream& vInStream);
 
+        const QString& getName() const { return m_name; }
+        const QString& getPortraitPath() const { return m_portraitPath; }
+        const QString& getSimpleInfo() const { return m_simpleInfo; }
+
         QString& fetchName() { return m_name; }
         QString& fetchPortraitPath() { return m_portraitPath; }
         QString& fetchSimpleInfo() { return m_simpleInfo; }

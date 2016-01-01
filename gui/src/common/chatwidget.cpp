@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-05
- * @modified  Sat 2015-12-05 21:59:57 (+0800)
+ * @modified  Fri 2016-01-01 11:08:38 (+0800)
  */
 
 #include  <QLabel>
@@ -52,10 +52,10 @@ namespace GuiCommon
         pPeerInfoLayout->addWidget(new QLabel(tr("ip"), m_pPeerInfoWidget));
         pPeerInfoLayout->addWidget(new QLabel(tr("port"), m_pPeerInfoWidget));
 
-        m_pChatLogWidget = new QWidget(this);
-        m_pChatLogWidget->setLayout(new QVBoxLayout(m_pChatLogWidget));
+        m_pRecordWidget = new QWidget(this);
+        m_pRecordWidget->setLayout(new QVBoxLayout(m_pRecordWidget));
         QScrollArea* pLogArea = new QScrollArea(this);
-        pLogArea->setWidget(m_pChatLogWidget);
+        pLogArea->setWidget(m_pRecordWidget);
         pLogArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         pLogArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         pMainLayout->addWidget(pLogArea, 2, 2, 5, 8);
@@ -64,7 +64,7 @@ namespace GuiCommon
         pLogArea->setStyleSheet(
                     "QWidget{background-color: transparent;} QScrollArea{background-color: rgba(255, 255, 255, 59);}");
 
-        m_psbLog = pLogArea->verticalScrollBar();
+        m_psbRecord = pLogArea->verticalScrollBar();
 
         QWidget* pInputWidget = new QWidget(this);
         pMainLayout->addWidget(pInputWidget, 7, 2, 3, 8);
@@ -92,7 +92,7 @@ namespace GuiCommon
 
     void CChatWidget::addMsg(const QString& vMsg, const QString& vSenderName, EMsgSendRecv vSendRecv)
     {
-        QLabel* pMsgItem = new QLabel(m_pChatLogWidget);
+        QLabel* pMsgItem = new QLabel(m_pRecordWidget);
         QGridLayout* pMsgLayout = new QGridLayout(pMsgItem);
         pMsgItem->setLayout(pMsgLayout);
         QString strTime = QTime::currentTime().toString("HH:mm:ss");
@@ -103,10 +103,10 @@ namespace GuiCommon
         pMsgLayout->addWidget(new QLabel(vSenderName, pMsgItem), 1, 9, 1, 1, align);
         pMsgItem->setFixedHeight(60);
 
-        m_pChatLogWidget->setFixedHeight(m_pChatLogWidget->height() + pMsgItem->height());
-        m_pChatLogWidget->layout()->addWidget(pMsgItem);
+        m_pRecordWidget->setFixedHeight(m_pRecordWidget->height() + pMsgItem->height());
+        m_pRecordWidget->layout()->addWidget(pMsgItem);
 
-        m_psbLog->setMaximumHeight(this->height());
-        m_psbLog->setSliderPosition(m_psbLog->maximum());
+        m_psbRecord->setMaximumHeight(this->height());
+        m_psbRecord->setSliderPosition(m_psbRecord->maximum());
     }
 }

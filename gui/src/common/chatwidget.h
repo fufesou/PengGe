@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-05
- * @modified  Sat 2015-12-05 21:59:10 (+0800)
+ * @modified  Fri 2016-01-01 11:08:33 (+0800)
  */
 
 #ifndef _CHATWIDGET_H
@@ -44,8 +44,8 @@ namespace GuiCommon
     private:
         QWidget* m_pChatListWidget;
         QWidget* m_pPeerInfoWidget;
-        QWidget* m_pChatLogWidget;
-        QScrollBar* m_psbLog;
+        QWidget* m_pRecordWidget;
+        QScrollBar* m_psbRecord;
         QTextEdit* m_pteInput;
         QSharedPointer<CDisplayItemInfo> m_pItemInfo;
     };

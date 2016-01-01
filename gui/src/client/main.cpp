@@ -10,7 +10,6 @@
 #include  <stdlib.h>
 #include  <QApplication>
 #include    "clientcontroller.h"
-#include    "mainwidget.h"
 
 
 int main(int argc, char *argv[])
@@ -22,12 +21,8 @@ int main(int argc, char *argv[])
 
     QApplication app(argc, argv);
 
-    /*
     GuiClient::CController clientController(argv[1], atoi(argv[2]));
     (void)clientController;
-    */
-    GuiClient::CMainWidget mainwidget;
-    mainwidget.show();
 
     return app.exec();
 }
