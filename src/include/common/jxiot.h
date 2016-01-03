@@ -147,9 +147,12 @@
  * @{
  */
 
-#define JX_NO_ERR           0
-#define JX_INVALIE_ARGS     -1
-#define JX_UNKOWN_ERR       -2
+#define JX_NO_ERR           (0)
+#define JX_WARNING        	(1)
+#define JX_NORMAL_ERR      	(2)
+#define JX_FATAL           	(3)
+#define JX_INVALIE_ARGS     (-1)
+#define JX_UNKOWN_ERR       (-2)
 
 /** @} */
 

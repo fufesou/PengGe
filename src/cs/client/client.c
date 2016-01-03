@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Wed 2015-12-09 19:33:58 (+0800)
+ * @modified  Fri 2016-01-01 18:39:42 (+0800)
  */
 
 #ifdef WIN32
@@ -45,6 +45,13 @@ struct csmsgpool;
 #include    "cs/client.h"
 #include    "am/account.h"
 
+
+struct recv_params_t {
+    struct csclient* pcli;
+    const struct sockaddr* pservaddr;
+    cssocklen_t addrlen;
+};
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -57,6 +64,19 @@ static char* s_cli_prompt = "client:";
 
 /** s_msgpool_dispatch This variable is used to manage client send and recv pool. */
 static struct csmsgpool_dispatch s_msgpool_dispatch;
+
+static int s_isRecvEnd = 0;
+static csthread_t s_recv_thread;
+
+static void s_finish_thread_recv(void);
+static void s_thread_recv_clear(void*);
+static void s_msgpool_append(char* data, ssize_t numbytes);
+
+#ifdef WIN32
+static unsigned int __stdcall s_thread_recv(void*);
+#else
+static void* CS_CALLBACK s_thread_recv(void*);
+#endif
 
 static void s_msgpool_append(char* data, ssize_t numbytes);
 void s_clear_msgpool_dispatch(void* unused);
@@ -73,9 +93,9 @@ void s_clear_msgpool_dispatch(void* unused);
  * | struct csmsg_header | process id(uint32_t) | process data(char*) | ... |                     \n
  * ---------------------------------------------------------------------------------------------- \n
  * or \n
- * ------------------------------------------------------------------------------------------------------------------------------------ \n
- * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ... |                                       \n
- * ------------------------------------------------------------------------------------------------------------------------------------ \n
+ * ------------------------------------------------------------------------------------------------------------------------ \n
+ * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ...                             \n
+ * ------------------------------------------------------------------------------------------------------------------------ \n
  * @param outmsg
  * @param outmsglen
  */
@@ -104,19 +124,29 @@ void csclient_init(struct csclient* cli, int tcpudp)
     cli->size_senbuf = sizeof(cli->sendbuf);
     cli->size_recvbuf = sizeof(cli->recvbuf);
 
-    cli->hsock = cssock_open(tcpudp);
-    if (cssock_block(cli->hsock, nonblocking) != 0) {
-        error = 1;
-        csfatal_ext(&error, cserr_exit, "%s: set socket to non-blocking mode failed, error code: %d\n", cli->prompt, cssock_get_last_error());
+    cli->hsock_sendrecv = cssock_open(tcpudp);
+    if (cssock_block(cli->hsock_sendrecv, nonblocking) != 0) {
+        error = JX_NORMAL_ERR;
+        csfatal_ext(&error, cserr_exit, "%s: set socket to non-blocking mode failed,"
+                    " error code: %d\n", cli->prompt, cssock_get_last_error());
     }
 
-    csclearlist_add(csclient_clear, cli);
+#ifdef WIN32
+    cli->hsock_recv = INVALID_SOCKET;
+#else
+    cli->hsock_recv = -1;
+#endif
+
     printf("%s: socket() is OK!\n", cli->prompt);
 }
 
 void csclient_clear(void* cli)
 {
-    (void)cli;
+    struct csclient* pcli = (struct csclient*)cli;
+    if (IS_SOCK_HANDLE(pcli->hsock_sendrecv))
+        cssock_close(pcli->hsock_sendrecv);
+    if (IS_SOCK_HANDLE(pcli->hsock_recv))
+        cssock_close(pcli->hsock_recv);
 
     /*
      * @par free memory
@@ -141,32 +171,32 @@ int s_react_dispatch(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
     return am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t), outmsg, outmsglen);
 }
 
-int csclient_print(const struct csclient *cli)
+int csclient_print(cssock_t hsock, const char* prompt)
 {
     int testres;
     cserr_t error;
-    if ((testres = cssock_print(cli->hsock, cli->prompt)) == -1) {
-        error = 1;
-        csfatal_ext(&error, cserr_exit, "%s socket has not been created.\n", cli->prompt);
-    } else if (testres == 1) {
-        printf("%s socket has not been connected.\n", cli->prompt);
+    if ((testres = cssock_print(hsock, prompt)) == JX_INVALIE_ARGS) {
+        error = JX_INVALIE_ARGS;
+        csfatal_ext(&error, cserr_exit, "%s socket has not been created.\n", prompt);
+    } else if (testres == JX_WARNING) {
+        printf("%s socket has not been connected.\n", prompt);
     }
 
     return testres;
 }
 
-void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
+void csclient_connect(cssock_t hsock, const char* prompt, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
-    cssock_connect(cli->hsock, servaddr, addrlen);
-    if (csclient_print(cli) != 0) {
+    cssock_connect(hsock, servaddr, addrlen);
+    if (csclient_print(hsock, prompt) != 0) {
         csclearlist_clear();
-        exit(1);
+        exit(JX_FATAL);
     }
 }
 
 void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen)
 {
-    csclient_connect(cli, servaddr, addrlen);
+    csclient_connect(cli->hsock_sendrecv, cli->prompt, servaddr, addrlen);
     while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
         cli->sendbuf[strlen(cli->sendbuf) - 1] = '\0';
 
@@ -247,3 +277,56 @@ void s_clear_msgpool_dispatch(void* unused)
     cspool_clear(&s_msgpool_dispatch.pool_unprocessed);
 }
 
+int csclient_thread_recv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
+{
+    struct recv_params_t recv_params = { cli, servaddr, addrlen };
+    return csthread_create(s_thread_recv, &recv_params, &s_recv_thread);
+}
+
+void s_finish_thread_recv(void)
+{
+    s_isRecvEnd = 1;
+}
+
+#ifdef WIN32
+unsigned int __stdcall s_thread_recv(void* recv_params)
+#else
+void* CS_CALLBACK s_thread_recv(void* recv_params)
+#endif
+{
+    char* pbuf = NULL;
+    int blocking = 0;
+    ssize_t recvlen = 0;
+    struct recv_params_t* precv_params = recv_params;
+
+    precv_params->pcli->hsock_recv = cssock_open(SOCK_DGRAM);
+    if (cssock_block(precv_params->pcli->hsock_recv, blocking) != 0) {
+        fprintf(stderr, "client: set socket to blocking mode failed, error code: %d\n", cssock_get_last_error());
+#ifdef WIN32
+        return JX_NORMAL_ERR;
+#else
+        return (void*)JX_NORMAL_ERR;
+#endif
+    }
+
+    csclearlist_add(s_thread_recv_clear, NULL);
+    pbuf = (char*)malloc(precv_params->pcli->size_recvbuf);
+
+    csclient_connect(precv_params->pcli->hsock_recv, precv_params->pcli->prompt, precv_params->pservaddr, precv_params->addrlen);
+
+    while (!s_isRecvEnd) {
+        recvlen = recvfrom(precv_params->pcli->hsock_recv, pbuf, precv_params->pcli->size_recvbuf, 0, NULL, NULL);
+        s_msgpool_append(pbuf, recvlen);
+    }
+
+    free(pbuf);
+
+    return 0;
+}
+
+void s_thread_recv_clear(void* unused)
+{
+    (void)unused;
+    s_finish_thread_recv();
+    csthread_wait_terminate(s_recv_thread);
+}

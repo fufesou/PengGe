@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
- * @modified  Wed 2015-12-23 22:15:40 (+0800)
+ * @modified  Sun 2016-01-03 19:37:16 (+0800)
  */
 
 #ifdef WIN32
@@ -49,7 +49,6 @@
 extern "C" {
 #endif
 
-#define RTT_DEBUG
 
 static struct rtt_info s_rttinfo;
 static int s_rttinit = 0;
@@ -99,7 +98,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
     ++s_sendhdr.header.seq;
     rtt_newpack(&s_rttinfo);
     sendlen = sizeof(s_sendhdr.addr);
-    cssock_getsockname(cli->hsock, &s_sendhdr.addr, &sendlen);
+    cssock_getsockname(cli->hsock_sendrecv, &s_sendhdr.addr, &sendlen);
     s_sendhdr.addrlen = (uint8_t)sendlen;
 
     s_recv_stat = RECV_RESEND;
@@ -109,7 +108,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
         csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
 
         if (SOCKET_ERROR == sendto(
-                    cli->hsock,
+                    cli->hsock_sendrecv,
                     outbuf,
                     sizeof(struct csmsg_header) + ntohl(s_sendhdr.numbytes),
                     0,
@@ -120,7 +119,7 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
         }
 
         s_reset_recvtimer();
-        if ((recvbytes = s_recvmsg(cli->hsock, cli->recvbuf, sizeof(cli->recvbuf))) == -3) {
+        if ((recvbytes = s_recvmsg(cli->hsock_sendrecv, cli->recvbuf, sizeof(cli->recvbuf))) == -3) {
             return -3;
         }
     }

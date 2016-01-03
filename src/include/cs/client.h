@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Sun 2015-12-06 18:23:21 (+0800)
+ * @modified  Sun 2016-01-03 19:57:14 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -25,7 +25,11 @@ extern "C" {
  */
 struct csclient
 {
-    cssock_t hsock;
+    /** hsock_sendrecv is the socket used for 'client-server-client' message. */
+    cssock_t hsock_sendrecv;
+
+    /** hsock_recv is a blocked socket used for 'server-client' message. */
+    cssock_t hsock_recv;
 
     /** sockaddr_in is the server socket address. */
     struct sockaddr_in sa_in;
@@ -84,24 +88,36 @@ CS_API void csclient_init(struct csclient* cli, int tcpudp);
  */
 CS_API void csclient_clear(void* cli);
 
-CS_API void csclient_connect(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
-
-
+CS_API void csclient_connect(cssock_t hsock, const char* prompt, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_print csclient_print will test and print client socket information.
  * If test fail, process will clear the socket environmtn and exit.
  *
- * @param cli
+ * @param hsock
+ * @param prompt
  *
  * @return 
- * 1. -1, if socket is not a valid socket.
- * 2. 0, if socket is connected.
- * 3. 1, if socket is not connected.
+ * 1. JX_INVALID_ARGS(-1), if socket is not a valid socket.
+ * 2. JX_NO_ERR(0), if socket is connected.
+ * 3. JX_WARNING(1), if socket is not connected.
  *
  * @sa cssock_print
  */
-CS_API int csclient_print(const struct csclient* cli);
+CS_API int csclient_print(cssock_t hsock, const char* prompt);
+
+/**
+ * @brief  csclient_thread_recv csclient_thread_recv will create a thread function that listen message from server.
+ *
+ * @param cli
+ * @param servaddr
+ * @param addrlen
+ *
+ * @return the thread create return value.   
+ *
+ * @note this function works with udp socket.
+ */
+CS_API int csclient_thread_recv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
 
 /**
  * @brief  csclient_udp This function process udp communication with server. This function call csclient_udp_once in a loop.

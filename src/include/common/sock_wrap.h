@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
- * @modified  Fri 2015-11-20 00:16:14 (+0800)
+ * @modified  Fri 2016-01-01 18:32:31 (+0800)
  */
 
 #ifndef  SOCK_WRAP_H
@@ -97,9 +97,9 @@ CS_API int cssock_block(cssock_t handle, int block);
  * @param header specify the header message of print infomation.
  *
  * @return   
- * 1. -1, if socket is not a valid socket.
- * 2. 0, if socket is connected.
- * 3. 1, if socket is not connected.
+ * 1. JX_INVALID_ARGS(-1), if socket is not a valid socket.
+ * 2. JX_NO_ERR(0), if socket is connected.
+ * 3. JX_WARNING(1), if socket is not connected.
  */
 CS_API int cssock_print(cssock_t handle, const char* header);
 

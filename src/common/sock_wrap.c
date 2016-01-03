@@ -141,10 +141,10 @@ void cssock_close(cssock_t handle)
 #else
     if (close(handle) != 0) {
 #endif
-        printf("cannot close \"sending_socket\". error code: %d\n", cssock_get_last_error());
+        printf("cannot close \"socket\". error code: %d\n", cssock_get_last_error());
     }
     else {
-        printf("closing \"sending_socket\" ...\n");
+        printf("closing \"socket\" ...\n");
     }
 }
 
@@ -230,7 +230,7 @@ int cssock_print(cssock_t handle, const char* header)
     char addrstr[INET6_ADDRSTRLEN];
 
     if (!IS_SOCK_HANDLE(handle)) {
-        return -1;
+        return JX_INVALIE_ARGS;
     }
 
     msgheader = (header == NULL) ? msgheader : header;
@@ -239,9 +239,9 @@ int cssock_print(cssock_t handle, const char* header)
         cssock_inet_ntop(AF_INET, &addr_in.sin_addr, addrstr, sizeof(addrstr));
         fprintf(stdout, "%s IP(s) used: %s\n", msgheader, addrstr);
         fprintf(stdout, "%s port used: %d\n", msgheader, htons(addr_in.sin_port));
-        return 0;
+        return JX_NO_ERR;
     }
-    return 1;
+    return JX_WARNING;
 }
 
 int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen)
