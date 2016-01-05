@@ -28,46 +28,46 @@
 #include    "cs/msgpool.h"
 
 
-int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, uint8_t addrlen)
+int jxmsg_copyaddr(struct jxmsg_header* msghdr, const struct sockaddr* addr, uint8_t addrlen)
 {
-    if (cs_memcpy(&msghdr->addr, sizeof(msghdr->addr), addr, (size_t)addrlen) != 0) {
+    if (jxmemcpy(&msghdr->addr, sizeof(msghdr->addr), addr, (size_t)addrlen) != 0) {
         return 1;
     }
     msghdr->addrlen = addrlen;
     return 0;
 }
 
-int csmsg_merge(const struct csmsg_header* msgheader, const char* data, char* unit, uint32_t unitlen)
+int jxmsg_merge(const struct jxmsg_header* msgheader, const char* data, char* unit, uint32_t unitlen)
 {
-    uint32_t len_unitheader = sizeof(struct csmsg_header);
+    uint32_t len_unitheader = sizeof(struct jxmsg_header);
     uint32_t msgdatalen = ntohl(msgheader->numbytes);
 
     assert((len_unitheader + msgdatalen) < unitlen);
-    if (cs_memcpy(unit, unitlen, msgheader, len_unitheader) != 0) {
+    if (jxmemcpy(unit, unitlen, msgheader, len_unitheader) != 0) {
         return 1;
     }
-    if (cs_memcpy(unit + len_unitheader, unitlen - len_unitheader, data, msgdatalen) != 0) {
+    if (jxmemcpy(unit + len_unitheader, unitlen - len_unitheader, data, msgdatalen) != 0) {
         return 1;
     }
 
     return 0;
 }
 
-void csmsg_extract(const char* unit, const struct csmsg_header** msgheader, const char** data)
+void jxmsg_extract(const char* unit, const struct jxmsg_header** msgheader, const char** data)
 {
-    *msgheader = (const struct csmsg_header*)unit;
-    *data = (const char*)(unit + sizeof(struct csmsg_header));
+    *msgheader = (const struct jxmsg_header*)unit;
+    *data = (const char*)(unit + sizeof(struct jxmsg_header));
 }
 
-int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* data, int datalen)
+int jxmsg_extract_copy(const char* unit, struct jxmsg_header* msgheader, char* data, int datalen)
 {
-    int len_unitheader = sizeof(struct csmsg_header);
+    int len_unitheader = sizeof(struct jxmsg_header);
 
-    if (cs_memcpy(msgheader, len_unitheader, unit, len_unitheader) != 0) {
+    if (jxmemcpy(msgheader, len_unitheader, unit, len_unitheader) != 0) {
         return 1;
     }
     
-    if (cs_memcpy(data, datalen, unit + len_unitheader, ntohl(msgheader->numbytes)) != 0) {
+    if (jxmemcpy(data, datalen, unit + len_unitheader, ntohl(msgheader->numbytes)) != 0) {
         return 1;
     }
     

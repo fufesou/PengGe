@@ -39,12 +39,35 @@
 #include    "common/sock_wrap.h"
 #include    "common/utility_wrap.h"
 #include    "common/clearlist.h"
+#include    "common/msgwrap.h"
 #include    "cs/msgpool.h"
 #include    "cs/msgpool_dispatch.h"
 #include    "cs/client.h"
+#include    "am/account.h"
 #include    "am/client_account.h"
 
-int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen);
+
+/**
+ * @brief  s_react_dispatch The income message from server
+ * will be handle by the coressponding 'react' method in this function.
+ *
+ * The actual process function will not process data until one byte after 'process id'. Thus
+ * the message data passed into the process function is 'inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t)'.
+ *
+ * @param inmsg The format of inmsg is: \n
+ * ---------------------------------------------------------------------------------------------- \n
+ * | struct csmsg_header | process id(uint32_t) | process data(char*) | ... |                     \n
+ * ---------------------------------------------------------------------------------------------- \n
+ * or \n
+ * ------------------------------------------------------------------------------------------------------------------------ \n
+ * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ...                             \n
+ * ------------------------------------------------------------------------------------------------------------------------ \n
+ * @param outmsg
+ * @param outmsglen
+ */
+static int s_react_dispatch(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen);
+
+static int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen);
 
 int main(int argc, char* argv[])
 {
@@ -71,11 +94,11 @@ int main(int argc, char* argv[])
     serveraddr.sin_addr.s_addr = inet_addr(argv[1]);
 
 
-    csclient_msgpool_dispatch_init(NULL, NULL);
+    csclient_msgpool_dispatch_init(s_react_dispatch, NULL);
 #define TEST_FILE_INPUT
 
 #ifdef TEST_FILE_INPUT
-    csclient_connect(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+    csclient_connect(udpclient.hsock_sendrecv, udpclient.prompt, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
     while (!feof(fp_input)) {
         udpclient.len_senddata = udpclient.size_senbuf;
         data_input[0] = 0;
@@ -125,4 +148,10 @@ int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
 	}
 
 	return 1;
+}
+
+int s_react_dispatch(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+{
+    uint32_t id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
+    return am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t), outmsg, outmsglen);
 }

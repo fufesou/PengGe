@@ -38,8 +38,8 @@ DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
 
-typedef int (CS_CALLBACK *pfunc_react_t)(char*, char*, __inout uint32_t*);
-typedef int (CS_CALLBACK *pfunc_reply_t)(char*, const void*, uint32_t, char*, __inout uint32_t*);
+typedef int (JXIOT_CALLBACK *pfunc_react_t)(char*, char*, __inout uint32_t*);
+typedef int (JXIOT_CALLBACK *pfunc_reply_t)(char*, const void*, uint32_t, char*, __inout uint32_t*);
 
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.
@@ -93,7 +93,7 @@ uint32_t am_method_getid(const char* methodname);
  * @return   1 if callback function is set, 0 if callback function is not set(
  * if methodname is not valid).
  */
-CS_API int am_set_react(const char* methodname, pfunc_react_t func_react);
+JXIOT_API int am_set_react(const char* methodname, pfunc_react_t func_react);
 
 /**
  * @brief  am_set_reply This function will set the react function of client.
@@ -104,7 +104,7 @@ CS_API int am_set_react(const char* methodname, pfunc_react_t func_react);
  * @return   1 if callback function is set, 0 if callback function is not set(
  * if methodname is not valid).
  */
-CS_API int am_set_reply(const char* methodname, pfunc_reply_t func_reply);
+JXIOT_API int am_set_reply(const char* methodname, pfunc_reply_t func_reply);
 
 #ifdef __cplusplus
 }

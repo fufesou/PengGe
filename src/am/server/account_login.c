@@ -29,10 +29,10 @@ void am_login_add(
     struct list_login_t* node_login = NULL;
 
     node_login = (struct list_login_t*)calloc(1, sizeof(struct list_login_t));
-    cs_memcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
+    jxmemcpy(&node_login->account_sock.account, sizeof(node_login->account_sock.account), account, sizeof(*account));
 
     node_login->account_sock.data_verification = calloc(len_verification, sizeof(char));
-    cs_memcpy(node_login->account_sock.data_verification, len_verification, data_verification, len_verification);
+    jxmemcpy(node_login->account_sock.data_verification, len_verification, data_verification, len_verification);
     node_login->account_sock.size_verification = len_verification;
 
     list_add(&node_login->listnode, node_head);

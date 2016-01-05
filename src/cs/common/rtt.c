@@ -43,7 +43,7 @@ rtt_init(struct rtt_info *ptr)
 {
     struct timeval  tv;
 
-    csgettimeofday(&tv, NULL);
+    jxgettimeofday(&tv, NULL);
     ptr->rtt_base = tv.tv_sec;      /* # sec since 1/1/1970 at start */
 
     ptr->rtt_rtt    = 0;
@@ -67,7 +67,7 @@ rtt_ts(struct rtt_info *ptr)
     uint32_t        ts;
     struct timeval  tv;
 
-    csgettimeofday(&tv, NULL);
+    jxgettimeofday(&tv, NULL);
     ts = ((tv.tv_sec - ptr->rtt_base) * 1000) + (tv.tv_usec / 1000);
     return(ts);
 }

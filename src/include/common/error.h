@@ -4,68 +4,70 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-24
- * @modified  Tue 2015-11-03 19:24:51 (+0800)
+ * @modified  Tue 2016-01-05 22:54:09 (+0800)
  */
 
 #ifndef _ERROR_H
 #define _ERROR_H
 
-typedef size_t cserr_t;
-typedef void (CS_CALLBACK *perr_clear_func_t)(void);
+typedef size_t jxerr_t;
+typedef void (JXIOT_CALLBACK *perr_clear_func_t)(void);
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-enum cserr_op
+enum jxerr_op
 {
-    cserr_exit  = 0x0001,
-    cserr_clear = 0x0002,
+    jxerr_exit  = 0x0001,
+    jxerr_clear = 0x0002,
 };
 
 /**
- * @brief  csfatal Print csfatal error message and exit(0)
+ * @brief  jxfatal Print jxfatal error message and exit(0)
  *
  * @param format
  * @param ...
  */
-void csfatal(const char* format, ...);
+void jxfatal(const char* format, ...);
 
 /**
- * @brief  csfatal_ext This function will print error message, clear socket
+ * @brief  jxfatal_ext This function will print error message, clear socket
  * environment and exit.
- * If errop is cserr_exit, exit(*(cserr_t*)data) will be called.
- * if errop is cserr_clear, ((perr_clear_func_t)data)() will be called.
+ * If errop is jxerr_exit, exit(*(jxerr_t*)data) will be called.
+ * if errop is jxerr_clear, ((perr_clear_func_t)data)() will be called.
  *
  * @param data 
  * @param errop
  * @param format
  * @param ...
  */
-void csfatal_ext(void* data, enum cserr_op errop, const char* format, ...);
+void jxfatal_ext(void* data, enum jxerr_op errop, const char* format, ...);
 
 /**
- * @brief  cswarning 
+ * @brief  jxwarning 
  *
  * @param format
  * @param ...
  *
- * @sa csfatal
+ * @sa jxfatal
+ *
+ * @todo use macros(contains __func__, __file__, __line__) instead of functions.
  */
-void cswarning(const char* format, ...);
+void jxwarning(const char* format, ...);
 
 /**
- * @brief  cswarning_ext 
+ * @brief  jxwarning_ext 
  *
  * @param data
  * @param errop
  * @param format
  * @param ...
  *
- * @sa csfatal_ext
+ * @sa jxfatal_ext
  */
-void cswarning_ext(void* data, enum cserr_op errop, const char* format, ...);
+void jxwarning_ext(void* data, enum jxerr_op errop, const char* format, ...);
 
 #ifdef __cplusplus
 }

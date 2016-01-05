@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
- * @modified  周二 2015-12-29 11:58:06 中国标准时间
+ * @modified  Mon 2016-01-04 23:58:31 (+0800)
  */
 
 #ifndef  MSGUNIT_H
@@ -14,16 +14,16 @@
 extern "C" {
 #endif
 
-#define GET_HEADER_DATA(ptr, mem) (((struct csmsg_header*)ptr)->mem)
+#define GET_HEADER_DATA(ptr, mem) (((struct jxmsg_header*)ptr)->mem)
 
 #pragma pack(4)
 /**
- * @brief  csmsg_header describe the header in pool item. csmsg_header is followed by the actual message data.
+ * @brief  jxmsg_header describe the header in pool item. jxmsg_header is followed by the actual message data.
  *
  * @todo This message header shoud be devided into two parts: 1. used in this host 2. transmit between client and server.
- * 'addr' and 'addrlen' belong to the first part, 'header', 'mflag' and 'numbytes' belong to the second part.
+ * 'addr' and 'addrlen' belong to the first part, 'header', and 'numbytes' belong to the second part.
  */
-struct csmsg_header {
+struct jxmsg_header {
     /**
      * @brief addr addr is only used in current host. It will be updated inmmediately after receiving.
      */
@@ -41,11 +41,6 @@ struct csmsg_header {
     struct hdr header;
 
     /**
-     * @brief  mflag specifies the flag of current message.
-     */
-    uint8_t mflag;
-
-    /**
      * @brief numbytes numbytes will be transmit between client and server. Thus the conversion between host and net should be apply to it.
      */
     uint32_t numbytes;
@@ -53,7 +48,7 @@ struct csmsg_header {
 #pragma pack()
 
 /**
- * @brief  csmsg_copyaddr This function set the value of address information.
+ * @brief  jxmsg_copyaddr This function set the value of address information.
  *
  * @param msghdr
  * @param addr
@@ -61,10 +56,10 @@ struct csmsg_header {
  *
  * @return   0 if succeed, 1 if fail.
  */
-int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, uint8_t addrlen);
+int jxmsg_copyaddr(struct jxmsg_header* msghdr, const struct sockaddr* addr, uint8_t addrlen);
 
 /**
- * @brief  csmsg_merge 
+ * @brief  jxmsg_merge 
  *
  * @param msgheader
  * @param data
@@ -73,19 +68,19 @@ int csmsg_copyaddr(struct csmsg_header* msghdr, const struct sockaddr* addr, uin
  *
  * @return   0 if succeed, 1 if fail.
  */
-int csmsg_merge(const struct csmsg_header* msghdr, const char* data, char* unit, uint32_t unitlen);
+int jxmsg_merge(const struct jxmsg_header* msghdr, const char* data, char* unit, uint32_t unitlen);
 
 /**
- * @brief  csmsg_extract 
+ * @brief  jxmsg_extract 
  *
  * @param unit
  * @param msgheader
  * @param data
  */
-void csmsg_extract(const char* unit, const struct csmsg_header** msgheader, const char** data);
+void jxmsg_extract(const char* unit, const struct jxmsg_header** msgheader, const char** data);
 
 /**
- * @brief  csmsg_extract_copy 
+ * @brief  jxmsg_extract_copy 
  *
  * @param unit
  * @param msgheader
@@ -94,7 +89,7 @@ void csmsg_extract(const char* unit, const struct csmsg_header** msgheader, cons
  *
  * @return   
  */
-int csmsg_extract_copy(const char* unit, struct csmsg_header* msgheader, char* data, int datalen);
+int jxmsg_extract_copy(const char* unit, struct jxmsg_header* msgheader, char* data, int datalen);
 
 
 #ifdef __cplusplus

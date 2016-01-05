@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-29
- * @modified  周二 2015-12-29 18:12:24 中国标准时间
+ * @modified  Tue 2016-01-05 21:53:08 (+0800)
  */
 
 // #define _CHECK_ARGS
@@ -63,44 +63,43 @@
  * @{
  */
 
-#ifndef __csin
-#define __csin
+#ifndef __jxin
+#define __jxin
 #endif
 
-#ifndef __csout
-#define __csout
+#ifndef __jxout
+#define __jxout
 #endif
 
-#ifndef __csinout
-#define __csinout
+#ifndef __jxinout
+#define __jxinout
 #endif
 
 #ifdef WIN32
-#define CS_CALLBACK __cdecl
+#define JXIOT_CALLBACK __cdecl
 #else                   /* *nix */
-#define CS_CALLBACK
+#define JXIOT_CALLBACK
 #endif                  /* WIN32 */
 
 #ifdef WIN32
 #ifdef PGCS_DLL
 #ifdef PGCS_BUILDING_LIB
-#define CS_API __declspec( dllexport )
+#define JXIOT_API __declspec( dllexport )
 #else
-#define CS_API __declspec( dllimport )
+#define JXIOT_API __declspec( dllimport )
 #endif                  /* PGCS_BUILDING_LIB */
 #else                   /* !PGCS_DLL */
-#define CS_API extern
+#define JXIOT_API extern
 #endif                  /* PGCS_DLL */
 #else
-#define CS_API extern   /* *nix */
+#define JXIOT_API extern   /* *nix */
 #endif                  /* WIN32 */
 
 /** @} */
 
 
 /** @defgroup mflag definitions
- * 'mflag' is the message flag in message header.
- * @sa msgwrap.h
+ * 'mflag' is the message flag, which is also the first byte of message.
  *
  * @{
 */
@@ -112,7 +111,7 @@
  *
  * @{
  */
-#define MFLAG_SERVER_COMMAND        0x00    /**< This message is the command from server that will be executed by client */
+#define MFLAG_SERVER_QUERY          0x00    /**< This message is the query from server that will be executed by client */
 #define MFLAG_SERVER_NOTIFY         0x01    /**< This message is just plain notification message that will be shown in client ui. */
 #define MFLAG_SERVER_LOG            0x02    /**< This message is just plain notification message that will be logged in client's log. */
 /** @} */
@@ -124,7 +123,7 @@
  *
  * @{
  */
-#define MFLAG_CLIENT_COMMAND        0x10    /**< This message will be treated as executed command in server. */
+#define MFLAG_CLIENT_QUERY          0x10    /**< This message will be treated as query in server. */
 #define MFLAG_CLIENT_NOTIFY         0x11    /**< This message will be shown in server's ui. */
 #define MFLAG_CLIENT_LOG            0x12    /**< This message will be shown in server's log. */
 #define MFLAG_CLIENT_COMMUNICATE_C  0x20    /**< This message will be delivered to another client. */
@@ -136,8 +135,10 @@
  *
  * The last 4 bits are reserved for server.
  * */
-#define MFLAG_BEGIN_SERVER(f) ((f) & 0x0F)
-#define MFLAG_BEGIN_CLIENT(f) ((f) & 0xF0)
+#define MFLAG_BEGIN_SERVER(f) ((f) < 0x10)
+#define MFLAG_BEGIN_CLIENT(f) ((f) >= 0x10)
+
+#define MFLAG_WAIT_RECV(f) ((f) == MFLAG_CLIENT_QUERY)
 
 /** @} */
 

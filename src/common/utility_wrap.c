@@ -13,7 +13,7 @@
 #include    "common/error.h"
 #include    "common/utility_wrap.h"
 
-int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count)
+int jxmemcpy(void* dst, size_t dstsize, const void* src, size_t count)
 {
     if (dstsize < count) {
         return -1;
@@ -34,7 +34,7 @@ int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count)
     return 0;
 }
 
-int cs_fopen(FILE** streamptr, const char* filename, const char* mode)
+int jxfopen(FILE** streamptr, const char* filename, const char* mode)
 {
 #ifdef WIN32
     if (fopen_s(streamptr, filename, mode) != 0) {
@@ -50,7 +50,7 @@ int cs_fopen(FILE** streamptr, const char* filename, const char* mode)
 #ifndef WIN32
 #include  <signal.h>
 
-cssigfunc* cssignal(int signo, cssigfunc* func)
+jxsigfunc* jxsignal(int signo, jxsigfunc* func)
 {
     struct sigaction act, oact;
     act.sa_handler = func;
@@ -71,11 +71,11 @@ cssigfunc* cssignal(int signo, cssigfunc* func)
     return (oact.sa_handler);
 }
 
-cssigfunc* cssignal_ext(int signo, cssigfunc* func)
+jxsigfunc* jxsignal_ext(int signo, jxsigfunc* func)
 {
-    cssigfunc* sigfunc;
-    if ((sigfunc = cssignal(signo, func)) == SIG_ERR) {
-        csfatal("signal error");
+    jxsigfunc* sigfunc;
+    if ((sigfunc = jxsignal(signo, func)) == SIG_ERR) {
+        jxfatal("signal error");
     }
     return sigfunc;
 }

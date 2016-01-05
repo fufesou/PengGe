@@ -12,7 +12,7 @@
 #define _CLEARLIST_H
 
 struct clear_item_t {
-    void (CS_CALLBACK *pfunc_clear)(void*);
+    void (JXIOT_CALLBACK *pfunc_clear)(void*);
     void* pargs;
 };
 
@@ -25,8 +25,8 @@ struct list_clear_t {
 extern "C" {
 #endif
 
-CS_API void csclearlist_add(void (CS_CALLBACK *pfunc_clear)(void* pargs), void* pargs);
-CS_API void csclearlist_clear();
+JXIOT_API void jxclearlist_add(void (JXIOT_CALLBACK *pfunc_clear)(void* pargs), void* pargs);
+JXIOT_API void jxclearlist_clear();
 
 #ifdef __cplusplus
 }

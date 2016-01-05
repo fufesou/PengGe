@@ -16,14 +16,14 @@ extern "C"
 #endif
 
 #ifdef WIN32
-#define csprintf sprintf_s
+#define jxsprintf sprintf_s
 #else
-#define csprintf snprintf
+#define jxsprintf snprintf
 #endif
 
 
 /**
- * @brief  cs_memecpy cs_memcpy is a simple wrapper of memcpy_s(windows) or memcpy(unix).
+ * @brief  jx_memecpy jxmemcpy is a simple wrapper of memcpy_s(windows) or memcpy(unix).
  *
  * @param dst
  * @param dstsize
@@ -36,10 +36,10 @@ extern "C"
  *
  *  @note c11 has introduced memcpy_s.
  */
-CS_API int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count);
+JXIOT_API int jxmemcpy(void* dst, size_t dstsize, const void* src, size_t count);
 
 /**
- * @brief cs_fopen
+ * @brief jxfopen
  * @param streamptr
  * @param filename
  * @param mode
@@ -47,24 +47,24 @@ CS_API int cs_memcpy(void* dst, size_t dstsize, const void* src, size_t count);
  *
  * @todo move this function to common lib.
  */
-CS_API int cs_fopen(FILE** streamptr, const char* filename, const char* mode);
+JXIOT_API int jxfopen(FILE** streamptr, const char* filename, const char* mode);
 
 
 #ifndef WIN32
-typedef void cssigfunc(int);
+typedef void jxsigfunc(int);
 
 /**
- * @brief  cssignal cssignal works the same as signal.
+ * @brief  jxsignal jxsignal works the same as signal.
  *
  * @param signo
  * @param func
  *
  * @return   
  */
-cssigfunc* cssignal(int signo, cssigfunc* func);
+jxsigfunc* jxsignal(int signo, jxsigfunc* func);
 
 /**
- * @brief  cssignal_ext works the same as cssignal, but to print error message
+ * @brief  jxsignal_ext works the same as jxsignal, but to print error message
  * and exit if func fail to register.
  *
  * @param signo
@@ -72,7 +72,7 @@ cssigfunc* cssignal(int signo, cssigfunc* func);
  *
  * @return   
  */
-cssigfunc* cssignal_ext(int signo, cssigfunc* func);
+jxsigfunc* jxsignal_ext(int signo, jxsigfunc* func);
 #endif
 
 #ifdef __cplusplus

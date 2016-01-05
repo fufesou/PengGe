@@ -42,7 +42,7 @@ extern "C"
  *
  * @note We support only telephone account creation for now.
  */
-CS_API int am_account_create_request(const char* usernum, const char* tel, char* outmsg, uint32_t* outmsglen);
+JXIOT_API int am_account_create_request(const char* usernum, const char* tel, char* outmsg, uint32_t* outmsglen);
 
 /**
  * @brief  am_account_verify_request 
@@ -58,7 +58,7 @@ CS_API int am_account_create_request(const char* usernum, const char* tel, char*
  *
  * @return   
  */
-CS_API int am_account_verify_request(const char* tel, const char* randcode, char* outmsg, uint32_t* outmsglen);
+JXIOT_API int am_account_verify_request(const char* tel, const char* randcode, char* outmsg, uint32_t* outmsglen);
 
 /**
  * @brief  am_account_login_request 
@@ -76,7 +76,7 @@ CS_API int am_account_verify_request(const char* tel, const char* randcode, char
  *
  * @return   
  */
-CS_API int am_account_login_request(const char* keywords, const char* passwd, char* outmsg, uint32_t* outmsglen);
+JXIOT_API int am_account_login_request(const char* keywords, const char* passwd, char* outmsg, uint32_t* outmsglen);
 
 /**
  * @brief  am_account_logout_request 
@@ -90,7 +90,7 @@ CS_API int am_account_login_request(const char* keywords, const char* passwd, ch
  *
  * @return   
  */
-CS_API int am_account_logout_request(char* outmsg, uint32_t* outmsglen);
+JXIOT_API int am_account_logout_request(char* outmsg, uint32_t* outmsglen);
 
 /**
  * @brief  am_account_changeusername_request
@@ -106,7 +106,7 @@ CS_API int am_account_logout_request(char* outmsg, uint32_t* outmsglen);
  *
  * @return   
  */
-CS_API int am_account_changeusername_request(
+JXIOT_API int am_account_changeusername_request(
             const char* passwd,
             const char* username_new,
             char* outmsg,
@@ -126,7 +126,7 @@ CS_API int am_account_changeusername_request(
  *
  * @return   
  */
-CS_API int am_account_changepasswd_request(
+JXIOT_API int am_account_changepasswd_request(
             const char* passwd_old,
             const char* passwd_new,
             char* outmsg,
@@ -147,7 +147,7 @@ CS_API int am_account_changepasswd_request(
  *
  * @return  0 if succeed, 1 if fail. 
  */
-CS_API int am_account_changegrade_request(
+JXIOT_API int am_account_changegrade_request(
             const char* passwd,
             uint8_t grade,
             char* outmsg,
@@ -161,7 +161,7 @@ CS_API int am_account_changegrade_request(
  *
  * @return   
  */
-CS_API int am_account_inquire_request(char* outmsg, uint32_t* outmsglen);
+JXIOT_API int am_account_inquire_request(char* outmsg, uint32_t* outmsglen);
 
 
 #ifdef __cplusplus

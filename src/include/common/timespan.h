@@ -11,9 +11,9 @@
 #define _TIMESPAN_H
 
 #ifdef WIN32
-#define cstimelong_t ULARGE_INTEGER
+#define jxtimelong_t ULARGE_INTEGER
 #else
-#define cstimelong_t struct timeval
+#define jxtimelong_t struct timeval
 #endif
 
 #ifdef __cplusplus
@@ -21,11 +21,11 @@ extern "C"
 {
 #endif
 
-void csgettimeofday(struct timeval* tv, void* tz);
-void cstimelong_cur(cstimelong_t* tl);
-unsigned long long cstimelong_span_microsec(const cstimelong_t* start);
-unsigned int cstimelong_span_millisec(const cstimelong_t* start);
-unsigned int cstimelong_span_sec(const cstimelong_t* start);
+void jxgettimeofday(struct timeval* tv, void* tz);
+void jxtimelong_cur(jxtimelong_t* tl);
+unsigned long long jxtimelong_span_microsec(const jxtimelong_t* start);
+unsigned int jxtimelong_span_millisec(const jxtimelong_t* start);
+unsigned int jxtimelong_span_sec(const jxtimelong_t* start);
 
 #ifdef __cplusplus
 }

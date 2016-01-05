@@ -74,10 +74,10 @@ int am_account_create_request(const char* usernum, const char* tel, char* outmsg
     if (*outmsglen < msglen || len_tel == 0) {
         return -1;
     }
-    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), usernum, len_num + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), usernum, len_num + 1) != 0) {
         return 1;
     }
-    if (cs_memcpy(outmsg + sizeof(uint32_t) + len_num + 1, *outmsglen - sizeof(uint32_t) - len_num - 1, tel, len_tel + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t) + len_num + 1, *outmsglen - sizeof(uint32_t) - len_num - 1, tel, len_tel + 1) != 0) {
         return 1;
     }
 
@@ -103,10 +103,10 @@ int am_account_verify_request(const char* tel, const char* randcode, char* outms
     if (*outmsglen < msglen) {
         return 1;
     }
-    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), tel, len_tel + 1) != 0) {
         return 1;
     }
-    if (cs_memcpy(outmsg + sizeof(uint32_t) + len_tel + 1, *outmsglen - sizeof(uint32_t) - len_randcode - 1, randcode, len_randcode + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t) + len_tel + 1, *outmsglen - sizeof(uint32_t) - len_randcode - 1, randcode, len_randcode + 1) != 0) {
         return 1;
     }
 
@@ -133,14 +133,14 @@ int am_account_login_request(const char* keywords, const char* passwd, char* out
         return 1;
     }
 
-    if (cs_memcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), keywords, len_keywords + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t), *outmsglen - sizeof(uint32_t), keywords, len_keywords + 1) != 0) {
         return 1;
     }
-    if (cs_memcpy(outmsg + sizeof(uint32_t) + len_keywords + 1, *outmsglen - sizeof(uint32_t) - len_keywords - 1, passwd, len_passwd + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t) + len_keywords + 1, *outmsglen - sizeof(uint32_t) - len_keywords - 1, passwd, len_passwd + 1) != 0) {
         return 1;
     }
     *outmsglen = msglen;
-    cs_memcpy(s_account_client.passwd, sizeof(s_account_client.passwd), passwd, len_passwd + 1);
+    jxmemcpy(s_account_client.passwd, sizeof(s_account_client.passwd), passwd, len_passwd + 1);
 
     return 0;
 }
@@ -180,15 +180,15 @@ int am_account_changeusername_request(
         return 1;
     }
 
-    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, passwd, len_passwd + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, passwd, len_passwd + 1) != 0) {
         return 1;
     }
-    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2 + len_passwd + 1, *outmsglen - sizeof(uint32_t) * 2 - len_passwd - 1, username_new, len_username_new + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t) * 2 + len_passwd + 1, *outmsglen - sizeof(uint32_t) * 2 - len_passwd - 1, username_new, len_username_new + 1) != 0) {
         return 1;
     }
     *outmsglen = msglen;
 
-    cs_memcpy(s_account_tmp.account_basic.username, sizeof(s_account_tmp.account_basic.username), username_new, strlen(username_new) + 1);
+    jxmemcpy(s_account_tmp.account_basic.username, sizeof(s_account_tmp.account_basic.username), username_new, strlen(username_new) + 1);
 
     return 0;
 }
@@ -217,10 +217,10 @@ int am_account_changepasswd_request(
         return 1;
     }
 
-    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, passwd_old, len_passwd_old + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, passwd_old, len_passwd_old + 1) != 0) {
         return 1;
     }
-    if (cs_memcpy(
+    if (jxmemcpy(
                     outmsg + sizeof(uint32_t) * 2 + len_passwd_old + 1,
                     *outmsglen - sizeof(uint32_t) * 2 - len_passwd_old - 1,
                     passwd_new,
@@ -229,7 +229,7 @@ int am_account_changepasswd_request(
     }
     *outmsglen = msglen;
 
-    cs_memcpy(s_account_tmp.passwd, sizeof(s_account_tmp.passwd), passwd_new, strlen(passwd_new) + 1);
+    jxmemcpy(s_account_tmp.passwd, sizeof(s_account_tmp.passwd), passwd_new, strlen(passwd_new) + 1);
 
     return 0;
 }
@@ -255,7 +255,7 @@ int am_account_changegrade_request(
         return 1;
     }
 
-    if (cs_memcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, passwd, len_passwd + 1) != 0) {
+    if (jxmemcpy(outmsg + sizeof(uint32_t) * 2, *outmsglen - sizeof(uint32_t) * 2, passwd, len_passwd + 1) != 0) {
         return 1;
     }
     *(uint8_t*)(outmsg + sizeof(uint32_t) * 2 + len_passwd + 1) = grade;
@@ -296,20 +296,20 @@ int am_account_changegrade_request(
  *
  * @return   The return value has no meaning, and it always is 0.
  */
-int am_account_create_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_create_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     uint32_t len_result = 0;
     if (inmsg[0] == g_succeed) {
         printf("client: create account succeed, please wait for a moment to receiving the random telcode, then revify it.\n");
         if (outmsg != NULL) {
             len_result = 1;
-            csprintf(outmsg, *outmsglen, "account_create%c%c%c%c%c", TO4C(len_result), g_succeed);
+            jxsprintf(outmsg, *outmsglen, "account_create%c%c%c%c%c", TO4C(len_result), g_succeed);
         }
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: account_create fail, %s\n", inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "account_create%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
+            jxsprintf(outmsg, *outmsglen, "account_create%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
@@ -356,11 +356,11 @@ int am_account_create_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
  * - 0 if succeed.
  * - 1 if verify fail.
  * - -2 if message is unkown.
- * - others, if copy account fail, see cs_memcpy for return code.
+ * - others, if copy account fail, see jxmemcpy for return code.
  *
- * @sa cs_memcpy
+ * @sa jxmemcpy
  */
-int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_verify_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
@@ -369,7 +369,7 @@ int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
     size_t size_account = sizeof(struct account_basic_t);
 
     if (inmsg[0] == g_succeed) {
-        if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
+        if ((ret = (jxmemcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, sizeof(struct account_basic_t)))) != 0) {
             fprintf(stderr, "client: account_verify suceed, but client cannot update account data.\n");
             return ret;
         }
@@ -382,7 +382,7 @@ int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
 
            len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
             assert(*outmsglen > (len_sig + len_result));
-            cs_memcpy(
+            jxmemcpy(
                         outmsg + len_sig + sizeof(uint32_t) + size_account + 1, 
                         *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
                         inmsg + 1 + size_account,
@@ -391,15 +391,15 @@ int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
             len_result = 1 + size_account;
             assert(*outmsglen > (len_sig + len_result));
         }
-        cs_memcpy(outmsg, *outmsglen, sig_msg, len_sig);
+        jxmemcpy(outmsg, *outmsglen, sig_msg, len_sig);
         *((uint32_t*)(outmsg + len_sig)) = len_result;
         *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
-        cs_memcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
+        jxmemcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: %s fail, %s\n", sig_msg, inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "%s%c%c%c%c%c%s", sig_msg, TO4C(len_result), g_fail, inmsg + 1);
+            jxsprintf(outmsg, *outmsglen, "%s%c%c%c%c%c%s", sig_msg, TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
@@ -445,11 +445,11 @@ int am_account_verify_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
  * - 0 if succeed.
  * - 1 if fail.
  * - -2 if message is unkown.
- * - others, if copy account fail, see cs_memcpy for return code.
+ * - others, if copy account fail, see jxmemcpy for return code.
  *
- * @sa cs_memcpy
+ * @sa jxmemcpy
  */
-int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_login_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
@@ -458,7 +458,7 @@ int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsg
     size_t size_account = sizeof(struct account_basic_t);
 
     if (inmsg[0] == g_succeed) {
-        if ((ret = (cs_memcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, size_account))) != 0) {
+        if ((ret = (jxmemcpy(&s_account_client.account_basic, sizeof(struct account_basic_t), inmsg + 1, size_account))) != 0) {
             fprintf(stderr, "client: account_loginsuceed, but client cannot update account data.\n");
             return ret;
         }
@@ -471,7 +471,7 @@ int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsg
 
             len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
             assert(*outmsglen > (len_sig + len_result));
-            cs_memcpy(
+            jxmemcpy(
                         outmsg + len_sig + sizeof(uint32_t) + size_account + 1, 
                         *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
                         inmsg + 1 + size_account,
@@ -480,15 +480,15 @@ int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsg
             len_result = 1 + size_account;
             assert(*outmsglen > (len_sig + len_result));
         }
-        cs_memcpy(outmsg, *outmsglen, sig_msg, len_sig);
+        jxmemcpy(outmsg, *outmsglen, sig_msg, len_sig);
         *((uint32_t*)(outmsg + len_sig)) = len_result;
         *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
-        cs_memcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
+        jxmemcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: %s fail, %s\n", sig_msg, inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "%s%c%c%c%c%c%s", sig_msg, TO4C(len_result), g_fail, inmsg + 1);
+            jxsprintf(outmsg, *outmsglen, "%s%c%c%c%c%c%s", sig_msg, TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
@@ -530,11 +530,11 @@ int am_account_login_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsg
  * - 0 if succeed.
  * - 1 if verify fail.
  * - -2 if message is unkown.
- * - others, if copy account fail, see cs_memcpy for return code.
+ * - others, if copy account fail, see jxmemcpy for return code.
  *
- * @sa cs_memcpy
+ * @sa jxmemcpy
  */
-int am_account_logout_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_logout_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
@@ -545,17 +545,17 @@ int am_account_logout_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
             fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
             if (outmsg != NULL) {
                 len_result = (int)strlen(inmsg) + 1;
-                csprintf(outmsg, *outmsglen, "account_logout%c%c%c%c%c%s", TO4C(len_result), g_succeed, inmsg + 1);
+                jxsprintf(outmsg, *outmsglen, "account_logout%c%c%c%c%c%s", TO4C(len_result), g_succeed, inmsg + 1);
             }
         } else if (outmsg != NULL) {
             len_result = 1;
-            csprintf(outmsg, *outmsglen, "account_logout%c%c%c%c%c", TO4C(len_result), g_succeed);
+            jxsprintf(outmsg, *outmsglen, "account_logout%c%c%c%c%c", TO4C(len_result), g_succeed);
         }
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: account_logout fail, %s\n", inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "account_logout%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
+            jxsprintf(outmsg, *outmsglen, "account_logout%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
@@ -597,17 +597,17 @@ int am_account_logout_react(char* inmsg, char* outmsg, __csinout uint32_t* outms
  * - 0 if succeed.
  * - 1 if verify fail.
  * - -2 if message is unkown.
- * - others, if copy account fail, see cs_memcpy for return code.
+ * - others, if copy account fail, see jxmemcpy for return code.
  *
- * @sa cs_memcpy
+ * @sa jxmemcpy
  */
-int am_account_changeusername_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_changeusername_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
 
     if (inmsg[0] == g_succeed) {
-        if ((ret = cs_memcpy(
+        if ((ret = jxmemcpy(
                         &s_account_client.account_basic.username,
                         sizeof(s_account_client.account_basic.username),
                         &s_account_tmp.account_basic.username,
@@ -622,7 +622,7 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __csinout uint32_
             fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
             if (outmsg != NULL) {
                 len_result = (int)strlen(inmsg) + 1;
-                csprintf(
+                jxsprintf(
                         outmsg,
                         *outmsglen,
                         "account_changeusername%c%c%c%c%c%s",
@@ -631,13 +631,13 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __csinout uint32_
             }
         } else if (outmsg != NULL) {
             len_result = 1;
-            csprintf(outmsg, *outmsglen, "account_changeusername%c%c%c%c%c", TO4C(len_result), g_succeed);
+            jxsprintf(outmsg, *outmsglen, "account_changeusername%c%c%c%c%c", TO4C(len_result), g_succeed);
         }
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: account_changeusername fail, %s\n", inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "account_changeusername%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
+            jxsprintf(outmsg, *outmsglen, "account_changeusername%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
@@ -678,17 +678,17 @@ int am_account_changeusername_react(char* inmsg, char* outmsg, __csinout uint32_
  * - 0 if succeed.
  * - 1 if verify fail.
  * - -2 if message is unkown.
- * - others, if copy account fail, see cs_memcpy for return code.
+ * - others, if copy account fail, see jxmemcpy for return code.
  *
- * @sa cs_memcpy
+ * @sa jxmemcpy
  */
-int am_account_changepasswd_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_changepasswd_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     int ret = 1;
     uint32_t len_result = 0;
 
     if (inmsg[0] == g_succeed) {
-        if ((ret = cs_memcpy(
+        if ((ret = jxmemcpy(
                         &s_account_client.passwd,
                         sizeof(s_account_client.passwd),
                         &s_account_tmp.passwd,
@@ -703,17 +703,17 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __csinout uint32_t*
             fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
             if (outmsg != NULL) {
                 len_result = (int)strlen(inmsg) + 1;
-                csprintf(outmsg, *outmsglen, "account_changepasswd%c%c%c%c%c%s", TO4C(len_result), g_succeed, inmsg + 1);
+                jxsprintf(outmsg, *outmsglen, "account_changepasswd%c%c%c%c%c%s", TO4C(len_result), g_succeed, inmsg + 1);
             }
         } else if (outmsg != NULL) {
             len_result = 1;
-            csprintf(outmsg, *outmsglen, "account_changepasswd%c%c%c%c%c", TO4C(len_result), g_succeed);
+            jxsprintf(outmsg, *outmsglen, "account_changepasswd%c%c%c%c%c", TO4C(len_result), g_succeed);
         }
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: account_changepasswd fail, %s\n", inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "account_changepasswd%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
+            jxsprintf(outmsg, *outmsglen, "account_changepasswd%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {
@@ -755,11 +755,11 @@ int am_account_changepasswd_react(char* inmsg, char* outmsg, __csinout uint32_t*
  * - 0 if succeed.
  * - 1 if verify fail.
  * - -2 if message is unkown.
- * - others, if copy account fail, see cs_memcpy for return code.
+ * - others, if copy account fail, see jxmemcpy for return code.
  *
- * @sa cs_memcpy
+ * @sa jxmemcpy
  */
-int am_account_changegrade_react(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_changegrade_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     uint32_t len_result = 0;
 
@@ -770,18 +770,18 @@ int am_account_changegrade_react(char* inmsg, char* outmsg, __csinout uint32_t* 
         if (inmsg[1] != 0) {
             if (outmsg != NULL) {
                 len_result = (int)strlen(inmsg) + 1;
-                csprintf(outmsg, *outmsglen, "account_changegrade%c%c%c%c%c%s", TO4C(len_result), g_succeed, inmsg + 1);
+                jxsprintf(outmsg, *outmsglen, "account_changegrade%c%c%c%c%c%s", TO4C(len_result), g_succeed, inmsg + 1);
             }
             fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1);
         } else if (outmsg != NULL) {
             len_result = 1;
-            csprintf(outmsg, *outmsglen, "account_changegrade%c%c%c%c%c", TO4C(len_result), g_succeed);
+            jxsprintf(outmsg, *outmsglen, "account_changegrade%c%c%c%c%c", TO4C(len_result), g_succeed);
         }
     } else if (inmsg[0] == g_fail) {
         fprintf(stderr, "client: account_changegrade fail, %s\n", inmsg + 1);
         if (outmsg != NULL) {
             len_result = 1 + (int)strlen(inmsg + 1) + 1;
-            csprintf(outmsg, *outmsglen, "account_changegrade%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
+            jxsprintf(outmsg, *outmsglen, "account_changegrade%c%c%c%c%c%s", TO4C(len_result), g_fail, inmsg + 1);
         }
         return 1;
     } else {

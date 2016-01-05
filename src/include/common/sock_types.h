@@ -25,11 +25,11 @@
  *
  */
 #ifdef WIN32
-typedef SOCKET cssock_t;
-typedef int cssocklen_t;
+typedef SOCKET jxsock_t;
+typedef int jxsocklen_t;
 #else
-typedef int cssock_t;
-typedef socklen_t cssocklen_t;
+typedef int jxsock_t;
+typedef socklen_t jxsocklen_t;
 #endif
 
 

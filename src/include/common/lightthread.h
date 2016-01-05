@@ -16,16 +16,16 @@ extern "C"
 #endif
 
 #ifdef WIN32
-    typedef void* csmutex_t;
-    typedef void* cssem_t;
-    typedef void* csthread_t;
+    typedef void* jxmutex_t;
+    typedef void* jxsem_t;
+    typedef void* jxthread_t;
     typedef unsigned int (__stdcall *pthread_proc_t)(void*);
 
 #else
-    typedef pthread_mutex_t csmutex_t;
-    typedef sem_t cssem_t;
-    typedef pthread_t csthread_t;
-    typedef void* (CS_CALLBACK *pthread_proc_t)(void*);
+    typedef pthread_mutex_t jxmutex_t;
+    typedef sem_t jxsem_t;
+    typedef pthread_t jxthread_t;
+    typedef void* (JXIOT_CALLBACK *pthread_proc_t)(void*);
 #endif
 
 
@@ -33,7 +33,7 @@ extern "C"
  **             the thread block                 **
  **************************************************/
 /**
- * @brief  csthread_create 
+ * @brief  jxthread_create 
  *
  * @param proc
  * @param pargs
@@ -41,70 +41,70 @@ extern "C"
  *
  * @return  On success, returns 0; or, win: return -1, *nix: error number.
  */
-CS_API int csthread_create(pthread_proc_t proc, void* pargs, csthread_t* handle);
+JXIOT_API int jxthread_create(pthread_proc_t proc, void* pargs, jxthread_t* handle);
 
 /**
- * @brief  csthread_exit 
+ * @brief  jxthread_exit 
  */
-CS_API void csthread_exit(void);
+JXIOT_API void jxthread_exit(void);
 /**
- * @brief  csthread_wait_terminate 
+ * @brief  jxthread_wait_terminate 
  *
  * @param handle
  */
-CS_API void csthread_wait_terminate(csthread_t handle);
+JXIOT_API void jxthread_wait_terminate(jxthread_t handle);
 
 /**
- * @brief  csthreadN_wait_terminate 
+ * @brief  jxthreadN_wait_terminate 
  *
  * @param handle
  * @param count
  */
-CS_API void csthreadN_wait_terminate(csthread_t* handle, int count);
+JXIOT_API void jxthreadN_wait_terminate(jxthread_t* handle, int count);
 
 /**
- * @brief  csthread_getpid 
+ * @brief  jxthread_getpid 
  *
  * @return   
  */
-CS_API unsigned int csthread_getpid(void);
+JXIOT_API unsigned int jxthread_getpid(void);
 
 /**
- * @brief  cssleep 
+ * @brief  jxsleep 
  *
  * @param msec
  */
-CS_API void cssleep(unsigned int msec);
+JXIOT_API void jxsleep(unsigned int msec);
 
 
 /**************************************************
  **             the mutex block                  **
  **************************************************/
 /**
- * @brief  csmutex_create csmutex_create will create the mutex and print error message if error occurs.
+ * @brief  jxmutex_create jxmutex_create will create the mutex and print error message if error occurs.
  *
  * @return   NULL if failed; valid mutex handle if succes.
  */
-CS_API csmutex_t csmutex_create(void);
+JXIOT_API jxmutex_t jxmutex_create(void);
 
 /**
- * @brief  csmutex_destroy 
+ * @brief  jxmutex_destroy 
  *
  * @param handle
  */
-CS_API void csmutex_destroy(csmutex_t* handle);
+JXIOT_API void jxmutex_destroy(jxmutex_t* handle);
 
 /**
- * @brief  csmutex_lock 
+ * @brief  jxmutex_lock 
  *
  * @param handle
  *
  * @return  0 if OK; -1 if failed.
  */
-CS_API int csmutex_lock(csmutex_t* handle);
+JXIOT_API int jxmutex_lock(jxmutex_t* handle);
 
 /**
- * @brief  csmutex_try_lock This function returns zero if a lock on the mutex object referenced by mutex is acquired.
+ * @brief  jxmutex_try_lock This function returns zero if a lock on the mutex object referenced by mutex is acquired.
  * Otherwise, an error number is returned to indicate the error.
  *
  * @param handle handle specify the mutex.
@@ -115,28 +115,28 @@ CS_API int csmutex_lock(csmutex_t* handle);
  * 2. -1, if timeout.
  * 3. others error code.
  */
-CS_API int csmutex_try_lock(csmutex_t* handle, unsigned int msec);
+JXIOT_API int jxmutex_try_lock(jxmutex_t* handle, unsigned int msec);
 
 /**
- * @brief  csmutex_unlock This function unlock the numtex.
+ * @brief  jxmutex_unlock This function unlock the numtex.
  *
  * @param handle handle specify the mutex.
  */
-CS_API void csmutex_unlock(csmutex_t* handle);
+JXIOT_API void jxmutex_unlock(jxmutex_t* handle);
 
 
 /**************************************************
  **             the semophare block              **
  **************************************************/
-CS_API int cssem_create(int value_init, int value_max, cssem_t* handle);
+JXIOT_API int jxsem_create(int value_init, int value_max, jxsem_t* handle);
 #ifdef WIN32
-CS_API int cssem_wait(cssem_t* handle);
-CS_API int cssem_post(cssem_t* handle);
-CS_API int cssem_destroy(cssem_t* handle);
+JXIOT_API int jxsem_wait(jxsem_t* handle);
+JXIOT_API int jxsem_post(jxsem_t* handle);
+JXIOT_API int jxsem_destroy(jxsem_t* handle);
 #else
-    #define cssem_wait sem_wait
-    #define cssem_post sem_post
-    #define cssem_destroy sem_destroy
+    #define jxsem_wait sem_wait
+    #define jxsem_post sem_post
+    #define jxsem_destroy sem_destroy
 #endif
 
 

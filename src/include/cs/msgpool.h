@@ -1,7 +1,7 @@
 /**
  * @file msgpool.h
  * @brief  This file defines message buffer pool operations.
- * With thread, mutex, semaphore used, This struct csmsgpool can be used for constructing multithread environment.
+ * With thread, mutex, semaphore used, This struct jxmsgpool can be used for constructing multithread environment.
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
@@ -16,12 +16,12 @@ extern "C" {
 #endif
 
 /**
- * @brief csmsgpool contains basic members for send receive buffer and thread operations.
- * The members of struct csmsgpool should be set with configuration.
+ * @brief jxmsgpool contains basic members for send receive buffer and thread operations.
+ * The members of struct jxmsgpool should be set with configuration.
  *
  * @todo write a cofigure parser to set the members
  */
-struct csmsgpool {
+struct jxmsgpool {
     int num_thread;
     int len_item;
     int num_item;
@@ -29,10 +29,10 @@ struct csmsgpool {
     struct array_buf empty_buf;
 
     /** hmutex */
-    csmutex_t hmutex;
+    jxmutex_t hmutex;
 
     /** hthread */
-    csthread_t* hthread;
+    jxthread_t* hthread;
 
     /** threadexit threadexit is used to make thread exit normally.
      *
@@ -54,14 +54,14 @@ struct csmsgpool {
      */
     int threadexit;
 
-    /** hsem_filled Be careful, csmsgpool call cssem_wait() and cssem_post() by default.
+    /** hsem_filled Be careful, jxmsgpool call jxsem_wait() and jxsem_post() by default.
      */
-    cssem_t hsem_filled;
+    jxsem_t hsem_filled;
 
     /** use_sem_in_pool 1 turn on semaphore wait or post, 0 turn off.
      *
-     * @note use_sem_in_pool only works in cspool_pulldata and cspool_pushdata.
-     * user shoud call semaphore wait and post explicit while calling cspool_pullitem and cspool_pushitem.
+     * @note use_sem_in_pool only works in jxpool_pulldata and jxpool_pushdata.
+     * user shoud call semaphore wait and post explicit while calling jxpool_pullitem and jxpool_pushitem.
      */
     int use_sem_in_pool;
 
@@ -71,7 +71,7 @@ struct csmsgpool {
 };
 
 /**
- * @brief cspool_init This function must be called before any of pool operation begins.
+ * @brief jxpool_init This function must be called before any of pool operation begins.
  * @param pool the operating pool
  * @param itemlen length for each buffer item.
  * @param itemnum number of buffer items.
@@ -81,17 +81,17 @@ struct csmsgpool {
  * @param pfunc the initial operation that each thread will operate once created.
  * @param pargs this args of pfunc.
  */
-void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, pthread_proc_t proc, void* pargs);
+void jxpool_init(struct jxmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, pthread_proc_t proc, void* pargs);
 
 /**
- * @brief  cspool_clear This function will do some clear works such as free memory.
+ * @brief  jxpool_clear This function will do some clear works such as free memory.
  *
  * @param pool
  */
-void cspool_clear(struct csmsgpool* pool);
+void jxpool_clear(struct jxmsgpool* pool);
 
 /**
- * @brief  cspool_pushitem 
+ * @brief  jxpool_pushitem
  *
  * @param pool
  * @param buf
@@ -99,20 +99,20 @@ void cspool_clear(struct csmsgpool* pool);
  *
  * @return   NULL if failed, else success.
  */
-char* cspool_pushitem(struct csmsgpool* pool, struct array_buf* buf, char* item);
+char* jxpool_pushitem(struct jxmsgpool* pool, struct array_buf* buf, char* item);
 
 /**
- * @brief  cspool_pullitem 
+ * @brief  jxpool_pullitem
  *
  * @param pool
  * @param buf
  *
  * @return   NULL if failed, else success.
  */
-char* cspool_pullitem(struct csmsgpool* pool, struct array_buf* buf);
+char* jxpool_pullitem(struct jxmsgpool* pool, struct array_buf* buf);
 
 /**
- * @brief  cspool_pushdata This function push one buffer item data to pool. This procedure can be splitted into two steps:
+ * @brief  jxpool_pushdata This function push one buffer item data to pool. This procedure can be splitted into two steps:
  * 1. take out one item from the empty buffer.
  * 2. copy data from 'data' to the buffer item. 
  * 3. push buffer item into the filled buffer.
@@ -126,10 +126,10 @@ char* cspool_pullitem(struct csmsgpool* pool, struct array_buf* buf);
  * 1 if fail. There is no empty buffer.
  * -1 if fail. copy data error.
  */
-int cspool_pushdata(struct csmsgpool* pool, const char* data, int datalen);
+int jxpool_pushdata(struct jxmsgpool* pool, const char* data, int datalen);
 
 /**
- * @brief  cspool_pulldata This function pull one buffer item data from filled buffer and move the item into the empty buffer.
+ * @brief  jxpool_pulldata This function pull one buffer item data from filled buffer and move the item into the empty buffer.
  *
  * @param pool
  * @param data
@@ -141,7 +141,7 @@ int cspool_pushdata(struct csmsgpool* pool, const char* data, int datalen);
  * 2 if wait semaphore failed.
  * -1 if size of data is not large enough.
  */
-int cspool_pulldata(struct csmsgpool* pool, char* data, int datalen);
+int jxpool_pulldata(struct jxmsgpool* pool, char* data, int datalen);
 
 #ifdef __cplusplus
 }

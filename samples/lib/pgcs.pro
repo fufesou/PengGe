@@ -22,15 +22,16 @@ unix {
 }
 
 HEADERS += \
+    ../../src/include/common/jxiot.h \
     ../../src/include/common/bufarray.h \
     ../../src/include/common/buflist.h \
     ../../src/include/common/clearlist.h \
+    ../../src/include/common/processlist.h \
     ../../src/include/common/config_macros.h \
     ../../src/include/common/cstypes.h \
     ../../src/include/common/error.h \
     ../../src/include/common/lightthread.h \
     ../../src/include/common/list.h \
-    ../../src/include/common/jxiot.h \
     ../../src/include/common/msgwrap.h \
     ../../src/include/common/sock_types.h \
     ../../src/include/common/sock_wrap.h \
@@ -52,6 +53,7 @@ SOURCES += \
     ../../src/common/bufarray.c \
     ../../src/common/buflist.c \
     ../../src/common/clearlist.c \
+    ../../src/common/processlist.c \
     ../../src/common/error.c \
     ../../src/common/global.c \
     ../../src/common/lightthread.c \

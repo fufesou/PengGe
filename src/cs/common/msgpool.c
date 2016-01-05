@@ -46,14 +46,14 @@ extern "C" {
  * 3. semaphare
  * 4. threads
  */
-static void s_initpool(struct csmsgpool* pool, pthread_proc_t proc, void* pargs);
+static void s_initpool(struct jxmsgpool* pool, pthread_proc_t proc, void* pargs);
 
 /**
  * @brief  s_clearpool This function will do some clear works such as free memory.
  *
  * @param pool The send or receive pool to clear.
  */
-static void s_clearpool(struct csmsgpool* pool);
+static void s_clearpool(struct jxmsgpool* pool);
 
 
 #ifdef __cplusplus
@@ -61,7 +61,7 @@ static void s_clearpool(struct csmsgpool* pool);
 #endif
 
 
-void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, pthread_proc_t proc, void* pargs)
+void jxpool_init(struct jxmsgpool* pool, int itemlen, int itemnum, int threadnum, char* userdata, size_t size_userdata, pthread_proc_t proc, void* pargs)
 {
 #ifdef _CHECK_ARGS
     if (pool == NULL || pfunc == NULL) return 0;
@@ -71,17 +71,17 @@ void cspool_init(struct csmsgpool* pool, int itemlen, int itemnum, int threadnum
     pool->num_thread = threadnum;
     pool->threadexit = 0;
 
-    cs_memcpy(pool->userdata, sizeof(pool->userdata), userdata, size_userdata);
+    jxmemcpy(pool->userdata, sizeof(pool->userdata), userdata, size_userdata);
 
     s_initpool(pool, proc, pargs);
 }
 
-void cspool_clear(struct csmsgpool* pool)
+void jxpool_clear(struct jxmsgpool* pool)
 {
     s_clearpool(pool);
 }
 
-void s_initpool(struct csmsgpool* pool, pthread_proc_t proc, void* pargs)
+void s_initpool(struct jxmsgpool* pool, pthread_proc_t proc, void* pargs)
 {
     const int init_fillednum = 0;
     int num_items;
@@ -96,18 +96,18 @@ void s_initpool(struct csmsgpool* pool, pthread_proc_t proc, void* pargs)
     init_emptynum = pool->filled_buf.num_item - 1 - num_items;
     init_buf(&pool->empty_buf, pool->num_item, pool->len_item, init_emptynum);
 
-    pool->hmutex = csmutex_create();
-    cssem_create(0, pool->filled_buf.num_item - 1, &pool->hsem_filled);
+    pool->hmutex = jxmutex_create();
+    jxsem_create(0, pool->filled_buf.num_item - 1, &pool->hsem_filled);
     pool->use_sem_in_pool = 1;
 
-    pool->hthread = (csthread_t*)malloc(sizeof(csthread_t) * pool->num_thread);
+    pool->hthread = (jxthread_t*)malloc(sizeof(jxthread_t) * pool->num_thread);
     for (i=0; i<pool->num_thread; ++i) {
-        csthread_create(proc, pargs, pool->hthread + i);
-        cssleep(20);
+        jxthread_create(proc, pargs, pool->hthread + i);
+        jxsleep(20);
     }
 }
 
-void s_clearpool(struct csmsgpool* pool)
+void s_clearpool(struct jxmsgpool* pool)
 {
     int i = 0;
 
@@ -116,97 +116,97 @@ void s_clearpool(struct csmsgpool* pool)
       */
     pool->threadexit = 1;
     for (; i<pool->num_thread; ++i) {
-        cssem_post(&pool->hsem_filled);
+        jxsem_post(&pool->hsem_filled);
     }
 
-    csthreadN_wait_terminate(pool->hthread, pool->num_thread);
-    cssem_destroy(&pool->hsem_filled);
+    jxthreadN_wait_terminate(pool->hthread, pool->num_thread);
+    jxsem_destroy(&pool->hsem_filled);
 
     clear_buf(&pool->filled_buf);
     clear_buf(&pool->empty_buf);
-    csmutex_destroy(&pool->hmutex);
+    jxmutex_destroy(&pool->hmutex);
 }
 
-char* cspool_pushitem(struct csmsgpool* pool, struct array_buf* buf, char* item)
+char* jxpool_pushitem(struct jxmsgpool* pool, struct array_buf* buf, char* item)
 {
-    csmutex_lock(&pool->hmutex);
+    jxmutex_lock(&pool->hmutex);
     item = push_item(buf, item);
-    csmutex_unlock(&pool->hmutex);
+    jxmutex_unlock(&pool->hmutex);
 
     return item;
 }
 
-char* cspool_pullitem(struct csmsgpool* pool, struct array_buf* buf)
+char* jxpool_pullitem(struct jxmsgpool* pool, struct array_buf* buf)
 {
     char* item;
 
-    csmutex_lock(&pool->hmutex);
+    jxmutex_lock(&pool->hmutex);
     item = pull_item(buf);
-    csmutex_unlock(&pool->hmutex);
+    jxmutex_unlock(&pool->hmutex);
     return item;
 }
 
-int cspool_pushdata(struct csmsgpool* pool, const char* data, int datalen)
+int jxpool_pushdata(struct jxmsgpool* pool, const char* data, int datalen)
 {
     char* poolbuf = NULL;
 
-    csmutex_lock(&pool->hmutex);
+    jxmutex_lock(&pool->hmutex);
     poolbuf = pull_item(&pool->empty_buf);
-    csmutex_unlock(&pool->hmutex);
+    jxmutex_unlock(&pool->hmutex);
 
     if (poolbuf == NULL) {
         return 1;
     }
 
-    if (cs_memcpy(poolbuf, pool->len_item, data, datalen) != 0)
+    if (jxmemcpy(poolbuf, pool->len_item, data, datalen) != 0)
     {
-        csmutex_lock(&pool->hmutex);
+        jxmutex_lock(&pool->hmutex);
         push_item(&pool->empty_buf, poolbuf);
-        csmutex_unlock(&pool->hmutex);
+        jxmutex_unlock(&pool->hmutex);
         return -1;
     }
 
-    csmutex_lock(&pool->hmutex);
+    jxmutex_lock(&pool->hmutex);
     push_item(&pool->filled_buf, poolbuf);
-    csmutex_unlock(&pool->hmutex);
+    jxmutex_unlock(&pool->hmutex);
     if (pool->use_sem_in_pool) {
         /*
          * @brief error handle block should be added here.
          */
-        cssem_post(&pool->hsem_filled);
+        jxsem_post(&pool->hsem_filled);
     }
 
     return 0;
 }
 
-int cspool_pulldata(struct csmsgpool* pool, char* data, int datalen)
+int jxpool_pulldata(struct jxmsgpool* pool, char* data, int datalen)
 {
     char* bufitem = NULL;
 
     if (pool->use_sem_in_pool) {
-        if (cssem_wait(&pool->hsem_filled) != 0) {
+        if (jxsem_wait(&pool->hsem_filled) != 0) {
             return 2;
         }
     }
-    csmutex_lock(&pool->hmutex);
+    jxmutex_lock(&pool->hmutex);
     bufitem = pull_item(&pool->filled_buf);
-    csmutex_unlock(&pool->hmutex);
+    jxmutex_unlock(&pool->hmutex);
 
     if (bufitem == NULL) {
         return 1;
     }
 
-    if (cs_memcpy(data, datalen, bufitem, strlen(bufitem) + 1) != 0)
+    if (jxmemcpy(data, datalen, bufitem, strlen(bufitem) + 1) != 0)
     {
-        csmutex_lock(&pool->hmutex);
+        jxmutex_lock(&pool->hmutex);
         push_item(&pool->filled_buf, bufitem);
-        csmutex_unlock(&pool->hmutex);
+        jxmutex_unlock(&pool->hmutex);
         return -1;
     }
 
-    csmutex_lock(&pool->hmutex);
+    jxmutex_lock(&pool->hmutex);
     push_item(&pool->empty_buf, bufitem);
-    csmutex_unlock(&pool->hmutex);
+    jxmutex_unlock(&pool->hmutex);
 
     return 0;
 }

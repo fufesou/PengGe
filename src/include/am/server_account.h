@@ -20,7 +20,7 @@ extern "C"
  *
  * @return  0 if succeed, 1 if fail. 
  */
-CS_API int am_server_account_init(void);
+JXIOT_API int am_server_account_init(void);
 
 /** am_server_account_clear will be added in am_server_account_init, user need not call
  * am_server_account_clear manually. 

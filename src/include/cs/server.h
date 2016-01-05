@@ -15,33 +15,33 @@ extern "C" {
 #endif
 
 
-struct csserver
+struct jxserver
 {
-    cssock_t hsock;
+    jxsock_t hsock;
     struct sockaddr_in sa_in;
     char* prompt;
 };
 
 /**
- * @brief  csserver_init 
+ * @brief  jxserver_init
  *
  * @param serv
  * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set, upd socket will be created if SOCK_DGRAM is set.
  *
  * @note This function must be called after init_sock_environment being called. 
  */
-CS_API void csserver_init(struct csserver* serv, int tcpudp, u_short port, u_long addr);
+JXIOT_API void jxserver_init(struct jxserver* serv, int tcpudp, u_short port, u_long addr);
 
 /**
- * @brief  csserver_udp This function process communication for udp socket.
+ * @brief  jxserver_udp This function process communication for udp socket.
  *
  * @param serv
  */
-CS_API void csserver_udp(struct csserver* serv);
+JXIOT_API void jxserver_udp(struct jxserver* serv);
 
-CS_API ssize_t csserver_recv(cssock_t handle, void* inbuf, size_t inbytes);
+JXIOT_API ssize_t jxserver_recv(jxsock_t handle, void* inbuf, size_t inbytes);
 
-CS_API int csserver_send(cssock_t handle, void* sendbuf);
+JXIOT_API int jxserver_send(jxsock_t handle, void* sendbuf);
 
 
 #ifdef __cplusplus

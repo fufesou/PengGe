@@ -37,7 +37,7 @@
 #include    "common/sock_wrap.h"
 #include    "common/clearlist.h"
 
-int cssock_envinit()
+int jxsock_envinit()
 {
 #ifdef WIN32
     WSADATA wsadata;
@@ -67,13 +67,13 @@ int cssock_envinit()
                    LOBYTE(wsadata.wHighVersion), HIBYTE(wsadata.wHighVersion));
     }
 
-    csclearlist_add(cssock_envclear, NULL);
+    jxclearlist_add(jxsock_envclear, NULL);
 #endif
 
     return 0;
 }
 
-void cssock_envclear(void* unused)
+void jxsock_envclear(void* unused)
 {
     (void)unused;
 #ifdef WIN32
@@ -86,7 +86,7 @@ void cssock_envclear(void* unused)
 #endif
 }
 
-int cssock_get_last_error(void)
+int jxsock_get_last_error(void)
 {
 #ifdef WIN32
     return WSAGetLastError();
@@ -95,7 +95,7 @@ int cssock_get_last_error(void)
 #endif
 }
 
-void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port)
+void jxaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port)
 {
     memset(addr_in, 0, sizeof(struct sockaddr_in));
     addr_in->sin_family = AF_INET;
@@ -108,11 +108,11 @@ void csaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port)
     addr_in->sin_port = htons(port);
 }
 
-cssock_t cssock_open(int tcpudp)
+jxsock_t jxsock_open(int tcpudp)
 {
     int error;
     int protocol = 0;
-    cssock_t hsock;
+    jxsock_t hsock;
 
     if (tcpudp == SOCK_STREAM) {
         protocol = IPPROTO_TCP;
@@ -123,13 +123,13 @@ cssock_t cssock_open(int tcpudp)
     hsock = socket(AF_INET, tcpudp, protocol); 
     if (!IS_SOCK_HANDLE(hsock)) {
         error = 1;
-        csfatal_ext(&error, cserr_exit, "error at socket(), error code: %d\n",  cssock_get_last_error());
+        jxfatal_ext(&error, jxerr_exit, "error at socket(), error code: %d\n",  jxsock_get_last_error());
     }
 
     return hsock;
 }
 
-void cssock_close(cssock_t handle)
+void jxsock_close(jxsock_t handle)
 {
     if (!IS_SOCK_HANDLE(handle))
     {
@@ -141,62 +141,62 @@ void cssock_close(cssock_t handle)
 #else
     if (close(handle) != 0) {
 #endif
-        printf("cannot close \"socket\". error code: %d\n", cssock_get_last_error());
+        printf("cannot close \"socket\". error code: %d\n", jxsock_get_last_error());
     }
     else {
         printf("closing \"socket\" ...\n");
     }
 }
 
-void cssock_connect(cssock_t handle, const struct sockaddr* sa, cssocklen_t addrlen)
+void jxsock_connect(jxsock_t handle, const struct sockaddr* sa, jxsocklen_t addrlen)
 {
-    cserr_t error;
+    jxerr_t error;
     if (connect(handle, sa, addrlen) != 0) {
-        cssock_close(handle);
+        jxsock_close(handle);
         error = 1;
-        csfatal_ext(&error, cserr_exit, "connect error. error code: %d.\n", cssock_get_last_error());
+        jxfatal_ext(&error, jxerr_exit, "connect error. error code: %d.\n", jxsock_get_last_error());
     }
 }
 
-void cssock_bind(cssock_t handle, struct sockaddr* sa, cssocklen_t addrlen)
+void jxsock_bind(jxsock_t handle, struct sockaddr* sa, jxsocklen_t addrlen)
 {
     int error;
     if ((bind(handle, sa, addrlen)) != 0) {
-        cssock_close(handle);
+        jxsock_close(handle);
         error = 1;
-        csfatal_ext(&error, cserr_exit, "error at listen(), error code: %d\n", cssock_get_last_error());
+        jxfatal_ext(&error, jxerr_exit, "error at listen(), error code: %d\n", jxsock_get_last_error());
     }
     
 }
 
-void cssock_listen(cssock_t handle, int maxconn)
+void jxsock_listen(jxsock_t handle, int maxconn)
 {
     int error;
     if (listen(handle, maxconn) != 0) {
-        cssock_close(handle);
+        jxsock_close(handle);
         error = 1;
-        csfatal_ext(&error, cserr_exit, "error at listen(), error code: %d\n", cssock_get_last_error());
+        jxfatal_ext(&error, jxerr_exit, "error at listen(), error code: %d\n", jxsock_get_last_error());
     }
 }
 
-cssock_t cssock_accept(cssock_t handle, const struct sockaddr* sa, cssocklen_t* addrlen)
+jxsock_t jxsock_accept(jxsock_t handle, const struct sockaddr* sa, jxsocklen_t* addrlen)
 {
     int error;
-    cssock_t hsock;
+    jxsock_t hsock;
 
 #ifdef WIN32
     if ((hsock = accept(handle, (struct sockaddr*)sa, addrlen)) == INVALID_SOCKET) {
 #else
     if ((hsock = accept(handle, (struct sockaddr*)sa, addrlen)) == -1) {
 #endif
-        cssock_close(handle);
+        jxsock_close(handle);
         error = 1;
-        csfatal_ext(&error, cserr_exit, "error at accept(), error code: %d\n", cssock_get_last_error());
+        jxfatal_ext(&error, jxerr_exit, "error at accept(), error code: %d\n", jxsock_get_last_error());
     }
     return hsock;
 }
 
-int cssock_block(cssock_t handle, int block)
+int jxsock_block(jxsock_t handle, int block)
 {
     unsigned long mode;
     int ctlret;
@@ -222,10 +222,10 @@ int cssock_block(cssock_t handle, int block)
     return -1;
 }
 
-int cssock_print(cssock_t handle, const char* header)
+int jxsock_print(jxsock_t handle, const char* header)
 {
     struct sockaddr_in addr_in;
-    cssocklen_t nlen = sizeof(struct sockaddr_in);
+    jxsocklen_t nlen = sizeof(struct sockaddr_in);
     const char* msgheader = "";
     char addrstr[INET6_ADDRSTRLEN];
 
@@ -236,7 +236,7 @@ int cssock_print(cssock_t handle, const char* header)
     msgheader = (header == NULL) ? msgheader : header;
 
     if (getsockname(handle, (struct sockaddr*)&addr_in, &nlen) == 0) {
-        cssock_inet_ntop(AF_INET, &addr_in.sin_addr, addrstr, sizeof(addrstr));
+        jxsock_inet_ntop(AF_INET, &addr_in.sin_addr, addrstr, sizeof(addrstr));
         fprintf(stdout, "%s IP(s) used: %s\n", msgheader, addrstr);
         fprintf(stdout, "%s port used: %d\n", msgheader, htons(addr_in.sin_port));
         return JX_NO_ERR;
@@ -244,26 +244,26 @@ int cssock_print(cssock_t handle, const char* header)
     return JX_WARNING;
 }
 
-int cssock_getsockname(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen)
+int jxsock_getsockname(jxsock_t handle, struct sockaddr* addr, jxsocklen_t* addrlen)
 {
     int res = 0;
     if ((res = getsockname(handle, addr, addrlen)) != 0) {
-        fprintf(stdout, "getsockname() fail, error code: %d.\n", cssock_get_last_error());
+        fprintf(stdout, "getsockname() fail, error code: %d.\n", jxsock_get_last_error());
     }
     return res;
 }
 
-int cssock_getpeername(cssock_t handle, struct sockaddr* addr, cssocklen_t* addrlen)
+int jxsock_getpeername(jxsock_t handle, struct sockaddr* addr, jxsocklen_t* addrlen)
 {
     int res = 0;
     if ((res = getpeername(handle, addr, addrlen)) != 0) {
-        fprintf(stdout, "getpeername() fail, error code: %d.\n", cssock_get_last_error());
+        fprintf(stdout, "getpeername() fail, error code: %d.\n", jxsock_get_last_error());
     }
     return res;
 }
 
 #ifdef WIN32
-const char* cssock_inet_ntop(int af, const void* src, char* dst, cssocklen_t size)
+const char* jxsock_inet_ntop(int af, const void* src, char* dst, jxsocklen_t size)
 {
     struct sockaddr_storage ss;
     unsigned long s = size;
@@ -297,7 +297,7 @@ const char* cssock_inet_ntop(int af, const void* src, char* dst, cssocklen_t siz
 #endif
 }
 
-int cssock_inet_pton(int af, const char* src, void* dst)
+int jxsock_inet_pton(int af, const char* src, void* dst)
 {
     struct sockaddr_storage ss;
     int size = sizeof(ss);

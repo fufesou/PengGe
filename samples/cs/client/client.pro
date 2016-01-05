@@ -13,7 +13,7 @@ HEADERS += \
     ../../../src/include/common/clearlist.h \
     ../../../src/include/common/config_macros.h \
     ../../../src/include/common/error.h \
-    ../../../src/include/common/macros.h \
+    ../../../src/include/common/jxiot.h \
     ../../../src/include/common/sock_types.h \
     ../../../src/include/common/sock_wrap.h \
     ../../../src/include/common/utility_wrap.h \

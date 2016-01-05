@@ -18,7 +18,7 @@
 #include  <stdio.h>
 #include    "common/timespan.h"
 
-void csgettimeofday(struct timeval* tv, void* tz)
+void jxgettimeofday(struct timeval* tv, void* tz)
 {
 #ifdef WIN32
     time_t clock;
@@ -43,7 +43,7 @@ void csgettimeofday(struct timeval* tv, void* tz)
 #endif
 }
 
-void cstimelong_cur(cstimelong_t* tl)
+void jxtimelong_cur(jxtimelong_t* tl)
 {
 #ifdef WIN32
     FILETIME ft;
@@ -55,10 +55,10 @@ void cstimelong_cur(cstimelong_t* tl)
 #endif
 }
 
-unsigned long long cstimelong_span_microsec(const cstimelong_t* start)
+unsigned long long jxtimelong_span_microsec(const jxtimelong_t* start)
 {
-    cstimelong_t end;
-    cstimelong_cur(&end);
+    jxtimelong_t end;
+    jxtimelong_cur(&end);
 
 #ifdef WIN32
     return (end.QuadPart - start->QuadPart) / 10;
@@ -67,13 +67,13 @@ unsigned long long cstimelong_span_microsec(const cstimelong_t* start)
 #endif
 }
 
-unsigned int cstimelong_span_millisec(const cstimelong_t* start)
+unsigned int jxtimelong_span_millisec(const jxtimelong_t* start)
 {
-    return (unsigned int)(cstimelong_span_microsec(start) / 1000LL);
+    return (unsigned int)(jxtimelong_span_microsec(start) / 1000LL);
 }
 
-unsigned int cstimelong_span_sec(const cstimelong_t* start)
+unsigned int jxtimelong_span_sec(const jxtimelong_t* start)
 {
-    return (unsigned int)(cstimelong_span_microsec(start) / 1000000LL);
+    return (unsigned int)(jxtimelong_span_microsec(start) / 1000000LL);
 }
 

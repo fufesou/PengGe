@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
- * @modified  Sun 2016-01-03 19:37:16 (+0800)
+ * @modified  Tue 2016-01-05 00:10:29 (+0800)
  */
 
 #ifdef WIN32
@@ -58,14 +58,14 @@ static int s_rttinit = 0;
 #define RECV_OK 0
 
 static int s_recv_stat = RECV_RESEND;
-static cstimelong_t s_recvbegin;
+static jxtimelong_t s_recvbegin;
 static int s_recvtimer;
 
 static int s_mutex_inited = 0;
-static csmutex_t s_mutex;
-static struct csmsg_header s_sendhdr;
+static jxmutex_t s_mutex;
+static struct hdr s_sendhdr;
 
-static int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes);
+static int s_recvmsg(jxsock_t hsock, void* inmsg, size_t inbytes);
 static void s_reset_recvtimer(void);
 static int s_recv_elapsed(void);
 
@@ -77,11 +77,12 @@ void s_sendrecv_clear(void* unused);
 }
 #endif
 
-ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen)
+ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen)
 {
     char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
-    cssocklen_t sendlen;
+    jxsocklen_t sendlen;
+    struct jxmsg_header* bufheader = NULL;
 
     if (s_rttinit == 0) {
         rtt_init(&s_rttinfo);
@@ -95,27 +96,41 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
         s_sendrecv_init();
     }
 
-    ++s_sendhdr.header.seq;
+    bufheader = (struct jxmsg_header*)outbuf;
+
+    bufheader->header.seq = ++s_sendhdr.seq;
     rtt_newpack(&s_rttinfo);
-    sendlen = sizeof(s_sendhdr.addr);
-    cssock_getsockname(cli->hsock_sendrecv, &s_sendhdr.addr, &sendlen);
-    s_sendhdr.addrlen = (uint8_t)sendlen;
+    sendlen = sizeof(bufheader->addr);
+    jxsock_getsockname(cli->hsock_sendrecv, &bufheader->addr, &sendlen);
+    bufheader->addrlen = (uint8_t)sendlen;
+    bufheader->numbytes = htonl(cli->len_senddata);
+
+    if (jxmemcpy(
+                    outbuf + sizeof(struct jxmsg_header),
+                    sizeof(outbuf) - sizeof(struct jxmsg_header),
+                    cli->sendbuf, cli->len_senddata) != 0) {
+        return 1;
+    }
+
 
     s_recv_stat = RECV_RESEND;
+
     while (RECV_RESEND == s_recv_stat) {
-        s_sendhdr.header.ts = rtt_ts(&s_rttinfo);
-        s_sendhdr.numbytes = htonl(cli->len_senddata);
-        csmsg_merge(&s_sendhdr, cli->sendbuf, outbuf, sizeof(outbuf));
+        bufheader->header.ts = s_sendhdr.ts = rtt_ts(&s_rttinfo);
 
         if (SOCKET_ERROR == sendto(
                     cli->hsock_sendrecv,
                     outbuf,
-                    sizeof(struct csmsg_header) + ntohl(s_sendhdr.numbytes),
+                    sizeof(struct jxmsg_header) + cli->len_senddata,
                     0,
                     servaddr,
-                    (cssocklen_t)addrlen)) {
-            fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->prompt, cssock_get_last_error());
+                    (jxsocklen_t)addrlen)) {
+            fprintf(stderr, "%s sendto() fail, error code: %d.\n", cli->prompt, jxsock_get_last_error());
             return -2;
+        }
+
+        if (MFLAG_WAIT_RECV(*cli->sendbuf)) {
+            return 0;
         }
 
         s_reset_recvtimer();
@@ -129,13 +144,13 @@ ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr,
         return -1;
     }
 
-    rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct csmsg_header*)cli->recvbuf)->header.ts);
-    csmsg_copyaddr((struct csmsg_header*)cli->recvbuf, servaddr, addrlen);
+    rtt_stop(&s_rttinfo, rtt_ts(&s_rttinfo) - ((struct jxmsg_header*)cli->recvbuf)->header.ts);
+    jxmsg_copyaddr((struct jxmsg_header*)cli->recvbuf, servaddr, addrlen);
 
-    return recvbytes - sizeof(struct csmsg_header);
+    return recvbytes - sizeof(struct jxmsg_header);
 }
 
-int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
+int s_recvmsg(jxsock_t hsock, void* inmsg, size_t inbytes)
 {
     int errcode;
     ssize_t recvbytes = -1;
@@ -152,15 +167,15 @@ int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
         }
 
         if ((recvbytes = recvfrom(hsock, inmsg, inbytes, 0, NULL, NULL)) == -1) {
-            errcode = cssock_get_last_error();
+            errcode = jxsock_get_last_error();
             if (ETRYAGAIN(errcode)) {
                 continue;
             } else {
                 fprintf(stderr, "recvfrom() fail, error code: %d.\n", errcode);
                 return -3;
             }
-        } else if (recvbytes > (ssize_t)sizeof(struct csmsg_header) &&
-            ((struct csmsg_header*)inmsg)->header.seq == s_sendhdr.header.seq) {
+        } else if (recvbytes > (ssize_t)sizeof(struct jxmsg_header) &&
+            ((struct jxmsg_header*)inmsg)->header.seq == s_sendhdr.seq) {
 
             s_recv_stat = RECV_OK;
             return recvbytes;
@@ -171,27 +186,27 @@ int s_recvmsg(cssock_t hsock, void* inmsg, size_t inbytes)
 
 void s_reset_recvtimer(void)
 {
-    cstimelong_cur(&s_recvbegin);
+    jxtimelong_cur(&s_recvbegin);
     s_recvtimer = rtt_start(&s_rttinfo);
 }
 
 int s_recv_elapsed(void)
 {
-    s_recvtimer -= (int)cstimelong_span_sec(&s_recvbegin);
+    s_recvtimer -= (int)jxtimelong_span_sec(&s_recvbegin);
     return (s_recvtimer <= 0);
 }
 
 void s_sendrecv_init(void)
 {
     if (s_mutex_inited == 0) {
-        s_mutex = csmutex_create();
+        s_mutex = jxmutex_create();
     }
 
-    csclearlist_add(s_sendrecv_clear, NULL);
+    jxclearlist_add(s_sendrecv_clear, NULL);
 }
 
 void s_sendrecv_clear(void* unused)
 {
     (void)unused;
-    csmutex_destroy(&s_mutex);
+    jxmutex_destroy(&s_mutex);
 }

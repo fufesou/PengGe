@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Tue 2015-12-08 22:53:30 (+0800)
+ * @modified  Tue 2016-01-05 23:17:07 (+0800)
  */
 
 #ifndef _MSGPOOL_DISPATCH
@@ -25,75 +25,72 @@ extern "C"
 {
 #endif
 
-typedef int (CS_CALLBACK *pfunc_msgprocess_t)(char* inmsg, char* outmsg, uint32_t* outmsglen);
-typedef int (CS_CALLBACK *pfunc_msgprocess_af_t)(char* userdata, char* msg);
-
-struct csmsgpool_dispatch
+struct jxmsgpool_dispatch
 {
     char* prompt;
 
-    struct csmsgpool pool_unprocessed;
+    struct jxmsgpool pool_unprocessed;
 
     /** This pool can be ignored if immediately sending data is not required after process.
      * 
      * @sa semd_msg
      */
-    struct csmsgpool pool_processed;
+    struct jxmsgpool pool_processed;
 
-    /** process_msg This variable must be set to point a function. */
-    pfunc_msgprocess_t process_msg;
-
-    /** process_af_msg If send message is not required after process, set process_af_msg to 0;
+    /**
+     * @brief  processlist_head the items of list_process_head contain mflag and corresponding process functions.
+     *
+     * @sa struct list_process_t
      */
-    pfunc_msgprocess_af_t process_af_msg;
+    struct list_head processlist_head;
 };
 
 /**
- * @brief  csmsgpool_dispatch_init This function should be called first of all.
+ * @brief  jxmsgpool_dispatch_init This function should be called first of all.
  *
- * @param pool_dispath
+ * @param pool_dispatch
  */
-void csmsgpool_dispatch_init(struct csmsgpool_dispatch* pool_dispath);
+void jxmsgpool_dispatch_init(struct jxmsgpool_dispatch* pool_dispatch);
 
 #ifdef WIN32
 
 /**
- * @brief  csmsgpool_process This is the thread function of send pool.
+ * @brief  jxmsgpool_process This is the thread function of send pool.
  *
- * @param pool_dispath This pointer should be casted from (struct cspool_process*);
+ * @param pool_dispatch This pointer should be casted from (struct jxpool_process*);
  *
  * @return   
  */
-unsigned int __stdcall csmsgpool_process(void* pool_dispath);
+unsigned int __stdcall jxmsgpool_process(void* pool_dispatch);
 
 /**
- * @brief  csmsgpool_process_af This is the thread function of recv pool.
+ * @brief  jxmsgpool_process_af This is the thread function of recv pool.
  *
- * @param pool_dispath This pointer should be casted from (struct cspool_process*);
+ * @param pool_dispatch This pointer should be casted from (struct jxpool_process*);
  *
  * @return   
  */
-unsigned int __stdcall csmsgpool_process_af(void* pool_dispath);
+unsigned int __stdcall jxmsgpool_process_af(void* pool_dispatch);
 
 #else
 
 /**
- * @brief  csmsgpool_process This is the thread function of send pool.
+ * @brief  jxmsgpool_process This is the thread function of send pool.
  *
- * @param pool_dispath This pointer should be casted from (struct cspool_process*);
+ * @param pool_dispatch This pointer should be casted from (struct jxpool_process*);
  *
  * @return   
  */
-void* csmsgpool_process(void* pool_dispath);
+void* jxmsgpool_process(void* pool_dispatch);
 
 /**
- * @brief  csmsgpool_process_af This is the thread function of recv pool.
+ * @brief  jxmsgpool_process_af This is the thread function of recv pool.
  *
- * @param pool_dispath This pointer should be casted from (struct cspool_process*);
+ * @param pool_dispatch This pointer should be casted from (struct jxpool_process*);
  *
  * @return   
  */
-void* csmsgpool_process_af(void* pool_dispath);
+void* jxmsgpool_process_af(void* pool_dispatch);
 #endif
 
 #ifdef __cplusplus

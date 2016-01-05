@@ -29,7 +29,7 @@ static void s_clearlist_clear(void);
 #endif
 
 
-void csclearlist_add(void (CS_CALLBACK *pfunc_clear)(void* pargs), void* pargs)
+void jxclearlist_add(void (JXIOT_CALLBACK *pfunc_clear)(void* pargs), void* pargs)
 {
     struct list_clear_t* node_clear = NULL;
 
@@ -40,7 +40,7 @@ void csclearlist_add(void (CS_CALLBACK *pfunc_clear)(void* pargs), void* pargs)
     list_add(&node_clear->listnode, &s_list_clear);
 }
 
-void csclearlist_clear()
+void jxclearlist_clear()
 {
     s_execute_clears();
     s_clearlist_clear();

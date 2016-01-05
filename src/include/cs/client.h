@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Sun 2016-01-03 19:57:14 (+0800)
+ * @modified  Tue 2016-01-05 23:17:27 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -17,19 +17,19 @@ extern "C" {
 #endif
 
 /**
- * csclient contains necessary members and functions for client operations.
- * This struct object must be initialized (by calling csclient_init)
+ * jxclient contains necessary members and functions for client operations.
+ * This struct object must be initialized (by calling jxclient_init)
  *  before any operations applied to it.
  *
- * @sa csclient_init
+ * @sa jxclient_init
  */
-struct csclient
+struct jxclient
 {
     /** hsock_sendrecv is the socket used for 'client-server-client' message. */
-    cssock_t hsock_sendrecv;
+    jxsock_t hsock_sendrecv;
 
     /** hsock_recv is a blocked socket used for 'server-client' message. */
-    cssock_t hsock_recv;
+    jxsock_t hsock_recv;
 
     /** sockaddr_in is the server socket address. */
     struct sockaddr_in sa_in;
@@ -62,7 +62,7 @@ struct csclient
 
 
 /**
- * @brief  csclient_init 
+ * @brief  jxclient_init
  *
  * @param cli
  * @param tcpudp Tcp socket will be created if SOCK_STREAM  is set,
@@ -74,24 +74,24 @@ struct csclient
  * @note 
  * 1. This function must be called after init_sock_environment being called. 
  * 2. Socket is set to be non-blocking socket by default.
- *  Call cssock_block explicitly if you need the socket to be blocking.
+ *  Call jxsock_block explicitly if you need the socket to be blocking.
  *
- * @sa cssock_block cssock_open
+ * @sa jxsock_block jxsock_open
  */
-CS_API void csclient_init(struct csclient* cli, int tcpudp);
+JXIOT_API void jxclient_init(struct jxclient* cli, int tcpudp);
 
 /**
- * @brief  csclient_clear  There may be some clear works after communication,
+ * @brief  jxclient_clear  There may be some clear works after communication,
  *  such as free the memory.
  *
  * @param cli
  */
-CS_API void csclient_clear(void* cli);
+JXIOT_API void jxclient_clear(void* cli);
 
-CS_API void csclient_connect(cssock_t hsock, const char* prompt, const struct sockaddr* servaddr, cssocklen_t addrlen);
+JXIOT_API void jxclient_connect(jxsock_t hsock, const char* prompt, const struct sockaddr* servaddr, jxsocklen_t addrlen);
 
 /**
- * @brief  csclient_print csclient_print will test and print client socket information.
+ * @brief  jxclient_print jxclient_print will test and print client socket information.
  * If test fail, process will clear the socket environmtn and exit.
  *
  * @param hsock
@@ -102,12 +102,12 @@ CS_API void csclient_connect(cssock_t hsock, const char* prompt, const struct so
  * 2. JX_NO_ERR(0), if socket is connected.
  * 3. JX_WARNING(1), if socket is not connected.
  *
- * @sa cssock_print
+ * @sa jxsock_print
  */
-CS_API int csclient_print(cssock_t hsock, const char* prompt);
+JXIOT_API int jxclient_print(jxsock_t hsock, const char* prompt);
 
 /**
- * @brief  csclient_thread_recv csclient_thread_recv will create a thread function that listen message from server.
+ * @brief  jxclient_thread_recv jxclient_thread_recv will create a thread function that listen message from server.
  *
  * @param cli
  * @param servaddr
@@ -117,31 +117,35 @@ CS_API int csclient_print(cssock_t hsock, const char* prompt);
  *
  * @note this function works with udp socket.
  */
-CS_API int csclient_thread_recv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
+JXIOT_API int jxclient_thread_recv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen);
 
 /**
- * @brief  csclient_udp This function process udp communication with server. This function call csclient_udp_once in a loop.
+ * @brief  jxclient_udp This function process udp communication with server. This function call jxclient_udp_once in a loop.
  *
  * @param cli
- * @param fp is the FILE pointer where input data comes from.
+ * @param fp        is the FILE pointer where input data comes from.
  * @param servaddr
  * @param addrlen
  *
- * @sa csclient_udp_once
+ * @sa jxclient_udp_once
+ *
+ * @note            the first byte of message buffer is the mflag.
  */
-CS_API void csclient_udp(struct csclient* cli, FILE* fp, const struct sockaddr* servaddr, cssocklen_t addrlen);
+JXIOT_API void jxclient_udp(struct jxclient* cli, FILE* fp, const struct sockaddr* servaddr, jxsocklen_t addrlen);
 
 /**
- * @brief  csclient_udp_once This function process udp send&recv one time.
+ * @brief  jxclient_udp_once This function process udp send&recv one time.
  *
- * @param cli cli has already been filled with data(end with '\0') to send.
+ * @param cli       cli has already been filled with data(end with '\0') to send.
  * @param servaddr
  * @param addrlen
+ *
+ * @note            the first byte of message buffer is the mflag.
  */
-CS_API void csclient_udp_once(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
+JXIOT_API void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen);
 
 /**
- * @brief  csclient_sendrecv 
+ * @brief  jxclient_sendrecv
  *
  * @param cli
  * @param servaddr
@@ -152,12 +156,10 @@ CS_API void csclient_udp_once(struct csclient* cli, const struct sockaddr* serva
  * 2. -1, if timeout.
  * 3. -2, if sendto error occurs.
  * 4. -3, if recvfrom error occurs.
- *
- * @sa cssendrecv_init cssendrecv_clear
  */
-CS_API ssize_t csclient_sendrecv(struct csclient* cli, const struct sockaddr* servaddr, cssocklen_t addrlen);
+JXIOT_API ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen);
 
-CS_API void csclient_msgpool_dispatch_init(pfunc_msgprocess_t func_msgprocess, pfunc_msgprocess_af_t func_msgprocess_af);
+JXIOT_API void jxclient_msgpool_dispatch_init(struct list_head processlist_head);
 
 #ifdef __cplusplus
 }

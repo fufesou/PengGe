@@ -30,45 +30,45 @@ extern "C"
 {
 #endif
 
-void s_cserr_operation(void* data, enum cserr_op errop);
+void s_jxerr_operation(void* data, enum jxerr_op errop);
 
 #ifdef __cplusplus
 }
 #endif
 
-void csfatal(const char* format, ...)
+void jxfatal(const char* format, ...)
 {
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
 
-    csclearlist_clear();
+    jxclearlist_clear();
     exit(0);
 }
 
-void csfatal_ext(void* data, enum cserr_op errop, const char* format, ...)
+void jxfatal_ext(void* data, enum jxerr_op errop, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
 
-    s_cserr_operation(data, errop);
+    s_jxerr_operation(data, errop);
 }
 
-void s_cserr_operation(void* data, enum cserr_op errop)
+void s_jxerr_operation(void* data, enum jxerr_op errop)
 {
-    int willexit = errop & cserr_exit;
+    int willexit = errop & jxerr_exit;
 
-    if (errop == cserr_exit) {
-        csclearlist_clear();
-        exit((int)*(cserr_t*)data);
+    if (errop == jxerr_exit) {
+        jxclearlist_clear();
+        exit((int)*(jxerr_t*)data);
     }
 
-    errop &= (~cserr_exit);
+    errop &= (~jxerr_exit);
     switch (errop) {
-        case cserr_clear:
+        case jxerr_clear:
             ((perr_clear_func_t)data)();
             break;
 
@@ -76,12 +76,12 @@ void s_cserr_operation(void* data, enum cserr_op errop)
             break;
     }
     if (willexit) {
-        csclearlist_clear();
+        jxclearlist_clear();
         exit(0);
     }
 }
 
-void cswarning(const char* format, ...)
+void jxwarning(const char* format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -89,12 +89,12 @@ void cswarning(const char* format, ...)
     va_end(args);
 }
 
-void cswarning_ext(void* data, enum cserr_op errop, const char* format, ...)
+void jxwarning_ext(void* data, enum jxerr_op errop, const char* format, ...)
 {
     va_list args;
     va_start(args, format);
     vfprintf(stdout, format, args);
     va_end(args);
 
-    s_cserr_operation(data, errop);
+    s_jxerr_operation(data, errop);
 }

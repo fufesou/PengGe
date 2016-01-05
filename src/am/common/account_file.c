@@ -47,7 +47,7 @@ extern "C" {
 
 static char s_cfgfile[ACCOUNT_FILE_NUM][16];
 static FILE* s_fpcfg[ACCOUNT_FILE_NUM];
-static csmutex_t s_mutex_file[ACCOUNT_FILE_NUM];
+static jxmutex_t s_mutex_file[ACCOUNT_FILE_NUM];
 
 static int s_account_find_common(uint32_t fileid, void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account);
 
@@ -60,7 +60,7 @@ static void s_am_account_config_clear(void* unused);
 
 int s_account_find_common(uint32_t fileid, void* keydata, int cmpcount, size_t dataoffset, struct account_data_t* account)
 {
-    csmutex_lock(&s_mutex_file[fileid]);
+    jxmutex_lock(&s_mutex_file[fileid]);
     if (s_fpcfg[fileid] == 0) {
         return 0;
     }
@@ -68,14 +68,14 @@ int s_account_find_common(uint32_t fileid, void* keydata, int cmpcount, size_t d
     while (!feof(s_fpcfg[fileid])) {
         if (fread(account, sizeof(*account), 1, s_fpcfg[fileid]) == 1) {
             if (memcmp((char*)account + dataoffset, keydata, cmpcount) == 0) {
-                csmutex_unlock(&s_mutex_file[fileid]);
+                jxmutex_unlock(&s_mutex_file[fileid]);
                 return 1;
             }
         } else if (ferror(s_fpcfg[fileid])) {
             fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
         }
     }
-    csmutex_unlock(&s_mutex_file[fileid]);
+    jxmutex_unlock(&s_mutex_file[fileid]);
 
     return 0;
 }
@@ -131,7 +131,7 @@ int am_account_find_login(const char* login, struct account_data_t* account)
     uint32_t fileid = 0;
 
     for (; fileid < ACCOUNT_FILE_NUM; ++fileid) {
-        csmutex_lock(&s_mutex_file[fileid]);
+        jxmutex_lock(&s_mutex_file[fileid]);
         if (s_fpcfg[fileid] == 0) {
             continue;
         }
@@ -140,7 +140,7 @@ int am_account_find_login(const char* login, struct account_data_t* account)
             if (fread(account, sizeof(*account), 1, s_fpcfg[fileid]) == 1) {
                 if ((strncmp(account->data_basic.tel, login, len_first + 1) == 0) ||
                             (strncmp(account->data_basic.usernum, login, len_first + 1) == 0)) {
-                    csmutex_unlock(&s_mutex_file[fileid]);
+                    jxmutex_unlock(&s_mutex_file[fileid]);
                     if (strncmp(account->passwd, login + len_first + 1, len_second + 1) == 0) {
                         return 1;
                     } else {
@@ -151,7 +151,7 @@ int am_account_find_login(const char* login, struct account_data_t* account)
                 fprintf(stderr, "file - %s, line - %d, read file error.\n", __FILE__, __LINE__);
             }
         }
-        csmutex_unlock(&s_mutex_file[fileid]);
+        jxmutex_unlock(&s_mutex_file[fileid]);
     }
     return 0;
 }
@@ -167,18 +167,18 @@ void am_account_config_init(void)
     }
 
     for (fileid=0; fileid<ACCOUNT_FILE_NUM; ++fileid) {
-        csprintf(s_cfgfile[fileid], sizeof(s_cfgfile[fileid]), "%u", fileid);
+        jxsprintf(s_cfgfile[fileid], sizeof(s_cfgfile[fileid]), "%u", fileid);
 
         /** all files are opened first of all to avoid unexpected errors arising when server's running. */
-        if (cs_fopen(&s_fpcfg[fileid], s_cfgfile[fileid], "ab+") != 0) {
+        if (jxfopen(&s_fpcfg[fileid], s_cfgfile[fileid], "ab+") != 0) {
             errcode = 1;
-            csfatal_ext(&errcode, cserr_exit, "open file error.\n");
+            jxfatal_ext(&errcode, jxerr_exit, "open file error.\n");
         }
 
-        s_mutex_file[fileid] = csmutex_create();
+        s_mutex_file[fileid] = jxmutex_create();
     }
 
-    csclearlist_add(s_am_account_config_clear, NULL);
+    jxclearlist_add(s_am_account_config_clear, NULL);
     s_inited = 1;
 }
 
@@ -194,13 +194,13 @@ void s_am_account_config_clear(void* unused)
             }
         }
 
-        csmutex_destroy(&s_mutex_file[fileid]);
+        jxmutex_destroy(&s_mutex_file[fileid]);
     }
 }
 
 int am_account_data2basic(const struct account_data_t* data, struct account_basic_t* basic)
 {
-    return cs_memcpy(basic, sizeof(*basic), &data->data_basic, sizeof(*basic));
+    return jxmemcpy(basic, sizeof(*basic), &data->data_basic, sizeof(*basic));
 }
 
 int am_account_print(FILE* streamptr, const struct account_data_t* account)
@@ -218,8 +218,8 @@ int am_account_write(const struct account_data_t* account)
 {
     uint32_t fileid = account->data_basic.id >> 10;
 
-    if (csmutex_lock(&s_mutex_file[fileid])) {
-        fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
+    if (jxmutex_lock(&s_mutex_file[fileid])) {
+        fprintf(stderr, "file- %s, line- %d, jxmutex_lock error.\n", __FILE__, __LINE__);
         return 1;
     }
     if (s_fpcfg[fileid] == 0) {
@@ -227,19 +227,19 @@ int am_account_write(const struct account_data_t* account)
     }
     if (fseek(s_fpcfg[fileid], 0, SEEK_END) != 0) {
         fprintf(stderr, "write new account error, call fseek fail.\n");
-        csmutex_unlock(&s_mutex_file[fileid]);
+        jxmutex_unlock(&s_mutex_file[fileid]);
         return 1;
     }
     if (fwrite((void*)account, sizeof(struct account_data_t), 1, s_fpcfg[fileid]) != 1) {
         fprintf(stderr, "write new account error, fwrite fail.\n");
-        csmutex_unlock(&s_mutex_file[fileid]);
+        jxmutex_unlock(&s_mutex_file[fileid]);
         return 1;
     }
 
     if (fflush(s_fpcfg[fileid])) {
         fprintf(stderr, "file - %s, line - %d: fflush error.", __FILE__, __LINE__);
     }
-    csmutex_unlock(&s_mutex_file[fileid]);
+    jxmutex_unlock(&s_mutex_file[fileid]);
 
     return 0;
 }
@@ -252,15 +252,15 @@ int am_account_update(const struct account_data_t* account)
     char tmpname[16];
     uint32_t fileid = account->data_basic.id >> 10;
 
-    csprintf(tmpname, sizeof(tmpname), "t_%u", fileid);
-    cs_fopen(&fptmp, tmpname, "ab+");
+    jxsprintf(tmpname, sizeof(tmpname), "t_%u", fileid);
+    jxfopen(&fptmp, tmpname, "ab+");
     if (fwrite(account, sizeof(*account), 1, fptmp) != 1) {
         fprintf(stderr, "update account error, cannot write account data to tmp file.\n");
         fclose(fptmp);
         return 1;
     }
 
-    csmutex_lock(&s_mutex_file[fileid]);
+    jxmutex_lock(&s_mutex_file[fileid]);
     rewind(s_fpcfg[fileid]);
     while (!feof(s_fpcfg[fileid])) {
         if (fread(&account_tmp, sizeof(account_tmp), 1, s_fpcfg[fileid]) == 1) {
@@ -279,12 +279,12 @@ int am_account_update(const struct account_data_t* account)
     remove(s_cfgfile[fileid]);
     rename(tmpname, s_cfgfile[fileid]);
 
-    if (cs_fopen(&s_fpcfg[fileid], s_cfgfile[fileid], "ab+") != 0) {
+    if (jxfopen(&s_fpcfg[fileid], s_cfgfile[fileid], "ab+") != 0) {
         errcode = 1;
-        csfatal_ext(&errcode, cserr_exit, "update file fatal error, open file error.\n");
+        jxfatal_ext(&errcode, jxerr_exit, "update file fatal error, open file error.\n");
     }
 
-    csmutex_unlock(&s_mutex_file[fileid]);
+    jxmutex_unlock(&s_mutex_file[fileid]);
 
     return 0;
 }

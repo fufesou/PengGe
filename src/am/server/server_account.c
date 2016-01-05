@@ -55,7 +55,7 @@ struct account_tmp_t
     char tel[ACCOUNT_TEL_LEN];
     char* randcode;
     uint8_t size_randcode;
-    cstimelong_t time_created;
+    jxtimelong_t time_created;
 };
 
 struct list_account_tmp_t
@@ -79,9 +79,9 @@ extern char g_curmaxnum[ACCOUNT_USERNUM_LEN];
 
 
 static int s_thread_exit = 0;
-static csthread_t s_handle_thread;
-static csmutex_t s_mutex_login;
-static csmutex_t s_mutex_tmp;
+static jxthread_t s_handle_thread;
+static jxmutex_t s_mutex_login;
+static jxmutex_t s_mutex_tmp;
 static LIST_HEAD(s_list_login);
 static LIST_HEAD(s_list_tmp);
 
@@ -164,17 +164,17 @@ static int s_account_create(struct account_tmp_t* account_tmp, struct account_da
         delnode = s_list_tmp.next;
         while (delnode != (&s_list_tmp)) {
 
-            csmutex_lock(&s_mutex_tmp);
+            jxmutex_lock(&s_mutex_tmp);
             node_tmp = container_of(delnode, struct list_account_tmp_t, listnode);
             delnode = delnode->next;
 
             if (s_account_tmp_timeout(node_tmp)) {
                 s_account_tmp_remove(node_tmp);
             }
-            csmutex_unlock(&s_mutex_tmp);
+            jxmutex_unlock(&s_mutex_tmp);
         }
 
-        cssleep(10 * 60 * 1000);
+        jxsleep(10 * 60 * 1000);
     }
 
     return 0;
@@ -214,14 +214,14 @@ void s_account_tmp_add(const char* info, const char* randcode)
         s_usernum_inc(g_curmaxnum, sizeof(g_curmaxnum));
         usernum = &g_curmaxnum[0];
     }
-    cs_memcpy(tmp_new->account_tmp.usernum, sizeof(tmp_new->account_tmp.usernum), usernum, strlen(usernum) + 1);
-    cs_memcpy(tmp_new->account_tmp.tel, sizeof(tmp_new->account_tmp.tel), tel, strlen(tel) + 1);
+    jxmemcpy(tmp_new->account_tmp.usernum, sizeof(tmp_new->account_tmp.usernum), usernum, strlen(usernum) + 1);
+    jxmemcpy(tmp_new->account_tmp.tel, sizeof(tmp_new->account_tmp.tel), tel, strlen(tel) + 1);
 
     tmp_new->account_tmp.randcode = (char*)calloc(randcodelen + 1, sizeof(char));
-    cs_memcpy(tmp_new->account_tmp.randcode, randcodelen + 1, randcode, randcodelen);
+    jxmemcpy(tmp_new->account_tmp.randcode, randcodelen + 1, randcode, randcodelen);
     tmp_new->account_tmp.size_randcode = randcodelen + 1;
 
-    cstimelong_cur(&tmp_new->account_tmp.time_created);
+    jxtimelong_cur(&tmp_new->account_tmp.time_created);
 
     list_add(&tmp_new->listnode, &s_list_tmp);
 }
@@ -231,7 +231,7 @@ void s_account_tmp_clear(void)
     struct list_account_tmp_t* node_tmp = NULL;
     struct list_head* delnode = s_list_tmp.next;
 
-    csmutex_lock(&s_mutex_tmp);
+    jxmutex_lock(&s_mutex_tmp);
     while (delnode != (&s_list_tmp)) {
         node_tmp = container_of(delnode, struct list_account_tmp_t, listnode);
         delnode = delnode->next;
@@ -240,7 +240,7 @@ void s_account_tmp_clear(void)
 
     s_list_tmp.prev = &s_list_tmp;
     s_list_tmp.next = &s_list_tmp;
-    csmutex_unlock(&s_mutex_tmp);
+    jxmutex_unlock(&s_mutex_tmp);
 }
 
 void s_account_tmp_remove(struct list_account_tmp_t* list_tmp)
@@ -267,7 +267,7 @@ struct list_account_tmp_t* s_account_tmp_find(const char* tel)
 
 int s_account_tmp_timeout(struct list_account_tmp_t* list_tmp)
 {
-    return (cstimelong_span_sec(&list_tmp->account_tmp.time_created) > g_timeout_verification);
+    return (jxtimelong_span_sec(&list_tmp->account_tmp.time_created) > g_timeout_verification);
 }
 
 
@@ -307,7 +307,7 @@ int s_account_create(struct account_tmp_t* account_tmp, struct account_data_t* a
 
     account->data_basic.grade = 0;
     account->data_basic.id = (g_curmaxid++);
-    if (cs_memcpy(
+    if (jxmemcpy(
                 account->data_basic.tel,
                 SIZEOF_ARR(account->data_basic.tel),
                 account_tmp->tel,
@@ -320,7 +320,7 @@ int s_account_create(struct account_tmp_t* account_tmp, struct account_data_t* a
         len_rand_username = sizeof(rand_username) - 1;
     }
     s_gen_randcode(len_rand_username, rand_username, 'a', 'z');
-    if (cs_memcpy(
+    if (jxmemcpy(
                     account->data_basic.username,
                     SIZEOF_ARR(account->data_basic.username),
                     rand_username,
@@ -337,12 +337,12 @@ int s_account_create(struct account_tmp_t* account_tmp, struct account_data_t* a
 #else
     s_gen_randcode(len_rand_passwd, rand_passwd, 'a', 'z');
 #endif
-    cs_memcpy(
+    jxmemcpy(
                 account->data_basic.usernum,
                 SIZEOF_ARR(account->data_basic.usernum),
                 account_tmp->usernum,
                 sizeof(account_tmp->usernum));
-    return cs_memcpy(
+    return jxmemcpy(
                 account->passwd,
                 SIZEOF_ARR(account->passwd),
                 rand_passwd,
@@ -388,7 +388,7 @@ int s_account_created(const char* tel)
  *
  * @return  0 if succeed, 1 if fail. 
  */
-int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     char* randcode = NULL;
     char* tel = strchr(inmsg, '\0') + 1;
@@ -398,7 +398,7 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
     (void)len_verification;
 
     if (s_account_created(tel)) {
-        csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_exist);
+        jxsprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_exist);
         *outmsglen = 1 + strlen(msg_exist) + 1;
         return 1;
     }
@@ -446,7 +446,7 @@ int am_account_create_reply(char* inmsg, const void* data_verification, uint32_t
  *
  * @note Verifying mutliple times is allowed here.
  */
-int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     struct account_data_t account;
     struct account_basic_t account_basic;
@@ -458,7 +458,7 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
     const char* msg_err = NULL;
     int ret_stat = 0;
 
-    csmutex_lock(&s_mutex_tmp);
+    jxmutex_lock(&s_mutex_tmp);
     if ((node_tmp = s_account_tmp_find(inmsg)) == NULL) {
         msg_err = msg_err_tel;
         ret_stat = 1;
@@ -483,24 +483,24 @@ int am_account_verify_reply(char* inmsg, const void* data_verification, uint32_t
         goto err;
     }
     s_account_tmp_remove(node_tmp);
-    csmutex_unlock(&s_mutex_tmp);
+    jxmutex_unlock(&s_mutex_tmp);
 
-    csmutex_lock(&s_mutex_login);
+    jxmutex_lock(&s_mutex_login);
     am_account_data2basic(&account, &account_basic);
     account_basic.id = htonl(account_basic.id);   /**< id is converted to net endian */
     outmsg[0] = g_succeed;
-    cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
+    jxmemcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
     am_login_add(&s_list_login, &account, data_verification, len_verification);
     *outmsglen = sizeof(account_basic) + 1;
-    csmutex_unlock(&s_mutex_login);
+    jxmutex_unlock(&s_mutex_login);
 
     return 0;
 
 err:
     outmsg[0] = g_fail;
-    cs_memcpy(outmsg + 1, *outmsglen - 1, msg_err, strlen(msg_err) + 1);
+    jxmemcpy(outmsg + 1, *outmsglen - 1, msg_err, strlen(msg_err) + 1);
     *outmsglen = 1 + strlen(msg_err) + 1;
-    csmutex_unlock(&s_mutex_tmp);
+    jxmutex_unlock(&s_mutex_tmp);
 
     return ret_stat;
 }
@@ -536,7 +536,7 @@ err:
  * @warning Consider of efficience, this function dose not prevent the same host from loging in the same account.
  * This may lead to heavy list if the user maliciously continually log in the same account.
  */
-int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     int login_status = 0;
     struct account_data_t account;
@@ -547,11 +547,11 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
 
     login_status = am_account_find_login(inmsg, &account);
     if (login_status == 0) {
-        csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_not_exist);
+        jxsprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_not_exist);
         *outmsglen = 1 + strlen(msg_account_not_exist);
         return 1;
     } else if (login_status == 2) {
-        csprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_passwd);
+        jxsprintf(outmsg, *outmsglen, "%c%s", g_fail, msg_account_passwd);
         *outmsglen = 1 + strlen(msg_account_passwd);
         return 1;
     }
@@ -559,13 +559,13 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
     am_account_data2basic(&account, &account_basic);
     account_basic.id = htonl(account_basic.id);
     outmsg[0] = g_succeed;
-    cs_memcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
+    jxmemcpy(outmsg + 1, *outmsglen - 1, &account_basic, sizeof(account_basic));
 
-    csmutex_lock(&s_mutex_login);
+    jxmutex_lock(&s_mutex_login);
     login_status = am_login_tryadd(&s_list_login, &account, data_verification, len_verification);
-    csmutex_unlock(&s_mutex_login);
+    jxmutex_unlock(&s_mutex_login);
     if (login_status == 1) {
-        cs_memcpy(outmsg + 1 + sizeof(account_basic),
+        jxmemcpy(outmsg + 1 + sizeof(account_basic),
                 *outmsglen - 1 - sizeof(account_basic),
                 msg_account_login_other,
                 strlen(msg_account_login_other) + 1);
@@ -606,7 +606,7 @@ int am_account_login_reply(char* inmsg, const void* data_verification, uint32_t 
  *
  * @return   
  */
-int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     const char* msg_account_not_found = "account is not loged in.";
     const char* msg_outmsg = "invalid outmsg argument.";
@@ -617,37 +617,37 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
 
     if (*outmsglen <= 2 || outmsg == NULL) {
         *outmsg = g_fail;
-        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_outmsg, strlen(msg_outmsg) + 1);
+        jxmemcpy(outmsg + 1, *outmsglen - 1, msg_outmsg, strlen(msg_outmsg) + 1);
         *outmsglen = 1 + strlen(msg_outmsg) + 1;
         return 3;
     }
 
-    if (csmutex_lock(&s_mutex_login) != 0) {
-        fprintf(stderr, "file- %s, line- %d, csmutex_lock error.\n", __FILE__, __LINE__);
+    if (jxmutex_lock(&s_mutex_login) != 0) {
+        fprintf(stderr, "file- %s, line- %d, jxmutex_lock error.\n", __FILE__, __LINE__);
     }
     if ((account_login = am_login_find_id(&s_list_login, id)) == NULL) {
         *outmsg = g_fail;
-        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_account_not_found, strlen(msg_account_not_found) + 1);
+        jxmemcpy(outmsg + 1, *outmsglen - 1, msg_account_not_found, strlen(msg_account_not_found) + 1);
         *outmsglen = 1 + strlen(msg_account_not_found) + 1;
-        csmutex_unlock(&s_mutex_login);
+        jxmutex_unlock(&s_mutex_login);
         return 1;
     }
     if (memcmp(data_verification, account_login->data_verification, len_verification) != 0) {
         *outmsg = g_fail;
-        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_verification, strlen(msg_verification) + 1);
+        jxmemcpy(outmsg + 1, *outmsglen - 1, msg_verification, strlen(msg_verification) + 1);
         *outmsglen = 1 + strlen(msg_verification) + 1;
-        csmutex_unlock(&s_mutex_login);
+        jxmutex_unlock(&s_mutex_login);
         return 2;
     }
     
     if (am_login_remove_account(account_login) != 0) {
-        cs_memcpy(outmsg + 1, *outmsglen - 1, msg_write_account, strlen(msg_write_account) + 1);
+        jxmemcpy(outmsg + 1, *outmsglen - 1, msg_write_account, strlen(msg_write_account) + 1);
         *outmsglen = 1 + strlen(msg_write_account) + 1;
     } else {
         *(outmsg + 1) = 0;
         *outmsglen = 1;
     }
-    csmutex_unlock(&s_mutex_login);
+    jxmutex_unlock(&s_mutex_login);
     *outmsg = g_succeed;
 
     return 0;
@@ -681,19 +681,19 @@ int am_account_logout_reply(char* inmsg, const void* data_verification, uint32_t
  *
  * @return   
  */
-int am_account_changeusername_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_changeusername_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     const char* passwd = NULL;
     const char* username_new = NULL;
     struct account_data_t* account_data = NULL;
     uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
-    csmutex_lock(&s_mutex_login);
+    jxmutex_lock(&s_mutex_login);
     account_data = &am_login_find_id_verification(&s_list_login, id, data_verification, len_verification)->account;
-    csmutex_unlock(&s_mutex_login);
+    jxmutex_unlock(&s_mutex_login);
 
     if (account_data == NULL) {
-        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
+        jxsprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
         *outmsglen = strlen(outmsg);
         return 1;
     }
@@ -702,14 +702,14 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
     username_new = strchr(passwd, '\0') + 1;
 
     if (strncmp(passwd, account_data->passwd, strlen(account_data->passwd)) == 0) {
-        cs_memcpy(
+        jxmemcpy(
                     account_data->data_basic.username,
                     sizeof(account_data->data_basic.username),
                     username_new,
                     strlen(username_new) + 1);
-        csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
+        jxsprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
     } else {
-        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
+        jxsprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
 
     *outmsglen = strlen(outmsg) + 1;
@@ -744,19 +744,19 @@ int am_account_changeusername_reply(char* inmsg, const void* data_verification, 
  *
  * @return   
  */
-int am_account_changepasswd_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_changepasswd_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     const char* passwd_old = NULL;
     const char* passwd_new = NULL;
     struct account_data_t* account_login = NULL;
     uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
-    csmutex_lock(&s_mutex_login);
+    jxmutex_lock(&s_mutex_login);
     account_login = &am_login_find_id_verification(&s_list_login, id, data_verification, len_verification)->account;
-    csmutex_unlock(&s_mutex_login);
+    jxmutex_unlock(&s_mutex_login);
 
     if (account_login == NULL) {
-        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
+        jxsprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
         *outmsglen = strlen(outmsg);
         return 1;
     }
@@ -765,10 +765,10 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
     passwd_new = strchr(passwd_old, '\0') + 1;
 
     if (strncmp(passwd_old, account_login->passwd, strlen(account_login->passwd)) == 0) {
-        cs_memcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new) + 1);
-        csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
+        jxmemcpy(account_login->passwd, sizeof(account_login->passwd), passwd_new, strlen(passwd_new) + 1);
+        jxsprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
     }  else {
-        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
+        jxsprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
 
     *outmsglen = strlen(outmsg) + 1;
@@ -804,18 +804,18 @@ int am_account_changepasswd_reply(char* inmsg, const void* data_verification, ui
  *
  * @return   
  */
-int am_account_changegrade_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __csinout uint32_t* outmsglen)
+int am_account_changegrade_reply(char* inmsg, const void* data_verification, uint32_t len_verification, char* outmsg, __jxinout uint32_t* outmsglen)
 {
     const char* passwd = NULL;
     struct account_data_t* account_login = NULL;
     uint32_t id = ntohl(*(uint32_t*)(inmsg));
 
-    csmutex_lock(&s_mutex_login);
+    jxmutex_lock(&s_mutex_login);
     account_login = &am_login_find_id_verification(&s_list_login, id, data_verification, len_verification)->account;
-    csmutex_unlock(&s_mutex_login);
+    jxmutex_unlock(&s_mutex_login);
 
     if (account_login == NULL) {
-        csprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
+        jxsprintf(outmsg, *outmsglen, "%c%s wiht id: %d.", g_fail, "account is not logged in.", id);
         *outmsglen = strlen(outmsg);
         return 1;
     }
@@ -824,9 +824,9 @@ int am_account_changegrade_reply(char* inmsg, const void* data_verification, uin
 
     if (strncmp(passwd, account_login->passwd, strlen(account_login->passwd)) == 0) {
         account_login->data_basic.grade = (uint8_t)ntohl(*(uint32_t*)(strchr(passwd, '\0') + 1));
-        csprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
+        jxsprintf(outmsg, *outmsglen, "%c%c", g_succeed, '\0');
     } else {
-        csprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
+        jxsprintf(outmsg, *outmsglen, "%c%s.", g_fail, "passwd error.");
     }
 
     *outmsglen = strlen(outmsg) + 1;
@@ -840,18 +840,18 @@ int am_server_account_init(void)
         return 0;
     }
 
-    s_mutex_login = csmutex_create();
-    s_mutex_tmp = csmutex_create();
+    s_mutex_login = jxmutex_create();
+    s_mutex_tmp = jxmutex_create();
 
-    if (csthread_create(s_thread_clear_tmp, NULL, &s_handle_thread) != 0) {
+    if (jxthread_create(s_thread_clear_tmp, NULL, &s_handle_thread) != 0) {
         fprintf(stderr, "am_server: create tmp account cleaner thread error.\n");
-        csmutex_destroy(&s_mutex_login);
-        csmutex_destroy(&s_mutex_tmp);
+        jxmutex_destroy(&s_mutex_login);
+        jxmutex_destroy(&s_mutex_tmp);
         return 1;
     }
 
     am_account_config_init();
-    csclearlist_add(s_am_server_account_clear, NULL);
+    jxclearlist_add(s_am_server_account_clear, NULL);
     s_inited = 1;
 
     return 0;
@@ -861,17 +861,17 @@ void s_am_server_account_clear(void* unused)
 {
     (void)unused;
 
-    csmutex_lock(&s_mutex_login);
+    jxmutex_lock(&s_mutex_login);
     if (am_login_write(&s_list_login) != 0) {
         fprintf(stderr, "fatal error, current account data cannot be update to the database!\n");
     }
     am_login_clear(&s_list_login);
-    csmutex_unlock(&s_mutex_login);
+    jxmutex_unlock(&s_mutex_login);
 
     s_account_tmp_clear();
     s_thread_exit = 1;
-    csthread_wait_terminate(s_handle_thread);
+    jxthread_wait_terminate(s_handle_thread);
 
-    csmutex_destroy(&s_mutex_login);
-    csmutex_destroy(&s_mutex_tmp);
+    jxmutex_destroy(&s_mutex_login);
+    jxmutex_destroy(&s_mutex_tmp);
 }
