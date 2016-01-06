@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-26
- * @modified  Fri 2015-11-20 19:35:34 (+0800)
+ * @modified  Wed 2016-01-06 22:37:45 (+0800)
  */
 
 #ifndef  SERVER_HELPER_H
@@ -42,6 +42,8 @@ JXIOT_API void jxserver_udp(struct jxserver* serv);
 JXIOT_API ssize_t jxserver_recv(jxsock_t handle, void* inbuf, size_t inbytes);
 
 JXIOT_API int jxserver_send(jxsock_t handle, void* sendbuf);
+
+JXIOT_API void jxserver_msgpool_dispatch_init(struct jxserver* serv, struct list_head* plist_head);
 
 
 #ifdef __cplusplus

@@ -34,6 +34,8 @@
 #include    "common/sock_wrap.h"
 #include    "common/utility_wrap.h"
 #include    "common/clearlist.h"
+#include    "common/processlist.h"
+#include    "common/msgprocess.h"
 #include    "cs/msgpool.h"
 #include    "cs/msgpool_dispatch.h"
 #include    "cs/client.h"
@@ -57,7 +59,7 @@ extern "C" {
 extern char g_succeed;
 extern char g_fail;
 
-static int CS_CALLBACK s_account_msg_dispatch(char* unused, char* msg);
+static int JXIOT_CALLBACK s_account_msg_dispatch(char* unused, char* msg);
 static void s_process_create_react(uint32_t msglen, const char* msg);
 static void s_process_verify_react(uint32_t msglen, const char* msg);
 static void s_process_login_react(uint32_t msglen, const char* msg);
@@ -84,13 +86,13 @@ static struct
 }
 #endif
 
-static void s_process_create_request(QString vUserNumber, QString vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_verify_request(QString vTel, QString vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_login_request(QString vUserInfo, QString vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_changeusername_request(QString vPasswd, QString vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_changepasswd_request(QString vPasswd, QString vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr);
-static void s_process_changegrade_request(QString vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_create_request(QString vUserNumber, QString vTel, struct jxclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_verify_request(QString vTel, QString vRandCode, struct jxclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_login_request(QString vUserInfo, QString vPasswd, struct jxclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_logout_request(struct jxclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changeusername_request(QString vPasswd, QString vNewUsername, struct jxclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changepasswd_request(QString vPasswd, QString vNewPasswd, struct jxclient* vClient, struct sockaddr_in* vServerAddr);
+static void s_process_changegrade_request(QString vPasswd, uint8_t vGrade, struct jxclient* vClient, struct sockaddr_in* vServerAddr);
 
 
 namespace GuiClient
@@ -105,12 +107,12 @@ namespace GuiClient
 
     CController::CController(const char* vServerIP, unsigned short vServerPort)
         : m_pSendThread(new GuiCommon::CGuiThread(this))
-        , m_pCSClient(NULL)
+        , m_pjxclient(NULL)
         , m_pServerAddr(NULL)
     {
         if (initClient(vServerIP, vServerPort))
         {
-            m_pSendThread->setFixedArgs(m_pCSClient, m_pServerAddr);
+            m_pSendThread->setFixedArgs(m_pjxclient, m_pServerAddr);
             initWidgets();
         }
         else
@@ -121,8 +123,8 @@ namespace GuiClient
 
     CController::~CController()
     {
-        csclearlist_clear();
-        free(m_pCSClient);
+        jxclearlist_clear();
+        free(m_pjxclient);
         free(m_pServerAddr);
 
         foreach (QWidget* pWidget, m_mapWidget) {
@@ -241,17 +243,22 @@ namespace GuiClient
 
     bool CController::initClient(const char* vServerIP, unsigned short vServerPort)
     {
-        m_pCSClient = (struct csclient*)malloc(sizeof(struct csclient));
+        struct list_head* pprocess_client_head = NULL;
+
+        m_pjxclient = (struct jxclient*)malloc(sizeof(struct jxclient));
         m_pServerAddr = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
 
-        cssock_envinit();
-        csclient_init(m_pCSClient, SOCK_DGRAM);
+        jxsock_envinit();
+        jxclient_init(m_pjxclient, SOCK_DGRAM);
         
         m_pServerAddr->sin_family = AF_INET;
         m_pServerAddr->sin_port = htons(vServerPort);
         m_pServerAddr->sin_addr.s_addr = inet_addr(vServerIP);
 
-        csclient_msgpool_dispatch_init(NULL, s_account_msg_dispatch);
+        jxprocesslist_init();
+        pprocess_client_head = jxprocesslist_client_default_get();
+        jxprocesslist_set(pprocess_client_head, JX_MFLAG_CLIENT_QUERY, NULL, s_account_msg_dispatch, 0);
+        jxclient_msgpool_dispatch_init(pprocess_client_head);
 
         return true;
     }
@@ -273,7 +280,7 @@ namespace GuiClient
     {
         hideAllWidgets();
         showWidget(s_sigLoginingWidget);
-        // s_process_login_request(vUserInfo, vPasswd, m_pCSClient, m_pServerAddr);
+        // s_process_login_request(vUserInfo, vPasswd, m_pjxclient, m_pServerAddr);
         m_pSendThread->setArgs((void*)s_process_login_request, vUserInfo, vPasswd);
         m_pSendThread->start();
         dynamic_cast<CLoginingWidget*>(m_mapWidget[s_sigLoginingWidget])->beginRequest();
@@ -283,7 +290,7 @@ namespace GuiClient
     {
         hideAllWidgets();
         showWidget(s_sigRegisteringWidget);
-        // s_process_create_request(vUserNum, vTelNum, m_pCSClient, m_pServerAddr);
+        // s_process_create_request(vUserNum, vTelNum, m_pjxclient, m_pServerAddr);
         m_pSendThread->setArgs((void*)s_process_create_request, vUserNum, vTelNum);
         m_pSendThread->start();
         dynamic_cast<CRegisteringWidget*>(m_mapWidget[s_sigRegisteringWidget])->beginRequest();
@@ -293,7 +300,7 @@ namespace GuiClient
     {
         hideAllWidgets();
         showWidget(s_sigVerifyingWidget);
-        // s_process_verify_request(vTelNum, vRandCode, m_pCSClient, m_pServerAddr);
+        // s_process_verify_request(vTelNum, vRandCode, m_pjxclient, m_pServerAddr);
         m_pSendThread->setArgs((void*)s_process_verify_request, vTelNum, vRandCode);
         m_pSendThread->start();
         dynamic_cast<CVerifyingWidget*>(m_mapWidget[s_sigVerifyingWidget])->beginRequest();
@@ -356,7 +363,7 @@ namespace GuiClient
 
     void CController::logout()
     {
-        s_process_logout_request(m_pCSClient, m_pServerAddr);
+        s_process_logout_request(m_pjxclient, m_pServerAddr);
         hideAllWidgets();
         showWidget(s_sigLoginWidget);
     }
@@ -373,11 +380,11 @@ namespace GuiClient
  ********************************************************/
 #define SEND_COMMON \
     qDebug() << "send request begin."; \
-    csclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr)); \
+    jxclient_udp_once(vClient, (struct sockaddr*)vServerAddr, sizeof(*vServerAddr)); \
     qDebug() << "send request end."; \
     return;
 
-void s_process_create_request(QString vUserNumber, QString vTel, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_create_request(QString vUserNumber, QString vTel, struct jxclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_create_request(vUserNumber.toLatin1().constData(),
@@ -389,7 +396,7 @@ void s_process_create_request(QString vUserNumber, QString vTel, struct csclient
     qDebug() << "cannot handle create request";
 }
 
-void s_process_verify_request(QString vTel, QString vRandCode, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_verify_request(QString vTel, QString vRandCode, struct jxclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_verify_request(vTel.toLatin1().constData(),
@@ -401,7 +408,7 @@ void s_process_verify_request(QString vTel, QString vRandCode, struct csclient* 
     qDebug () << "cannot handle verify request";
 }
 
-void s_process_login_request(QString vUserInfo, QString vPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_login_request(QString vUserInfo, QString vPasswd, struct jxclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_login_request(vUserInfo.toLatin1().constData(),
@@ -413,7 +420,7 @@ void s_process_login_request(QString vUserInfo, QString vPasswd, struct csclient
     qDebug() << "cannot handle login request";
 }
 
-void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_logout_request(struct jxclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_logout_request(vClient->sendbuf, &vClient->len_senddata) == 0) {
@@ -422,7 +429,7 @@ void s_process_logout_request(struct csclient* vClient, struct sockaddr_in* vSer
     qDebug() << "cannot handle logout request";
 }
 
-void s_process_changeusername_request(QString vPasswd, QString vNewUsername, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_changeusername_request(QString vPasswd, QString vNewUsername, struct jxclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_changeusername_request(vPasswd.toLatin1().data(),
@@ -434,7 +441,7 @@ void s_process_changeusername_request(QString vPasswd, QString vNewUsername, str
     qDebug() << "cannot handle logout request";
 }
 
-void s_process_changepasswd_request(QString vPasswd, QString vNewPasswd, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_changepasswd_request(QString vPasswd, QString vNewPasswd, struct jxclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_changepasswd_request(vPasswd.toLatin1().data(),
@@ -446,7 +453,7 @@ void s_process_changepasswd_request(QString vPasswd, QString vNewPasswd, struct 
     qDebug() << "cannot handle logout request";
 }
 
-void s_process_changegrade_request(QString vPasswd, uint8_t vGrade, struct csclient* vClient, struct sockaddr_in* vServerAddr)
+void s_process_changegrade_request(QString vPasswd, uint8_t vGrade, struct jxclient* vClient, struct sockaddr_in* vServerAddr)
 {
     vClient->len_senddata = vClient->size_senbuf;
     if (am_account_changegrade_request(vPasswd.toLatin1().data(),

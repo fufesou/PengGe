@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-28
- * @modified  Wed 2015-12-09 19:34:13 (+0800)
+ * @modified  Wed 2016-01-06 22:47:20 (+0800)
  */
 
 #ifdef WIN32
@@ -37,6 +37,7 @@
 #include    "common/bufarray.h"
 #include    "common/list.h"
 #include    "common/clearlist.h"
+#include    "common/processlist.h"
 #include    "common/sock_types.h"
 #include    "common/lightthread.h"
 #include    "common/sock_wrap.h"
@@ -44,12 +45,7 @@
 #include    "cs/msgpool.h"
 #include    "cs/msgpool_dispatch.h"
 #include    "cs/server.h"
-#include    "am/account.h"
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 static char* s_serv_prompt = "server:";
 
@@ -58,12 +54,12 @@ static char* s_serv_prompt = "server:";
  */
 static struct jxmsgpool_dispatch s_msgpool_dispatch;
 
-void s_jxserver_clear(void* serv);
-static void s_init_msgpool_dispatch(struct jxserver* serv);
-static void s_clear_msgpool_dispatch(void* unused);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-static int s_msg_process(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen);
-static int s_msg_process_af(char* userdata, char* msg);
+static void s_jxserver_clear(void* serv);
+static void s_clear_msgpool_dispatch(void* unused);
 
 #ifdef __cplusplus
 }
@@ -92,9 +88,6 @@ void jxserver_init(struct jxserver *serv, int tcpudp, u_short port, u_long addr)
     jxsock_bind(serv->hsock, (struct sockaddr*)&serv->sa_in, sizeof(struct sockaddr_in));
     printf("%s bind() is OK\n", serv->prompt);
 
-    s_init_msgpool_dispatch(serv);
-
-    jxclearlist_add(s_clear_msgpool_dispatch, NULL);
     jxclearlist_add(s_jxserver_clear, serv);
 }
 
@@ -199,13 +192,28 @@ void jxserver_udp(struct jxserver* serv)
     printf("%s: finish receiving. closing the listening socket...\n", serv->prompt);
 }
 
-void s_init_msgpool_dispatch(struct jxserver* serv)
-{   
+void s_clear_msgpool_dispatch(void* unused)
+{
+    (void)unused;
+    if (s_msgpool_dispatch.pool_unprocessed.num_thread != 0) {
+        jxpool_clear(&s_msgpool_dispatch.pool_unprocessed);
+    }
+    if (s_msgpool_dispatch.pool_processed.num_thread != 0) {
+        jxpool_clear(&s_msgpool_dispatch.pool_processed);
+    }
+}
+
+JXIOT_API void jxserver_msgpool_dispatch_init(struct jxserver* serv, struct list_head* plist_head)
+{
+    if (!jxprocesslist_process_valid(plist_head)) {
+        jxwarning("invalid process list.");
+        return;
+    }
+
     jxmsgpool_dispatch_init(&s_msgpool_dispatch);
 
     s_msgpool_dispatch.prompt = "server msgpool_dispatch:";
-    s_msgpool_dispatch.process_msg = s_msg_process;
-    s_msgpool_dispatch.process_af_msg = s_msg_process_af;
+    s_msgpool_dispatch.processlist_head = plist_head;
 
     jxpool_init(
                 &s_msgpool_dispatch.pool_unprocessed,           /* struct jxmsgpool* pool */
@@ -213,9 +221,16 @@ void s_init_msgpool_dispatch(struct jxserver* serv)
                 SERVER_POOL_NUM_ITEM,                           /* int itemnum            */
                 NUM_THREAD,                                     /* int threadnum          */
                 (char*)(&serv->hsock),                       	/* char* userdatsa        */
-                sizeof(serv->hsock),							/* size_t size_userdat    */
+                sizeof(serv->hsock),							/* size_t size_userdata   */
                 jxmsgpool_process,                              /* pthread_proc_t proc    */
                 (void*)&s_msgpool_dispatch);                    /* void* pargs            */
+
+    jxclearlist_add(s_clear_msgpool_dispatch, NULL);
+
+    if (!jxprocesslist_process_af_valid(plist_head)) {
+        jxwarning("server do not register process_af functions.\n");
+        return ;
+    }
 
     jxpool_init(
                 &s_msgpool_dispatch.pool_processed,
@@ -226,63 +241,4 @@ void s_init_msgpool_dispatch(struct jxserver* serv)
                 sizeof(serv->hsock),
                 jxmsgpool_process_af,
                 (void*)&s_msgpool_dispatch);
-
-    jxclearlist_add(s_clear_msgpool_dispatch, NULL);
-}
-
-void s_clear_msgpool_dispatch(void* unused)
-{
-    (void)unused;
-    jxpool_clear(&s_msgpool_dispatch.pool_unprocessed);
-    jxpool_clear(&s_msgpool_dispatch.pool_processed);
-}
-
-/**
- * @brief  s_msg_dispatch message will be dispatched to account operations.
- *
- * @param inmsg The format of inmsg is \n
- * -----------------------------------------------------------------------------------------\n
- * | struct jxmsg_header | process id(uint32_t) | data(char*) | ... |                       \n
- * -----------------------------------------------------------------------------------------\n
- *
- * @outmsg
- * @outmsglen
- *
- * @return   
- */
-int s_msg_process(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
-{
-    int ret = 0;
-    uint32_t id_process = -1;
-    static uint32_t s_fixedlen = sizeof(struct jxmsg_header) + sizeof(uint32_t);
-    if (*outmsglen < s_fixedlen)
-    {
-        return 1;
-    }
-
-    jxmemcpy(outmsg, *outmsglen, inmsg, s_fixedlen);
-    *outmsglen -= s_fixedlen;
-
-    id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct jxmsg_header)));
-    ret = am_method_get(id_process)->reply(
-                inmsg + s_fixedlen,
-                &((struct jxmsg_header*)inmsg)->addr,
-                (uint32_t)((struct jxmsg_header*)inmsg)->addrlen,
-                outmsg + s_fixedlen,
-                outmsglen);
-
-    /** The length of variables.
-     *
-     * - s_fixedlen is only used here as a help variable, and stands for nothing.
-     * - *outmsglen is the same as length of total message(without struct jxmsg_header).
-     * - 'numbytes' in 'struct jxmsg_header' is the same as *outmsglen.
-     */
-    *outmsglen += sizeof(uint32_t);
-    ((struct jxmsg_header*)outmsg)->numbytes = htonl(*outmsglen);
-    return ret;
-}
-
-int s_msg_process_af(char* userdata, char* msg)
-{
-    return jxserver_send(*(jxsock_t*)userdata, msg);
 }

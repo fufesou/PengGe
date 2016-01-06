@@ -22,13 +22,16 @@
 #include  <semaphore.h>
 #endif
 
+#include  <assert.h>
 #include  <stdio.h>
 #include    "common/jxiot.h"
 #include    "common/cstypes.h"
 #include    "common/bufarray.h"
+#include    "common/list.h"
 #include    "common/sock_types.h"
 #include    "common/lightthread.h"
 #include    "common/msgwrap.h"
+#include    "common/processlist.h"
 #include    "cs/msgpool.h"
 #include    "cs/msgpool_dispatch.h"
 
@@ -45,8 +48,7 @@ extern "C"
 void jxmsgpool_dispatch_init(struct jxmsgpool_dispatch* pool_dispatch)
 {
     pool_dispatch->prompt = "jxmsgpool_dispatch:";
-    pool_dispatch->process_msg = 0;
-    pool_dispatch->process_af_msg = 0;
+    pool_dispatch->processlist_head = NULL;
 
     pool_dispatch->pool_processed.num_thread = 0;
     pool_dispatch->pool_unprocessed.num_thread = 0;
@@ -61,13 +63,15 @@ void* jxmsgpool_process(void* pool_dispatch)
     uint32_t outmsglen;
     char* msgbuf = NULL;
     char* outmsg = NULL;
+    pfunc_msgprocess_t pfunc_process = NULL;
+    pfunc_msgprocess_af_t pfunc_process_af = NULL;
     struct jxmsgpool_dispatch* msgpool_dispatch = (struct jxmsgpool_dispatch*)pool_dispatch;
     struct jxmsgpool* pool_unproc = &msgpool_dispatch->pool_unprocessed;
     struct jxmsgpool* pool_proced = &msgpool_dispatch->pool_processed;
 
     printf("%s child recv thread %d created.\n", msgpool_dispatch->prompt, jxthread_getpid());
 
-    if (msgpool_dispatch->process_msg == 0) {
+    if (!jxprocesslist_process_valid(msgpool_dispatch->processlist_head)) {
         printf("%s process_msg is not set, return 0.\n", msgpool_dispatch->prompt);
         return 0;
     }
@@ -82,24 +86,27 @@ void* jxmsgpool_process(void* pool_dispatch)
 
         msgbuf = jxpool_pullitem(pool_unproc, &pool_unproc->filled_buf);
 
-        if (msgpool_dispatch->process_af_msg != 0) {
-            while ((outmsg = jxpool_pullitem(pool_proced, &pool_proced->empty_buf)) == NULL)
-              ;
+        if ((pfunc_process = jxprocesslist_process_get(msgpool_dispatch->processlist_head, *msgbuf)) == NULL) {
+            assert(0);
+            fprintf(stderr, "message process function should never be NULL.\n");
         }
 
         printf("recv- thread id: %d, process message: %s.\n", jxthread_getpid(), msgbuf + sizeof(struct jxmsg_header));
 
         /** If 'process_af_msg' is not valid, outmsg buffer is unused in 'process_msg' */
-        if (msgpool_dispatch->process_af_msg != 0) {
+        if ((pfunc_process_af = jxprocesslist_process_af_get(msgpool_dispatch->processlist_head, *msgbuf))) {
+            while ((outmsg = jxpool_pullitem(pool_proced, &pool_proced->empty_buf)) == NULL)
+              ;
+
             outmsglen = pool_proced->len_item;
-            msgpool_dispatch->process_msg(msgbuf, outmsg, &outmsglen);
+            pfunc_process(msgbuf, outmsg, &outmsglen);
         } else {
-            msgpool_dispatch->process_msg(msgbuf, NULL, NULL);
+            pfunc_process(msgbuf, NULL, NULL);
         }
 
         jxpool_pushitem(pool_unproc, &pool_unproc->empty_buf, msgbuf);
 
-        if (msgpool_dispatch->process_af_msg != 0) {
+        if (pfunc_process_af) {
             if (outmsglen <= 0) {
                 jxpool_pushitem(pool_proced, &pool_proced->empty_buf, outmsg);
             } else {
@@ -119,15 +126,11 @@ void* jxmsgpool_process_af(void* pool_dispatch)
 #endif
 {
     char* outmsg = NULL;
+    pfunc_msgprocess_af_t pfunc_process_af = NULL;
     struct jxmsgpool_dispatch* msgpool_dispatch = (struct jxmsgpool_dispatch*)pool_dispatch;
     struct jxmsgpool* pool_proced = &msgpool_dispatch->pool_processed;
 
     printf("%s child send thread %d created.\n", msgpool_dispatch->prompt, jxthread_getpid());
-
-    if (msgpool_dispatch->process_af_msg == 0) {
-        printf("%s process_af_msg is not set, return 0.\n", msgpool_dispatch->prompt);
-        return 0;
-    }
 
     while (1) {
         jxsem_wait(&pool_proced->hsem_filled);
@@ -138,8 +141,11 @@ void* jxmsgpool_process_af(void* pool_dispatch)
 
         outmsg = jxpool_pullitem(pool_proced, &pool_proced->filled_buf);
 
-        msgpool_dispatch->process_af_msg(pool_proced->userdata, outmsg);
-        jxsleep(200);
+        if (!(pfunc_process_af = jxprocesslist_process_af_get(msgpool_dispatch->processlist_head, *outmsg))) {
+            printf("%s process_af_msg is not set, ingnore this message.\n", msgpool_dispatch->prompt);
+        } else {
+            pfunc_process_af(pool_proced->userdata, outmsg);
+        }
 
         jxpool_pushitem(pool_proced, &pool_proced->empty_buf, outmsg);
     }

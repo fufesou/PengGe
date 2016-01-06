@@ -6,7 +6,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-01
- * @modified  Sun 2015-12-06 15:14:15 (+0800)
+ * @modified  Wed 2016-01-06 22:29:36 (+0800)
  */
 
 #ifdef _MSC_VER 
@@ -40,38 +40,19 @@
 #include    "common/utility_wrap.h"
 #include    "common/clearlist.h"
 #include    "common/msgwrap.h"
+#include    "common/processlist.h"
+#include    "common/msgprocess.h"
 #include    "cs/msgpool.h"
 #include    "cs/msgpool_dispatch.h"
 #include    "cs/client.h"
 #include    "am/account.h"
 #include    "am/client_account.h"
 
-
-/**
- * @brief  s_react_dispatch The income message from server
- * will be handle by the coressponding 'react' method in this function.
- *
- * The actual process function will not process data until one byte after 'process id'. Thus
- * the message data passed into the process function is 'inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t)'.
- *
- * @param inmsg The format of inmsg is: \n
- * ---------------------------------------------------------------------------------------------- \n
- * | struct csmsg_header | process id(uint32_t) | process data(char*) | ... |                     \n
- * ---------------------------------------------------------------------------------------------- \n
- * or \n
- * ------------------------------------------------------------------------------------------------------------------------ \n
- * | struct csmsg_header | process id(uint32_t) | user id(uint32_t) | process data(char*) | ...                             \n
- * ------------------------------------------------------------------------------------------------------------------------ \n
- * @param outmsg
- * @param outmsglen
- */
-static int s_react_dispatch(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen);
-
 static int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen);
 
 int main(int argc, char* argv[])
 {
-    struct csclient udpclient;
+    struct jxclient udpclient;
     struct sockaddr_in serveraddr;
 	FILE* fp_input = NULL;
 	char data_input[1024];
@@ -81,24 +62,24 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    if (cs_fopen(&fp_input, "../client/input_test.txt", "r") != 0) {
+    if (jxfopen(&fp_input, "../client/input_test.txt", "r") != 0) {
         fprintf(stderr, "cannot open ../client/input_test.txt.\n");
 		exit(1);
 	}
 
-	cssock_envinit();
-    csclient_init(&udpclient, SOCK_DGRAM);
+    jxsock_envinit();
+    jxclient_init(&udpclient, SOCK_DGRAM);
 
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons((unsigned short)atoi(argv[2]));
     serveraddr.sin_addr.s_addr = inet_addr(argv[1]);
 
-
-    csclient_msgpool_dispatch_init(s_react_dispatch, NULL);
+    jxprocesslist_init();
+    jxclient_msgpool_dispatch_init(jxprocesslist_client_default_get());
 #define TEST_FILE_INPUT
 
 #ifdef TEST_FILE_INPUT
-    csclient_connect(udpclient.hsock_sendrecv, udpclient.prompt, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+    jxclient_connect(udpclient.hsock_sendrecv, udpclient.prompt, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
     while (!feof(fp_input)) {
         udpclient.len_senddata = udpclient.size_senbuf;
         data_input[0] = 0;
@@ -106,16 +87,16 @@ int main(int argc, char* argv[])
         if (s_msgdispatch(data_input, udpclient.sendbuf, &udpclient.len_senddata) != 0) {
 			fprintf(stderr, "dispatch message error.\n");
 		} else {
-			csclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+            jxclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 		}
 	}
 #else
-    csclient_udp(&udpclient, stdin, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+    jxclient_udp(&udpclient, stdin, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 #endif
 
 #undef TEST_FILE_INPUT
 
-    csclearlist_clear();
+    jxclearlist_clear();
 
 #ifdef _MSC_VER
 	system("pause");
@@ -148,10 +129,4 @@ int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
 	}
 
 	return 1;
-}
-
-int s_react_dispatch(char* inmsg, char* outmsg, __csinout uint32_t* outmsglen)
-{
-    uint32_t id_process = ntohl(*(uint32_t*)(inmsg + sizeof(struct csmsg_header)));
-    return am_method_get(id_process)->react(inmsg + sizeof(struct csmsg_header) + sizeof(uint32_t), outmsg, outmsglen);
 }

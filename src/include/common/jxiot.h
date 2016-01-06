@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-29
- * @modified  Tue 2016-01-05 21:53:08 (+0800)
+ * @modified  Wed 2016-01-06 22:50:45 (+0800)
  */
 
 // #define _CHECK_ARGS
@@ -111,9 +111,9 @@
  *
  * @{
  */
-#define MFLAG_SERVER_QUERY          0x00    /**< This message is the query from server that will be executed by client */
-#define MFLAG_SERVER_NOTIFY         0x01    /**< This message is just plain notification message that will be shown in client ui. */
-#define MFLAG_SERVER_LOG            0x02    /**< This message is just plain notification message that will be logged in client's log. */
+#define JX_MFLAG_SERVER_QUERY          0x00    /**< This message is the query from server that will be executed by client */
+#define JX_MFLAG_SERVER_NOTIFY         0x01    /**< This message is just plain notification message that will be shown in client ui. */
+#define JX_MFLAG_SERVER_LOG            0x02    /**< This message is just plain notification message that will be logged in client's log. */
 /** @} */
 
 /** @defgroup mflag_c definitions
@@ -123,22 +123,22 @@
  *
  * @{
  */
-#define MFLAG_CLIENT_QUERY          0x10    /**< This message will be treated as query in server. */
-#define MFLAG_CLIENT_NOTIFY         0x11    /**< This message will be shown in server's ui. */
-#define MFLAG_CLIENT_LOG            0x12    /**< This message will be shown in server's log. */
-#define MFLAG_CLIENT_COMMUNICATE_C  0x20    /**< This message will be delivered to another client. */
-#define MFLAG_CLIENT_COMMUNICATE_S  0x21    /**< This message will be shown in server's ui. */
-#define MFLAG_CLIENT_P2P            0x30    /**< This message will be regard as a 'p2p' reqeust message. */
+#define JX_MFLAG_CLIENT_QUERY          0x10    /**< This message will be treated as query in server. */
+#define JX_MFLAG_CLIENT_NOTIFY         0x11    /**< This message will be shown in server's ui. */
+#define JX_MFLAG_CLIENT_LOG            0x12    /**< This message will be shown in server's log. */
+#define JX_MFLAG_CLIENT_COMMUNICATE_C  0x20    /**< This message will be delivered to another client. */
+#define JX_MFLAG_CLIENT_COMMUNICATE_S  0x21    /**< This message will be shown in server's ui. */
+#define JX_MFLAG_CLIENT_P2P            0x30    /**< This message will be regard as a 'p2p' reqeust message. */
 /** @} */
 
 /** These mflags indicate whether current message session begins with server(or client) 
  *
  * The last 4 bits are reserved for server.
  * */
-#define MFLAG_BEGIN_SERVER(f) ((f) < 0x10)
-#define MFLAG_BEGIN_CLIENT(f) ((f) >= 0x10)
+#define JX_MFLAG_BEGIN_SERVER(f) ((f) < 0x10)
+#define JX_MFLAG_BEGIN_CLIENT(f) ((f) >= 0x10)
 
-#define MFLAG_WAIT_RECV(f) ((f) == MFLAG_CLIENT_QUERY)
+#define JX_MFLAG_WAIT_RECV(f) ((f) == JX_MFLAG_CLIENT_QUERY)
 
 /** @} */
 

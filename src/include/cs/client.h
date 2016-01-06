@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Tue 2016-01-05 23:17:27 (+0800)
+ * @modified  Wed 2016-01-06 21:09:43 (+0800)
  */
 
 #ifndef  CLIENT_UDP_H
@@ -159,7 +159,7 @@ JXIOT_API void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* se
  */
 JXIOT_API ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen);
 
-JXIOT_API void jxclient_msgpool_dispatch_init(struct list_head processlist_head);
+JXIOT_API void jxclient_msgpool_dispatch_init(struct list_head* plist_head);
 
 #ifdef __cplusplus
 }

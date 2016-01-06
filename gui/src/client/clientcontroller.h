@@ -15,7 +15,7 @@
 
 #include    "guitypes.h"
 
-QT_FORWARD_DECLARE_STRUCT(csclient)
+QT_FORWARD_DECLARE_STRUCT(jxclient)
 QT_FORWARD_DECLARE_CLASS(QWidget)
 
 namespace GuiCommon
@@ -68,7 +68,7 @@ namespace GuiClient
         QMap<QString, QWidget*> m_mapWidget;
 
         GuiCommon::CGuiThread* m_pSendThread;
-        struct csclient* m_pCSClient;
+        struct jxclient* m_pjxclient;
         struct sockaddr_in* m_pServerAddr;
     };
 }

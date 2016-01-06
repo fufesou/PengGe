@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-05
- * @modified  Tue 2016-01-05 22:39:21 (+0800)
+ * @modified  Wed 2016-01-06 22:18:15 (+0800)
  */
 
 #ifndef _PROCESSLIST_H
@@ -16,7 +16,7 @@ typedef int (JXIOT_CALLBACK *pfunc_msgprocess_af_t)(char* userdata, char* msg);
 
 struct list_process_t {
     struct list_head        listnode;
-    uint8_t                   mflag;
+    uint8_t                 mflag;
     pfunc_msgprocess_t      pprocess;
     pfunc_msgprocess_af_t   pprocess_af;
 };
@@ -35,7 +35,7 @@ struct list_process_t {
  */
 JXIOT_API void jxprocesslist_set(struct list_head* processlist_head, uint8_t mflag, pfunc_msgprocess_t pfunc_process, pfunc_msgprocess_af_t pfunc_process_af, int force);
 
-JXIOT_API void jxprocesslist_clear(void* processlist_head);
+JXIOT_API void JXIOT_CALLBACK jxprocesslist_clear(void* processlist_head);
 
 /**
  * @brief  jxprocesslist_process_valid this funtion checks whether a valid 'pprocess' is set in any list node.

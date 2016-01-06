@@ -14,7 +14,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
- * @modified  Tue 2016-01-05 23:17:07 (+0800)
+ * @modified  Wed 2016-01-06 21:10:45 (+0800)
  */
 
 #ifndef _MSGPOOL_DISPATCH
@@ -42,7 +42,7 @@ struct jxmsgpool_dispatch
      *
      * @sa struct list_process_t
      */
-    struct list_head processlist_head;
+    struct list_head* processlist_head;
 };
 
 /**

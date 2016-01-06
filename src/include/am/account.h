@@ -38,8 +38,8 @@ DECLARE_ACCOUNT_METHOD(account_changepasswd)
 DECLARE_ACCOUNT_METHOD(account_changegrade)
 
 
-typedef int (JXIOT_CALLBACK *pfunc_react_t)(char*, char*, __inout uint32_t*);
-typedef int (JXIOT_CALLBACK *pfunc_reply_t)(char*, const void*, uint32_t, char*, __inout uint32_t*);
+typedef int (JXIOT_CALLBACK *pfunc_react_t)(char*, char*, __jxinout uint32_t*);
+typedef int (JXIOT_CALLBACK *pfunc_reply_t)(char*, const void*, uint32_t, char*, __jxinout uint32_t*);
 
 /**
  * @brief  account_method_t This struct is used for method name-func mapping. This is useful when creating message request and replying request and reacting to the reply.

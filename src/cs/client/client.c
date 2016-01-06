@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Tue 2016-01-05 23:29:24 (+0800)
+ * @modified  Wed 2016-01-06 22:42:13 (+0800)
  */
 
 #ifdef WIN32
@@ -78,7 +78,7 @@ static void* JXIOT_CALLBACK s_thread_recv(void*);
 #endif
 
 static void s_msgpool_append(char* data, ssize_t numbytes);
-void s_clear_msgpool_dispatch(void* unused);
+static void s_clear_msgpool_dispatch(void* unused);
 
 #ifdef __cplusplus
 }
@@ -215,11 +215,11 @@ void s_msgpool_append(char* data, ssize_t numbytes)
     }
 }
 
-void jxclient_msgpool_dispatch_init(struct list_head processlist_head)
+void jxclient_msgpool_dispatch_init(struct list_head* plist_head)
 {   
     const int threadnum = 1; 
 
-    if (!jxprocesslist_process_valid(&processlist_head)) {
+    if (!jxprocesslist_process_valid(plist_head)) {
         jxwarning("invalid process list.");
         return;
     }
@@ -227,7 +227,7 @@ void jxclient_msgpool_dispatch_init(struct list_head processlist_head)
     jxmsgpool_dispatch_init(&s_msgpool_dispatch);
 
     s_msgpool_dispatch.prompt = "client msgpool_dispatch:";
-    s_msgpool_dispatch.processlist_head = processlist_head;
+    s_msgpool_dispatch.processlist_head = plist_head;
 
     jxpool_init(
                 &s_msgpool_dispatch.pool_unprocessed,       /* struct jxmsgpool* pool  */
@@ -241,7 +241,7 @@ void jxclient_msgpool_dispatch_init(struct list_head processlist_head)
 
     jxclearlist_add(s_clear_msgpool_dispatch, NULL);
 
-    if (!jxprocesslist_process_af_valid(&processlist_head)) {
+    if (!jxprocesslist_process_af_valid(plist_head)) {
         return ;
     }
 
@@ -259,11 +259,11 @@ void jxclient_msgpool_dispatch_init(struct list_head processlist_head)
 void s_clear_msgpool_dispatch(void* unused)
 {
     (void)unused;
-    if (s_msgpool_dispatch.pool_processed.num_thread != 0) {
-        jxpool_clear(&s_msgpool_dispatch.pool_processed);
-    }
     if (s_msgpool_dispatch.pool_unprocessed.num_thread != 0) {
         jxpool_clear(&s_msgpool_dispatch.pool_unprocessed);
+    }
+    if (s_msgpool_dispatch.pool_processed.num_thread != 0) {
+        jxpool_clear(&s_msgpool_dispatch.pool_processed);
     }
 }
 

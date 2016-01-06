@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-03
- * @modified  Tue 2016-01-05 00:10:29 (+0800)
+ * @modified  Wed 2016-01-06 22:51:18 (+0800)
  */
 
 #ifdef WIN32
@@ -129,7 +129,7 @@ ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr,
             return -2;
         }
 
-        if (MFLAG_WAIT_RECV(*cli->sendbuf)) {
+        if (JX_MFLAG_WAIT_RECV(*cli->sendbuf)) {
             return 0;
         }
 

@@ -13,7 +13,7 @@
 #include  <QVector>
 #include  <QThread>
 
-struct csclient;
+struct jxclient;
 struct sockaddr_in;
 
 namespace GuiCommon
@@ -31,7 +31,7 @@ namespace GuiCommon
         {}
         ~CGuiThread() {}
 
-        void setFixedArgs(struct csclient* vClient, struct sockaddr_in* vServAddr)
+        void setFixedArgs(struct jxclient* vClient, struct sockaddr_in* vServAddr)
         {
             m_pclient = vClient;
             m_pservaddr = vServAddr;
@@ -59,18 +59,18 @@ namespace GuiCommon
 
             if (m_vecArgs.size() == 0)
             {
-                ((void (*)(struct csclient*, struct sockaddr_in*))m_pfunc)
+                ((void (*)(struct jxclient*, struct sockaddr_in*))m_pfunc)
                         (m_pclient, m_pservaddr);
             }
             if (m_vecArgs.size() == 1)
             {
 
-                ((void (*)(QString, struct csclient*, struct sockaddr_in*))m_pfunc)
+                ((void (*)(QString, struct jxclient*, struct sockaddr_in*))m_pfunc)
                         (m_vecArgs[0], m_pclient, m_pservaddr);
             }
             if (m_vecArgs.size() == 2)
             {
-                ((void (*)(QString, QString, struct csclient*, struct sockaddr_in*))m_pfunc)
+                ((void (*)(QString, QString, struct jxclient*, struct sockaddr_in*))m_pfunc)
                         (m_vecArgs[0], m_vecArgs[1], m_pclient, m_pservaddr);
             }
             m_pfunc = NULL;
@@ -79,7 +79,7 @@ namespace GuiCommon
 
     private:
         void* m_pfunc;
-        struct csclient* m_pclient;
+        struct jxclient* m_pclient;
         struct sockaddr_in* m_pservaddr;
         QVector<QString> m_vecArgs;
     };
