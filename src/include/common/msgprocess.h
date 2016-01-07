@@ -10,10 +10,14 @@
 #ifndef _MSGPROCESS_H
 #define _MSGPROCESS_H
 
-void jxprocesslist_init(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-struct list_head* jxprocesslist_client_default_get(void);
-struct list_head* jxprocesslist_server_default_get(void);
+JXIOT_API void jxprocesslist_init(void);
+
+JXIOT_API struct list_head* jxprocesslist_client_default_get(void);
+JXIOT_API struct list_head* jxprocesslist_server_default_get(void);
 
 
 /** @defgroup client process functions
@@ -66,6 +70,10 @@ int JXIOT_CALLBACK jxprocess_server_am(char* inmsg, char*outmsg, __jxinout uint3
 int JXIOT_CALLBACK jxprocess_af_server_am(char* userdata, char* msg);
 
 /** @} */
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif //MSGPROCESS_H

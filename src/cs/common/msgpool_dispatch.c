@@ -84,6 +84,7 @@ void* jxmsgpool_process(void* pool_dispatch)
             break;
         }
 
+        /** The fist char of msgbuf is the mflag. */
         msgbuf = jxpool_pullitem(pool_unproc, &pool_unproc->filled_buf);
 
         if ((pfunc_process = jxprocesslist_process_get(msgpool_dispatch->processlist_head, *msgbuf)) == NULL) {
@@ -99,9 +100,10 @@ void* jxmsgpool_process(void* pool_dispatch)
               ;
 
             outmsglen = pool_proced->len_item;
-            pfunc_process(msgbuf, outmsg, &outmsglen);
+            *outmsg = *msgbuf;
+            pfunc_process(msgbuf + 1, outmsg + 1, &outmsglen);
         } else {
-            pfunc_process(msgbuf, NULL, NULL);
+            pfunc_process(msgbuf + 1, NULL, NULL);
         }
 
         jxpool_pushitem(pool_unproc, &pool_unproc->empty_buf, msgbuf);
@@ -139,12 +141,13 @@ void* jxmsgpool_process_af(void* pool_dispatch)
             break;
         }
 
+        /** The fist char of outmsg is the mflag. */
         outmsg = jxpool_pullitem(pool_proced, &pool_proced->filled_buf);
 
         if (!(pfunc_process_af = jxprocesslist_process_af_get(msgpool_dispatch->processlist_head, *outmsg))) {
             printf("%s process_af_msg is not set, ingnore this message.\n", msgpool_dispatch->prompt);
         } else {
-            pfunc_process_af(pool_proced->userdata, outmsg);
+            pfunc_process_af(pool_proced->userdata, outmsg + 1);
         }
 
         jxpool_pushitem(pool_proced, &pool_proced->empty_buf, outmsg);

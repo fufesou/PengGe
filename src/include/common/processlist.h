@@ -10,6 +10,10 @@
 #ifndef _PROCESSLIST_H
 #define _PROCESSLIST_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef int (JXIOT_CALLBACK *pfunc_msgprocess_t)(char* inmsg, char* outmsg, uint32_t* outmsglen);
 typedef int (JXIOT_CALLBACK *pfunc_msgprocess_af_t)(char* userdata, char* msg);
 
@@ -58,5 +62,10 @@ int jxprocesslist_process_af_valid(const struct list_head* processlist_head);
 pfunc_msgprocess_t jxprocesslist_process_get(const struct list_head* processlist_head, uint8_t mflag);
 
 pfunc_msgprocess_af_t jxprocesslist_process_af_get(const struct list_head* processlist_head, uint8_t mflag);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //PROCESSLIST_H
