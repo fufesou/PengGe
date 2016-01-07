@@ -21,7 +21,7 @@ extern "C" {
  * @brief  jxmsg_header describe the header in pool item. jxmsg_header is followed by the actual message data.
  *
  * @todo This message header shoud be devided into two parts: 1. used in this host 2. transmit between client and server.
- * 'addr' and 'addrlen' belong to the first part, 'header', and 'numbytes' belong to the second part.
+ * 'addr' and 'addrlen' belong to the first part, 'mlfag', 'header', and 'numbytes' belong to the second part.
  */
 struct jxmsg_header {
     /**
@@ -33,6 +33,13 @@ struct jxmsg_header {
      * @brief addrlen addrlen is only used in current host. It will be updated inmmediately after receiving.
      */
     uint8_t addrlen;
+
+    /**
+     * @brief mflag the message flag.
+     *
+     * @sa jxiot.h
+     */
+    mflag_t mflag;
 
     /**
      * @brief header 'header' will be transmit between client and server.

@@ -104,6 +104,8 @@
  * @{
 */
 
+typedef uint8_t mflag_t;
+
 /** @defgroup mflag_s definitions
  * @ingroup mflag
  * mflag_s indicates message sessions begin with server.

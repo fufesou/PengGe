@@ -139,10 +139,11 @@ JXIOT_API void jxclient_udp(struct jxclient* cli, FILE* fp, const struct sockadd
  * @param cli       cli has already been filled with data(end with '\0') to send.
  * @param servaddr
  * @param addrlen
+ * @param mflag		the message flag. @sa jxiot.h
  *
  * @note            the first byte of message buffer is the mflag.
  */
-JXIOT_API void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen);
+JXIOT_API void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen, mflag_t mflag);
 
 /**
  * @brief  jxclient_sendrecv
@@ -150,6 +151,7 @@ JXIOT_API void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* se
  * @param cli
  * @param servaddr
  * @param addrlen
+ * @param mflag		the message flag. @sa jxiot.h
  *
  * @return   
  * 1. number of bytes received.
@@ -157,7 +159,7 @@ JXIOT_API void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* se
  * 3. -2, if sendto error occurs.
  * 4. -3, if recvfrom error occurs.
  */
-JXIOT_API ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen);
+JXIOT_API ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen, mflag_t mflag);
 
 JXIOT_API void jxclient_msgpool_dispatch_init(struct list_head* plist_head);
 

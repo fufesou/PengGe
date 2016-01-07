@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
         if (s_msgdispatch(data_input, udpclient.sendbuf, &udpclient.len_senddata) != 0) {
 			fprintf(stderr, "dispatch message error.\n");
 		} else {
-            jxclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+            jxclient_udp_once(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr), *(data_input + 1));
 		}
 	}
 #else
@@ -108,24 +108,24 @@ int main(int argc, char* argv[])
 
 int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen)
 {
-	switch (*inmsg) {
+    switch (*inmsg) {
 		case '0':
-            return am_account_create_request(inmsg + 1, strchr(inmsg + 1, '\0') + 1, outmsg, outmsglen);
+            return am_account_create_request(inmsg + 2, strchr(inmsg + 2, '\0') + 1, outmsg, outmsglen);
 
 		case '1':
-            return am_account_verify_request(inmsg + 1, strchr(inmsg + 1, '\0') + 1, outmsg, outmsglen);
+            return am_account_verify_request(inmsg + 2, strchr(inmsg + 2, '\0') + 1, outmsg, outmsglen);
 
 		case '2':
-            return am_account_login_request(inmsg + 1, strchr(inmsg + 1, '\0') + 1, outmsg, outmsglen);
+            return am_account_login_request(inmsg + 2, strchr(inmsg + 2, '\0') + 1, outmsg, outmsglen);
 
         case '3':
             return am_account_logout_request(outmsg, outmsglen);
 
         case '4':
-            return am_account_changeusername_request(inmsg + 1, strchr(inmsg + 1, '\0') + 1, outmsg, outmsglen);
+            return am_account_changeusername_request(inmsg + 2, strchr(inmsg + 2, '\0') + 1, outmsg, outmsglen);
 
         case '5':
-            return am_account_changepasswd_request(inmsg + 1, strchr(inmsg+1, '\0') + 1, outmsg, outmsglen);
+            return am_account_changepasswd_request(inmsg + 2, strchr(inmsg+1, '\0') + 1, outmsg, outmsglen);
 	}
 
 	return 1;

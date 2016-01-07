@@ -77,7 +77,7 @@ void s_sendrecv_clear(void* unused);
 }
 #endif
 
-ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen)
+ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen, mflag_t mflag)
 {
     char outbuf[MAX_MSG_LEN];
     ssize_t recvbytes;
@@ -98,6 +98,7 @@ ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr,
 
     bufheader = (struct jxmsg_header*)outbuf;
 
+    bufheader->mflag = mflag;
     bufheader->header.seq = ++s_sendhdr.seq;
     rtt_newpack(&s_rttinfo);
     sendlen = sizeof(bufheader->addr);
@@ -111,7 +112,6 @@ ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr,
                     cli->sendbuf, cli->len_senddata) != 0) {
         return 1;
     }
-
 
     s_recv_stat = RECV_RESEND;
 
@@ -129,7 +129,7 @@ ssize_t jxclient_sendrecv(struct jxclient* cli, const struct sockaddr* servaddr,
             return -2;
         }
 
-        if (JX_MFLAG_WAIT_RECV(*cli->sendbuf)) {
+        if (!JX_MFLAG_WAIT_RECV(mflag)) {
             return 0;
         }
 

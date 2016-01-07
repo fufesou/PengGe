@@ -35,16 +35,6 @@
 #include    "cs/msgpool.h"
 #include    "cs/msgpool_dispatch.h"
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-
-#ifdef __cplusplus
-}
-#endif
-
 void jxmsgpool_dispatch_init(struct jxmsgpool_dispatch* pool_dispatch)
 {
     pool_dispatch->prompt = "jxmsgpool_dispatch:";
@@ -84,26 +74,28 @@ void* jxmsgpool_process(void* pool_dispatch)
             break;
         }
 
-        /** The fist char of msgbuf is the mflag. */
         msgbuf = jxpool_pullitem(pool_unproc, &pool_unproc->filled_buf);
 
-        if ((pfunc_process = jxprocesslist_process_get(msgpool_dispatch->processlist_head, *msgbuf)) == NULL) {
+        if (!(pfunc_process = jxprocesslist_process_get(
+                  msgpool_dispatch->processlist_head,
+                  GET_HEADER_DATA(msgbuf, mflag)))
+                ) {
             assert(0);
             fprintf(stderr, "message process function should never be NULL.\n");
         }
 
-        printf("recv- thread id: %d, process message: %s.\n", jxthread_getpid(), msgbuf + sizeof(struct jxmsg_header));
-
         /** If 'process_af_msg' is not valid, outmsg buffer is unused in 'process_msg' */
-        if ((pfunc_process_af = jxprocesslist_process_af_get(msgpool_dispatch->processlist_head, *msgbuf))) {
+        if ((pfunc_process_af = jxprocesslist_process_af_get(
+                 msgpool_dispatch->processlist_head,
+                 GET_HEADER_DATA(msgbuf, mflag)))
+                ) {
             while ((outmsg = jxpool_pullitem(pool_proced, &pool_proced->empty_buf)) == NULL)
               ;
 
             outmsglen = pool_proced->len_item;
-            *outmsg = *msgbuf;
-            pfunc_process(msgbuf + 1, outmsg + 1, &outmsglen);
+            pfunc_process(msgbuf, outmsg, &outmsglen);
         } else {
-            pfunc_process(msgbuf + 1, NULL, NULL);
+            pfunc_process(msgbuf, NULL, NULL);
         }
 
         jxpool_pushitem(pool_unproc, &pool_unproc->empty_buf, msgbuf);
@@ -141,13 +133,15 @@ void* jxmsgpool_process_af(void* pool_dispatch)
             break;
         }
 
-        /** The fist char of outmsg is the mflag. */
         outmsg = jxpool_pullitem(pool_proced, &pool_proced->filled_buf);
 
-        if (!(pfunc_process_af = jxprocesslist_process_af_get(msgpool_dispatch->processlist_head, *outmsg))) {
+        if (!(pfunc_process_af = jxprocesslist_process_af_get(
+                  msgpool_dispatch->processlist_head,
+                  GET_HEADER_DATA(outmsg, mflag)))
+                ) {
             printf("%s process_af_msg is not set, ingnore this message.\n", msgpool_dispatch->prompt);
         } else {
-            pfunc_process_af(pool_proced->userdata, outmsg + 1);
+            pfunc_process_af(pool_proced->userdata, outmsg);
         }
 
         jxpool_pushitem(pool_proced, &pool_proced->empty_buf, outmsg);

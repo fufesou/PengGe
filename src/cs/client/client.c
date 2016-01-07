@@ -169,22 +169,28 @@ void jxclient_connect(jxsock_t hsock, const char* prompt, const struct sockaddr*
 
 void jxclient_udp(struct jxclient* cli, FILE* fp, const struct sockaddr* servaddr, jxsocklen_t addrlen)
 {
+    char mflag;
+    char* buf = (char*)malloc(cli->size_senbuf);
     jxclient_connect(cli->hsock_sendrecv, cli->prompt, servaddr, addrlen);
-    while (fgets(cli->sendbuf, sizeof(cli->sendbuf), fp) != NULL) {
-        cli->sendbuf[strlen(cli->sendbuf) - 1] = '\0';
+
+    /** The first character of buf is the mflag. */
+    while (fgets(buf, cli->size_senbuf, fp) != NULL) {
+        mflag = *buf;
+        jxmemcpy(cli->sendbuf, cli->size_senbuf, buf + 1, strlen(buf + 1) + 1);
 
         if (strncmp(cli->sendbuf, g_exit, strlen(g_exit) + 1) == 0) {
             printf("%s exit.\n", cli->prompt);
             break;
         }
 
-        jxclient_udp_once(cli, servaddr, addrlen);
+        jxclient_udp_once(cli, servaddr, addrlen, mflag);
     }
+    free(buf);
 }
 
-void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen)
+void jxclient_udp_once(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen, mflag_t mflag)
 {
-    ssize_t numbytes = jxclient_sendrecv(cli, servaddr, addrlen);
+    ssize_t numbytes = jxclient_sendrecv(cli, servaddr, addrlen, mflag);
     if (numbytes > 0) {
         s_msgpool_append(cli->recvbuf, numbytes);
     }

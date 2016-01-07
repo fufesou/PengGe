@@ -120,13 +120,6 @@ ssize_t jxserver_recv(jxsock_t handle, void* inbuf, size_t inbytes)
     }
 #endif
 
-#ifdef _DEBUG
-    {
-        static int recvcount = 0;
-        printf("server: recvcount %d.\n", recvcount++);
-    }
-#endif
-
     return recvbytes - sizeof(struct jxmsg_header);
 }
 

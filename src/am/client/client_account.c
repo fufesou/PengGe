@@ -151,7 +151,7 @@ int am_account_logout_request(char* outmsg, uint32_t* outmsglen)
         return 1;
     }
     *(uint32_t*)outmsg = htonl(am_method_getid("account_logout"));
-    *(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
+    *(uint32_t*)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
     *outmsglen= sizeof(uint32_t) * 2;
     return 0;
 }
@@ -170,7 +170,7 @@ int am_account_changeusername_request(
         return 1;
     }
     *(uint32_t*)outmsg = htonl(am_method_getid("account_changeusername"));
-    *(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
+    *(uint32_t*)(outmsg + sizeof(uint32_t)) = htonl(s_account_client.account_basic.id);
 
     len_username_new = strlen(username_new);
     len_passwd = strlen(passwd);
@@ -375,26 +375,28 @@ int am_account_verify_react(char* inmsg, char* outmsg, __jxinout uint32_t* outms
         }
 
         s_account_client.account_basic.id = ntohl(s_account_client.account_basic.id);
-        fprintf(stdout, "client: account_verify succeed");
+        fprintf(stdout, "client: account_verify succeed.\n");
 
         if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
             fprintf(stdout, ", additional message from server - %s.\n", inmsg + 1 + sizeof(struct account_basic_t));
 
-           len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
-            assert(*outmsglen > (len_sig + len_result));
-            jxmemcpy(
-                        outmsg + len_sig + sizeof(uint32_t) + size_account + 1, 
-                        *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
-                        inmsg + 1 + size_account,
-                        strlen(inmsg + 1 + size_account) + 1);
-        } else {
+            if (outmsg != NULL) {
+                len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
+                assert(*outmsglen > (len_sig + len_result));
+                jxmemcpy(
+                            outmsg + len_sig + sizeof(uint32_t) + size_account + 1,
+                            *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
+                            inmsg + 1 + size_account,
+                            strlen(inmsg + 1 + size_account) + 1);
+            }
+        } else if (outmsg != NULL){
             len_result = 1 + size_account;
             assert(*outmsglen > (len_sig + len_result));
+            jxmemcpy(outmsg, *outmsglen, sig_msg, len_sig);
+            *((uint32_t*)(outmsg + len_sig)) = len_result;
+            *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
+            jxmemcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
         }
-        jxmemcpy(outmsg, *outmsglen, sig_msg, len_sig);
-        *((uint32_t*)(outmsg + len_sig)) = len_result;
-        *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
-        jxmemcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: %s fail, %s\n", sig_msg, inmsg + 1);
         if (outmsg != NULL) {
@@ -469,21 +471,23 @@ int am_account_login_react(char* inmsg, char* outmsg, __jxinout uint32_t* outmsg
         if (inmsg[1 + sizeof(struct account_basic_t)] != 0) {
             fprintf(stdout, "client: additional message from server - %s.\n", inmsg + 1 + size_account);
 
-            len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
-            assert(*outmsglen > (len_sig + len_result));
-            jxmemcpy(
-                        outmsg + len_sig + sizeof(uint32_t) + size_account + 1, 
-                        *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
-                        inmsg + 1 + size_account,
-                        strlen(inmsg + 1 + size_account) + 1);
-        } else {
+            if (outmsg != NULL) {
+                len_result = 1 + size_account + (int)strlen(inmsg + 1 + size_account) + 1;
+                assert(*outmsglen > (len_sig + len_result));
+                jxmemcpy(
+                            outmsg + len_sig + sizeof(uint32_t) + size_account + 1,
+                            *outmsglen - len_sig - sizeof(uint32_t) - size_account - 1,
+                            inmsg + 1 + size_account,
+                            strlen(inmsg + 1 + size_account) + 1);
+            }
+        } else if (outmsg != NULL){
             len_result = 1 + size_account;
             assert(*outmsglen > (len_sig + len_result));
+            jxmemcpy(outmsg, *outmsglen, sig_msg, len_sig);
+            *((uint32_t*)(outmsg + len_sig)) = len_result;
+            *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
+            jxmemcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
         }
-        jxmemcpy(outmsg, *outmsglen, sig_msg, len_sig);
-        *((uint32_t*)(outmsg + len_sig)) = len_result;
-        *(outmsg + len_sig + sizeof(uint32_t)) = g_succeed;
-        jxmemcpy(outmsg + len_sig + sizeof(uint32_t) + 1, *outmsglen - len_sig - sizeof(uint32_t) - 1, inmsg + 1, size_account);
     } else if (inmsg[0] == g_fail){
         fprintf(stderr, "client: %s fail, %s\n", sig_msg, inmsg + 1);
         if (outmsg != NULL) {

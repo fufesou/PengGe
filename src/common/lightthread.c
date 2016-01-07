@@ -25,19 +25,10 @@
 #include  <stdio.h>
 #include  <string.h>
 
+#include    "common/cstypes.h"
 #include    "common/jxiot.h"
 #include    "common/lightthread.h"
 #include    "common/timespan.h"
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
 
 /**
  * @brief The following block describe the windows thread functions.

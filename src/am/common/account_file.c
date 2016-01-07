@@ -25,6 +25,7 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <string.h>
+#include    "common/cstypes.h"
 #include    "common/jxiot.h"
 #include    "common/cstypes.h"
 #include    "common/config_macros.h"

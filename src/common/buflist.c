@@ -10,16 +10,16 @@
 #include  <malloc.h>
 #include  <stdio.h>
 #include  <assert.h>
-#include  "common/jxiot.h"
-#include  "common/list.h"
-#include  "common/buflist.h"
+#include    "common/cstypes.h"
+#include    "common/jxiot.h"
+#include    "common/list.h"
+#include    "common/buflist.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 static struct buf_node* s_create_bufnode(int buflen);
-
 
 #ifdef __cplusplus
 }
