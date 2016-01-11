@@ -24,8 +24,8 @@
 
 #include  <assert.h>
 #include  <stdio.h>
-#include    "common/jxiot.h"
 #include    "common/cstypes.h"
+#include    "common/jxiot.h"
 #include    "common/bufarray.h"
 #include    "common/list.h"
 #include    "common/sock_types.h"

@@ -26,8 +26,8 @@
 #include  <assert.h>
 #include  <stdio.h>
 #include  <string.h>
-#include    "common/jxiot.h"
 #include    "common/cstypes.h"
+#include    "common/jxiot.h"
 #include    "common/config_macros.h"
 #include    "am/account_macros.h"
 #include    "common/utility_wrap.h"

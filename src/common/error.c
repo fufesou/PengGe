@@ -17,8 +17,8 @@
 #include  <stdarg.h>
 #include  <stdio.h>
 #include  <stdlib.h>
-#include    "common/jxiot.h"
 #include    "common/cstypes.h"
+#include    "common/jxiot.h"
 #include    "common/error.h"
 #include    "common/list.h"
 #include    "common/sock_types.h"

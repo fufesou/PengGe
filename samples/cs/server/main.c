@@ -22,8 +22,8 @@
 
 #include  <stdio.h>
 #include  <stdlib.h>
-#include    "common/jxiot.h"
 #include    "common/cstypes.h"
+#include    "common/jxiot.h"
 #include    "common/sock_types.h"
 #include    "common/sock_wrap.h"
 #include    "common/list.h"

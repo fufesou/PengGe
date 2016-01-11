@@ -200,9 +200,9 @@ void s_sendrecv_init(void)
 {
     if (s_mutex_inited == 0) {
         s_mutex = jxmutex_create();
+        jxclearlist_add(s_sendrecv_clear, NULL);
+        s_mutex_inited = 1;
     }
-
-    jxclearlist_add(s_sendrecv_clear, NULL);
 }
 
 void s_sendrecv_clear(void* unused)
