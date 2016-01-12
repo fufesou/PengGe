@@ -275,7 +275,10 @@ void s_clear_msgpool_dispatch(void* unused)
 
 int jxclient_thread_recv(struct jxclient* cli, const struct sockaddr* servaddr, jxsocklen_t addrlen)
 {
-    struct recv_params_t recv_params = { cli, servaddr, addrlen };
+    static struct recv_params_t recv_params;
+    recv_params.pcli = cli;
+    recv_params.pservaddr = servaddr;
+    recv_params.addrlen = addrlen;
     return jxthread_create(s_thread_recv, &recv_params, &s_recv_thread);
 }
 
@@ -308,11 +311,13 @@ void* JXIOT_CALLBACK s_thread_recv(void* recv_params)
     jxclearlist_add(s_thread_recv_clear, NULL);
     pbuf = (char*)malloc(precv_params->pcli->size_recvbuf);
 
-    jxclient_connect(precv_params->pcli->hsock_recv, precv_params->pcli->prompt, precv_params->pservaddr, precv_params->addrlen);
+    // jxclient_connect(precv_params->pcli->hsock_recv, precv_params->pcli->prompt, precv_params->pservaddr, precv_params->addrlen);
 
     while (!s_isRecvEnd) {
         recvlen = recvfrom(precv_params->pcli->hsock_recv, pbuf, precv_params->pcli->size_recvbuf, 0, NULL, NULL);
-        s_msgpool_append(pbuf, recvlen);
+        if (recvlen > 0) {
+            s_msgpool_append(pbuf, recvlen);
+        }
     }
 
     free(pbuf);

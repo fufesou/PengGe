@@ -182,7 +182,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\common\msgprocess.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\common\msgwrap.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\common\processlist.c"
 					>
 				</File>
 				<File
@@ -206,6 +214,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\cs\client\client_sendrecv.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\cs\common\msgpool.c"
 					>
 				</File>
@@ -219,14 +231,6 @@
 				</File>
 				<File
 					RelativePath="..\..\src\cs\server\server.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\cs\client\unix_client_sendrecv.c"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\cs\client\win_client_sendrecv.c"
 					>
 				</File>
 			</Filter>
@@ -260,6 +264,114 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\..\src\include\am\account.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\am\account_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\am\account_login.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\am\account_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\bufarray.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\buflist.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\clearlist.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\cs\client.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\am\client_account.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\config_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\cstypes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\error.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\jxiot.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\lightthread.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\list.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\cs\msgpool.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\cs\msgpool_dispatch.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\msgprocess.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\msgwrap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\processlist.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\cs\server.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\am\server_account.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\sock_types.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\sock_wrap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\timespan.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\cs\unprtt.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\common\utility_wrap.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

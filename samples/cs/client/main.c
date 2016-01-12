@@ -10,7 +10,7 @@
  */
 
 #ifdef _MSC_VER 
-#pragma comment(lib, "../../../build/lib/pgcsd.lib")
+#pragma comment(lib, "../../Debug/pgcsd.lib")
 #endif
 
 #ifdef WIN32
@@ -79,6 +79,9 @@ int main(int argc, char* argv[])
 #define TEST_FILE_INPUT
 
 #ifdef TEST_FILE_INPUT
+
+    jxclient_thread_recv(&udpclient, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+
     jxclient_connect(udpclient.hsock_sendrecv, udpclient.prompt, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
     while (!feof(fp_input)) {
         udpclient.len_senddata = udpclient.size_senbuf;

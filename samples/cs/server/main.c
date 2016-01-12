@@ -8,7 +8,8 @@
  */
 
 #ifdef _MSC_VER 
-#pragma comment(lib, "../../../build/lib/pgcsd.lib")
+//#pragma comment(lib, "../../Debug/pgcsd.lib")
+#pragma comment(lib, "D:/Projects/PengGe/samples/Debug/pgcsd.lib")
 #endif
 
 #ifdef WIN32
