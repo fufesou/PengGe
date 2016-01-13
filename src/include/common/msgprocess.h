@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-06
- * @modified  Wed 2016-01-06 22:35:41 (+0800)
+ * @modified  Tue 2016-01-12 23:12:07 (+0800)
  */
 
 #ifndef _MSGPROCESS_H
@@ -66,8 +66,22 @@ int JXIOT_CALLBACK jxprocess_client_am(char* inmsg, char*outmsg, __jxinout uint3
  *
  * @return   
  */
-int JXIOT_CALLBACK jxprocess_server_am(char* inmsg, char*outmsg, __jxinout uint32_t* outmsglen);
+int JXIOT_CALLBACK jxprocess_server_am(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen);
 int JXIOT_CALLBACK jxprocess_af_server_am(char* userdata, char* msg);
+
+/**
+ * @brief  jxprocess_server_port handle the process of registering client receiving socket's port.
+ *
+ * @param inmsg        The format of inmsg is \n
+ * -----------------------------------------------------------------------------------------\n
+ * | struct jxmsg_header | ... |                                                            \n
+ * -----------------------------------------------------------------------------------------\n
+ * @param outmsg        unused
+ * @param outmsglen     unused
+ *
+ * @return   
+ */
+int JXIOT_CALLBACK jxprocess_server_port(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen);
 
 /** @} */
 

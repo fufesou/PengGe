@@ -116,12 +116,16 @@ ssize_t jxserver_recv(jxsock_t handle, void* inbuf, size_t inbytes)
         char addrstr[INET6_ADDRSTRLEN + 1];
         printf("server: recefrom() client ip: %s, port: %d.\n",
                jxsock_inet_ntop(AF_INET, &((struct sockaddr_in*)&cliaddr)->sin_addr, addrstr, sizeof(addrstr)),
-               htons(((struct sockaddr_in*)&cliaddr)->sin_port));
+               ntohs(((struct sockaddr_in*)&cliaddr)->sin_port));
     }
 #endif
 
     return recvbytes - sizeof(struct jxmsg_header);
 }
+
+#ifdef _DEBUG
+#include    "common/regportlist.h"
+#endif
 
 int jxserver_send(jxsock_t handle, void* sendbuf)
 {
@@ -136,7 +140,7 @@ int jxserver_send(jxsock_t handle, void* sendbuf)
         char addrstr[INET6_ADDRSTRLEN + 1];
         printf("server: client ip: %s, port: %d.\n",
                jxsock_inet_ntop(AF_INET, &((struct sockaddr_in*)&msghdr->addr)->sin_addr, addrstr, sizeof(addrstr)),
-               htons(((struct sockaddr_in*)&msghdr->addr)->sin_port));
+               ntohs(((struct sockaddr_in*)&msghdr->addr)->sin_port));
     }
 #endif
 
@@ -149,6 +153,21 @@ int jxserver_send(jxsock_t handle, void* sendbuf)
         return 1;
     }
 
+#ifdef _DEBUG
+    {
+        unsigned short port;
+        if (jxregportlist_query(&((struct sockaddr_in*)&msghdr->addr)->sin_addr, &port)) {
+            printf("not registered!\n");
+        } else {
+        ((struct sockaddr_in*)&msghdr->addr)->sin_port = port;
+        sendbytes = sendto(handle, "hello", 6, 0, &msghdr->addr, (jxsocklen_t)msghdr->addrlen);
+        if (sendbytes != 6) {
+            fprintf(stderr, "server: sendto() fail, error code: %d.\n", jxsock_get_last_error());
+        }
+        }
+    }
+#endif
+
     return 0;
 }
 
@@ -158,7 +177,7 @@ void jxserver_udp(struct jxserver* serv)
     int numbytes = 0;
     struct jxmsgpool* recvpool = &s_msgpool_dispatch.pool_unprocessed;
 
-    printf("%s: I\'m ready to receive a datagram...\n", serv->prompt);
+    printf("%s I\'m ready to receive a datagram...\n", serv->prompt);
     while (1) {
 
         /** @brief block untile one buffer avaliable. */
@@ -166,23 +185,19 @@ void jxserver_udp(struct jxserver* serv)
                     ;
 
         numbytes = jxserver_recv(serv->hsock, buf, recvpool->len_item);
-        if (numbytes > 0) {
+        if (numbytes >= 0) {
 
             /** Push to pool will succeed in normal case. There is no need to test the return value. */
             jxpool_pushitem(recvpool, &recvpool->filled_buf, buf);
             jxsem_post(&recvpool->hsem_filled);
         }
-        else if (numbytes <= 0) {
-            printf("%s: connection closed with error code: %d\n", serv->prompt, jxsock_get_last_error());
-            break;
-        }
         else {
-            printf("%s: recvfrom() failed with error code: %d\n", serv->prompt, jxsock_get_last_error());
+            printf("%s recvfrom() failed with error code: %d\n", serv->prompt, jxsock_get_last_error());
             break;
         }
     }
 
-    printf("%s: finish receiving. closing the listening socket...\n", serv->prompt);
+    printf("%s finish receiving. closing the listening socket...\n", serv->prompt);
 }
 
 void s_clear_msgpool_dispatch(void* unused)

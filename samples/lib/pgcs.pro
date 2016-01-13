@@ -28,6 +28,7 @@ HEADERS += \
     ../../src/include/common/clearlist.h \
     ../../src/include/common/processlist.h \
     ../../src/include/common/msgprocess.h \
+    ../../src/include/common/regportlist.h \
     ../../src/include/common/config_macros.h \
     ../../src/include/common/cstypes.h \
     ../../src/include/common/error.h \
@@ -57,6 +58,7 @@ SOURCES += \
     ../../src/common/clearlist.c \
     ../../src/common/processlist.c \
     ../../src/common/msgprocess.c \
+    ../../src/common/regportlist.c \
     ../../src/common/global.c \
     ../../src/common/lightthread.c \
     ../../src/common/list.c \

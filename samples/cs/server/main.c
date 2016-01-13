@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-25
- * @modified
+ * @modifiedWed 2016-01-13 22:58:19 (+0800)
  */
 
 #ifdef _MSC_VER 
@@ -39,6 +39,7 @@ void s_check_args(int argc, char* argv[]);
 
 int main(int argc, char* argv[])
 {
+    /** the server object must live to the end of process. */
     struct jxserver udpserver;
 
     s_check_args(argc, argv);

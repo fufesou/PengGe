@@ -6,7 +6,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-01
- * @modified  Wed 2016-01-06 22:29:36 (+0800)
+ * @modified  Wed 2016-01-13 22:57:39 (+0800)
  */
 
 #ifdef _MSC_VER 
@@ -52,6 +52,7 @@ static int s_msgdispatch(const char* inmsg, char* outmsg, uint32_t* outmsglen);
 
 int main(int argc, char* argv[])
 {
+    /** the client object and server socket address must live to the end of process. */
     struct jxclient udpclient;
     struct sockaddr_in serveraddr;
 	FILE* fp_input = NULL;

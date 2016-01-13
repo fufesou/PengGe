@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-06
- * @modified  Wed 2016-01-06 23:02:50 (+0800)
+ * @modified  Wed 2016-01-13 22:55:49 (+0800)
  */
 
 #ifdef WIN32
@@ -26,6 +26,7 @@
 #include    "common/processlist.h"
 #include    "common/msgprocess.h"
 #include    "common/clearlist.h"
+#include    "common/regportlist.h"
 #include    "common/msgwrap.h"
 #include    "cs/server.h"
 #include    "am/account.h"
@@ -63,6 +64,7 @@ void s_processlist_client_init(void)
 void s_processlist_server_init(void)
 {
     jxprocesslist_set(&s_processlist_server, JX_MFLAG_CLIENT_QUERY, jxprocess_server_am, jxprocess_af_server_am, 0);
+    jxprocesslist_set(&s_processlist_server, JX_MFLAG_CLIENT_PORT_REGISTER, jxprocess_server_port, NULL, 0);
 }
 
 void jxprocesslist_init(void)
@@ -138,6 +140,20 @@ int JXIOT_CALLBACK jxprocess_server_am(char* inmsg, char*outmsg, __jxinout uint3
 int JXIOT_CALLBACK jxprocess_af_server_am(char* userdata, char* msg)
 {
     return jxserver_send(*(jxsock_t*)userdata, msg);
+}
+
+int JXIOT_CALLBACK jxprocess_server_port(char* inmsg, char* outmsg, __jxinout uint32_t* outmsglen)
+{
+    struct jxmsg_header* regportmsg_header = (struct jxmsg_header*)inmsg;
+
+    (void)outmsg;
+    (void)outmsglen;
+
+    return jxregportlist_register(
+                &((struct sockaddr_in*)(&regportmsg_header->addr))->sin_addr,
+                sizeof(struct in_addr),
+                ((struct sockaddr_in*)(&regportmsg_header->addr))->sin_port,
+                0);
 }
 
 /** @} */

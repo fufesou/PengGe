@@ -4,7 +4,7 @@
  * @author cxl, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
- * @modified  Wed 2016-01-06 22:42:13 (+0800)
+ * @modified  Wed 2016-01-13 21:11:26 (+0800)
  */
 
 #ifdef WIN32
@@ -296,31 +296,66 @@ void* JXIOT_CALLBACK s_thread_recv(void* recv_params)
     char* pbuf = NULL;
     int blocking = 0;
     ssize_t recvlen = 0;
+    ssize_t sizebuf = 0;
+    jxsock_t hsock_recv;
+    struct sockaddr* servaddr = NULL;
+    jxsocklen_t servaddrlen = 0;
     struct recv_params_t* precv_params = recv_params;
 
-    precv_params->pcli->hsock_recv = jxsock_open(SOCK_DGRAM);
-    if (jxsock_block(precv_params->pcli->hsock_recv, blocking) != 0) {
-        fprintf(stderr, "client: set socket to blocking mode failed, error code: %d\n", jxsock_get_last_error());
+    /** initialize receive socket */
+    {
+        servaddrlen = precv_params->addrlen;
+        servaddr = (struct sockaddr*)malloc(servaddrlen);
+        jxmemcpy(servaddr, servaddrlen, precv_params->pservaddr, servaddrlen);
+
+        sizebuf = precv_params->pcli->size_recvbuf;
+        hsock_recv = precv_params->pcli->hsock_recv = jxsock_open(SOCK_DGRAM);
+        if (jxsock_block(hsock_recv, blocking) != 0) {
+            fprintf(stderr, "client: set socket to blocking mode failed, error code: %d\n", jxsock_get_last_error());
 #ifdef WIN32
-        return JX_NORMAL_ERR;
+            return JX_NORMAL_ERR;
 #else
-        return (void*)JX_NORMAL_ERR;
+            return (void*)JX_NORMAL_ERR;
 #endif
+        }
+
+        jxclearlist_add(s_thread_recv_clear, NULL);
     }
 
-    jxclearlist_add(s_thread_recv_clear, NULL);
-    pbuf = (char*)malloc(precv_params->pcli->size_recvbuf);
+    pbuf = (char*)malloc(sizebuf);
 
-    // jxclient_connect(precv_params->pcli->hsock_recv, precv_params->pcli->prompt, precv_params->pservaddr, precv_params->addrlen);
+    /** send the port register message */
+    {
+        ((struct jxmsg_header*)pbuf)->mflag = JX_MFLAG_CLIENT_PORT_REGISTER;
+        if (sendto(
+                        hsock_recv,
+                        pbuf,
+                        sizeof(struct jxmsg_header),
+                        0,
+                        servaddr,
+                        servaddrlen) != sizeof(struct jxmsg_header)) {
+            fprintf(stderr, "client: register client receiving socket's port error.\n");
+#ifdef WIN32
+            return JX_NORMAL_ERR;
+#else
+            return (void*)JX_NORMAL_ERR;
+#endif
+        }
+    }
 
     while (!s_isRecvEnd) {
-        recvlen = recvfrom(precv_params->pcli->hsock_recv, pbuf, precv_params->pcli->size_recvbuf, 0, NULL, NULL);
+        recvlen = recvfrom(hsock_recv, pbuf, sizebuf, 0, NULL, NULL);
         if (recvlen > 0) {
+#ifdef _DEBUG
+            printf("%s\n", pbuf);
+#else
             s_msgpool_append(pbuf, recvlen);
+#endif
         }
     }
 
     free(pbuf);
+    free(servaddr);
 
     return 0;
 }

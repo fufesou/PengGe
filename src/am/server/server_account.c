@@ -157,10 +157,20 @@ static int s_account_create(struct account_tmp_t* account_tmp, struct account_da
 {
     struct list_account_tmp_t* node_tmp = NULL;
     struct list_head* delnode = NULL;
+    const uint32_t interval = 10 * 60;
+    jxtimelong_t curtime;
 
     (void)unused;
 
+    jxtimelong_cur(&curtime);
+
     while (!s_thread_exit) {
+        if (jxtimelong_span_sec(&curtime) > interval) {
+            jxtimelong_cur(&curtime);
+        } else {
+            continue;
+        }
+
         delnode = s_list_tmp.next;
         while (delnode != (&s_list_tmp)) {
 
@@ -174,7 +184,7 @@ static int s_account_create(struct account_tmp_t* account_tmp, struct account_da
             jxmutex_unlock(&s_mutex_tmp);
         }
 
-        jxsleep(10 * 60 * 1000);
+        // jxsleep(10 * 60 * 1000);
     }
 
     return 0;
