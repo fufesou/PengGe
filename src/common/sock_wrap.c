@@ -8,8 +8,8 @@
  */
 
 #ifdef WIN32
-#include  <ws2tcpip.h>
 #include  <winsock2.h>
+#include  <ws2tcpip.h>
 #include  <windows.h>
 #define BLOCK_RW        0
 #define NONBLICK_RW     0
@@ -100,7 +100,9 @@ void jxaddrin_set(struct sockaddr_in* addr_in, const char* ip, int port)
     memset(addr_in, 0, sizeof(struct sockaddr_in));
     addr_in->sin_family = AF_INET;
     if (ip) {
-        addr_in->sin_addr.s_addr = inet_addr(ip);
+        if (jxsock_inet_pton(AF_INET, ip, &addr_in->sin_addr.s_addr) == 0) {
+            jxfatal("the ip: \"%s\" is not a valid ipv4 address.\n", ip);
+        }
     }
     else {
         addr_in->sin_addr.s_addr = htonl(INADDR_ANY);
@@ -313,7 +315,7 @@ int jxsock_inet_pton(int af, const char* src, void* dst)
 #ifdef UNICODE
     swprintf_s(src_copy, sizeof(src_copy) / sizeof(src_copy[0]), L"%hs", src);
 #else
-    strncpy(src_copy, src, INET6_ADDRSTRLEN);
+    strncpy_s(src_copy, sizeof(src_copy) / sizeof(src_copy[0]), src, INET6_ADDRSTRLEN);
 #endif
 
     src_copy[INET6_ADDRSTRLEN] = 0;

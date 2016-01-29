@@ -9,11 +9,14 @@
  * @modified  Wed 2016-01-06 22:29:36 (+0800)
  */
 
+#ifndef CMAKE_PRO
 #ifdef _MSC_VER 
 #pragma comment(lib, "../../../build/lib/pgcsd.lib")
 #endif
+#endif
 
 #ifdef WIN32
+#include  <WS2tcpip.h>
 #include  <winsock2.h>
 #include  <windows.h>
 #else
@@ -42,6 +45,7 @@
 #include    "common/msgwrap.h"
 #include    "common/processlist.h"
 #include    "common/msgprocess.h"
+#include    "common/error.h"
 #include    "cs/msgpool.h"
 #include    "cs/msgpool_dispatch.h"
 #include    "cs/client.h"
@@ -72,7 +76,10 @@ int main(int argc, char* argv[])
 
     serveraddr.sin_family = AF_INET;
     serveraddr.sin_port = htons((unsigned short)atoi(argv[2]));
-    serveraddr.sin_addr.s_addr = inet_addr(argv[1]);
+
+    if (jxsock_inet_pton(AF_INET, argv[1], &serveraddr.sin_addr.s_addr) == 0) {
+        jxfatal("the ip: \"%s\" is not a valid ipv4 address.\n");
+    }
 
     jxprocesslist_init();
     jxclient_msgpool_dispatch_init(jxprocesslist_client_default_get());

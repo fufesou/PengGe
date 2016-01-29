@@ -9,6 +9,8 @@ set(JXIOT_VERSION "${JXIOT_VERSION_MAJOR}.${JXIOT_VERSION_MINOR}")
 set(JXIOT_BRIEF "${JXIOT_NAME} is a simple communication utility project for users.")
 set(PROJECT_ROOT_DIR "${PROJECT_SOURCE_DIR}")
 
+add_definitions(-DCMAKE_PRO)
+
 option(JXIOT_TEST_ENABLED "enable tests build" ON)
 
 if(NOT COMMAND if_defined_set)

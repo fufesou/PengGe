@@ -50,7 +50,7 @@ unsigned int __stdcall jxmsgpool_process(void* pool_dispatch)
 void* jxmsgpool_process(void* pool_dispatch)
 #endif
 {
-    uint32_t outmsglen;
+    uint32_t outmsglen = 0;
     char* msgbuf = NULL;
     char* outmsg = NULL;
     pfunc_msgprocess_t pfunc_process = NULL;

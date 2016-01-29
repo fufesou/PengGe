@@ -7,8 +7,10 @@
  * @modified
  */
 
+#ifndef CMAKE_PRO
 #ifdef _MSC_VER 
 #pragma comment(lib, "../../../build/lib/pgcsd.lib")
+#endif
 #endif
 
 #ifdef WIN32

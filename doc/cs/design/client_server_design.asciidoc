@@ -7,7 +7,9 @@ v1.0, 2015-9-19
 :doctype: article
 :description:
 :icons: font
-:source-highlighter: highlightjs
+:source-highlighter: pygments
+:pygments-style: manni
+:pygments-linenums-mode: inline
 :linkcss!:
 :numbered:
 :idprefix:
@@ -62,7 +64,7 @@ message header数据结构定义在msgwrap.h中，基结构如<<csmsg_header,csm
 . numbytes于用记录消息数据(除开头部)的长度。
 --
 
-[source,c]
+[source,c,linenums]
 .csmsg_header
 ----
 struct csmsg_header
