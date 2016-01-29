@@ -1,0 +1,75 @@
+= jxiot - cs 消息处理方式
+陈小龙 <34814491@qq.com>
+v1.0, 2015-1-29
+:library: Asciidoctor
+:imagesdir: images
+:lang: zh-cmn-Hans
+:doctype: article
+:description:
+:icons: font
+:source-highlighter: pygments
+:pygments-style: manni
+:pygments-linenums-mode: inline
+:linkcss!:
+:numbered:
+:idprefix:
+:toc: right
+:toclevels: 3
+:experimental:
+
+== 消息处理过程简述
+
+jxiot的通信使用消息池和多线程处理。
+
+当有消息到达时，若消息池未满，则将到达的消息存放在消息池中。然后通过信号量(semaphore)异步通知线程处理消息。
+
+本文仅说明消息的处理方式。client和server的消息处理流程如下所示，整个消息过程依靠回调函数和信号量驱动。
+
+    ,--------------------.     
+    |    message in      |      
+    `--------------------'      
+              |                 
+              v                 
+    ,=======================.   
+    |    message buffer 1   |   
+    `======================='   
+              |                 
+              v                 
+      ,--------------------.    
+     /  process message   /     
+     `-------------------'      
+              |                 
+              v                 
+    ,========================.  
+    |    message buffer 2    |  
+    `========================'  
+              |                 
+              v                 
+      ,----------------------.  
+     /  process message af  /   
+     `---------------------'    
+              |                 
+              v                 
+    ,--------------------.
+    |    message out     |      
+    `--------------------'      
+
+
+cs分别为client和sever各维护一个回调函数队列，队列的每个项中包含_prcess message_和
+_process_message_af_回调函数指针。消息队列的定义和操作在processlist.h和processlist.c中。
+
+[source,c,linenums]
+.[processlist.h]
+--
+struct list_process_t {
+    struct list_head        listnode;
+    uint8_t                 mflag;
+    pfunc_msgprocess_t      pprocess;
+    pfunc_msgprocess_af_t   pprocess_af;
+};
+--
+
+mflag标志不同的消息类型。mflag的详细定义请参考#还未写#。
+
+有消息需要处理时，在client或server的消息处理链表中，根据mflag查找相应处理函数，再进行处理(若未找到相应处理函数，即返回NULL，则忽略消息)。
+消息队列的定义和绑定在msgprocess.h和msgprocess.c中。

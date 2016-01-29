@@ -1,0 +1,65 @@
+= jxiot - 消息池设计
+陈小龙 <34814491@qq.com>
+v1.0, 2015-1-29
+:library: Asciidoctor
+:imagesdir: images
+:lang: zh-cmn-Hans
+:doctype: article
+:description:
+:icons: font
+:source-highlighter: pygments
+:pygments-style: manni
+:pygments-linenums-mode: inline
+:linkcss!:
+:numbered:
+:idprefix:
+:toc: right
+:toclevels: 3
+:experimental:
+
+== 消息池概述
+
+消息池用于存放消息和通知线程处理函数对消息进行处理。
+
+消息池参考生产者消费者模式设计
+
+[source,c,linenums]
+--
+    int len_item;                   // 确定每个item的存储长度
+    int num_item;                   // 一共有多少个item
+    struct array_buf filled_buf;    // filled message buffer，循环队列，里面的item都存有未处理的消息
+    struct array_buf empty_buf;     // empty message buffer，循环队列，里面的item都不含消息数据
+
+    jxmutex_t hmutex;               // 用于同步message buffer的item的加入(push)和取出(pull)操作
+    jxsem_t hsem_filled;            // 信号量，标志当前有多少个未处理的消息，并发信号通知线程处理
+
+    ...
+--
+
+== 消息池分类
+
+消息池可分为公共消息池，私有消息池。
+
+=== 消息池链表
+
+消息池有多个，挂载到消息池链表中。需要处理特定对象的消息时，便在链表查找相应消息池对象，再进行处理。
+
+消息池链表的处理方式是若有可以处理的消息，则发送处理信号量，并将消息池对象的指针(以及相关处理信息)挂到待处理的消息池队列中。
+等线程取消息池指针，并进行处理。
+
+=== 公共消息池
+
+.公共消息池的消息特征
+----
+. 不重要的消息
+. 总消息长度在公共消息池消息单元长度范围内
+. 不需要排序的消息
+----
+
+=== 私有消息池
+
+.私有消息池的消息特征
+----
+. 重要消息，需要较快处理
+. 需要排序的消息
+----
