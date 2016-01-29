@@ -2,24 +2,5 @@ cmake_minimum_required(VERSION 3.2.0 FATAL_ERROR)
 project(jx_server)
 
 set(TARGET jx_server)
-file(GLOB SERVER_FILES ${CMAKE_CURRENT_SOURCE_DIR} *.c *.h)
 
-add_executable(${TARGET} ${SERVER_FILES})
-include_directories(
-    ${PROJECT_ROOT_DIR}/src/include
-    )
-
-if(WIN32)
-set(EXTRA_LIBS
-    ${EXTRA_LIBS} ${JXIOT_BASE_LIB} wsock32 winmm ws2_32
-    )
-else(WIN32)
-set(EXTRA_LIBS ${EXTRA_LIBS} ${JXIOT_BASE_LIB})
-endif(WIN32)
-
-target_link_libraries (${TARGET} ${EXTRA_LIBS})
-
-if(CMAKE_COMPILE_IS_GNUC OR CMAKE_COMPILE_IS_GNUCXX)
-    target_link_libraries(${TARGET} pthread)
-endif()
-
+include(${CMAKE_MODULE_PATH}/samples_include.cmake)
