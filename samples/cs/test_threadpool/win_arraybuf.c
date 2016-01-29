@@ -48,6 +48,10 @@ int main(void)
 
     InitializeCriticalSection(&cs_code);
 
+<<<<<<< Updated upstream:samples/cs/test_threadpool/win_arraybuf.c
+=======
+    empty_arraybuf.tail = 31;
+>>>>>>> Stashed changes:client_server/Qt_winsock/test_threadpool/main_arraybuf.c
     create_semophare(0, filled_arraybuf.num_item - 1);
     create_threads(NUM_THREAD);
 
