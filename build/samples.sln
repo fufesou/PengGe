@@ -5,7 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "cs\server\server.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "cs\client\client.vcproj", "{4FDA74CC-206B-4B20-A80F-207B811392C5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pgcs", "lib\pgcs.vcproj", "{DEEB340C-CDC6-4ADA-B6C2-4CB1B01DA05D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pgcs", "libpgcs\pgcs.vcproj", "{DEEB340C-CDC6-4ADA-B6C2-4CB1B01DA05D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

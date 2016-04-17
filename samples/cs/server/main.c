@@ -7,9 +7,11 @@
  * @modifiedWed 2016-01-13 22:58:19 (+0800)
  */
 
+#ifndef CMAKE_PRO
 #ifdef _MSC_VER 
 //#pragma comment(lib, "../../Debug/pgcsd.lib")
 #pragma comment(lib, "D:/Projects/PengGe/samples/Debug/pgcsd.lib")
+#endif
 #endif
 
 #ifdef WIN32
@@ -23,6 +25,7 @@
 
 #include  <stdio.h>
 #include  <stdlib.h>
+#include    "common/config_macros.h"
 #include    "common/cstypes.h"
 #include    "common/jxiot.h"
 #include    "common/sock_types.h"
@@ -43,6 +46,8 @@ int main(int argc, char* argv[])
     struct jxserver udpserver;
 
     s_check_args(argc, argv);
+
+    printf("use the cs version of %d.%d", JXIOT_CS_VERSION_MAJOR, JXIOT_CS_VERSION_MINOR);
 
     jxsock_envinit();
     if (am_server_account_init() != 0) {

@@ -12,29 +12,29 @@
 #ifndef CONFIG_MACROS_H
 #define CONFIG_MACROS_H
 
-#define JXIOT_CS_VERSION_MAJOR 0 
-#define JXIOT_CS_VERSION_MINOR 1
+#define JXIOT_CS_VERSION_MAJOR @JXIOT_CS_VERSION_MAJOR@ 
+#define JXIOT_CS_VERSION_MINOR @JXIOT_CS_VERSION_MINOR@
 
 
 /**************************************************
  **           client server block                **
  **************************************************/
-#define MAX_MSG_LEN             1024
-#define MAX_BUF_LEN             2048
-#define NUM_THREAD              8
-#define SERVER_POOL_NUM_ITEM    64
+#cmakedefine MAX_MSG_LEN             1024
+#cmakedefine MAX_BUF_LEN             2048
+#cmakedefine NUM_THREAD              8
+#cmakedefine SERVER_POOL_NUM_ITEM    64
 
 
 /**************************************************
  **         account management block             **
  **************************************************/
-#define ACCOUNT_PASSWD_LEN      32
-#define ACCOUNT_USERNAME_LEN    64
-#define ACCOUNT_TEL_LEN         16
-#define ACCOUNT_USERNUM_LEN     16
+#cmakedefine ACCOUNT_PASSWD_LEN      32
+#cmakedefine ACCOUNT_USERNAME_LEN    64
+#cmakedefine ACCOUNT_TEL_LEN         16
+#cmakedefine ACCOUNT_USERNUM_LEN     16
 
-#define ACCOUNT_PERFILE_NUM     1024
-#define ACCOUNT_FILE_NUM        100
+#cmakedefine ACCOUNT_PERFILE_NUM     1024
+#cmakedefine ACCOUNT_FILE_NUM        100
 #define ACCOUNT_MAX_NUM         (ACCOUNT_PERFILE_NUM * ACCOUNT_FILE_NUM)
 
 

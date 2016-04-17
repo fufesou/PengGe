@@ -1,0 +1,8 @@
+graph { flow : down; }
+node {  shape: parallelogram; }
+
+[ message in ] -> [ message buffer 1 ] -> [ process message ] -> [ message buffer 2 ] -> [
+process message af ] -> [ message out ]
+
+
+# update end
