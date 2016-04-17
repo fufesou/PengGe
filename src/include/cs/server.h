@@ -1,7 +1,7 @@
 /**
  * @file server.h
  * @brief This file provide some helper functions for server.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-26
  * @modified  Wed 2016-01-06 22:37:45 (+0800)

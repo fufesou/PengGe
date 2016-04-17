@@ -1,7 +1,7 @@
 /**
  * @file requestwidget.h
  * @brief  CRequestWidget is the base widget for processing request(register, verify, login, etc).
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-10
  * @modified  Tue 2015-12-15 14:37:02 (+0800)

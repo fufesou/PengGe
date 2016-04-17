@@ -1,7 +1,7 @@
 /**
  * @file jxiot.h
  * @brief  This file define the commonly used consts variables and macros in client-server.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-29
  * @modified  Tue 2016-01-12 22:58:33 (+0800)

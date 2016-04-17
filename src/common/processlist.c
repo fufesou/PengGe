@@ -1,7 +1,7 @@
 /**
  * @file processlist.c
  * @brief  this file contains the utility implementations of struct list_process_t.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-05
  * @modified  Tue 2016-01-05 23:08:55 (+0800)

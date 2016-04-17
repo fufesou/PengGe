@@ -1,7 +1,7 @@
 /**
  * @file sock_wrap.h
  * @brief This file defines some basic wrapper functions of socket.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
  * @modified  Fri 2016-01-01 18:32:31 (+0800)

@@ -3,7 +3,7 @@
  * @brief Client must login before exchange message with server. 
  * The format of login message is "login: <username> <password>".
  * The format of logout message is "logout".
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-01
  * @modified  Wed 2016-01-13 22:57:39 (+0800)

@@ -1,7 +1,7 @@
 /**
  * @file sock_types.h
  * @brief This file defines some basic socket types and macros for this application.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-10
  * @modified  Tue 2015-11-03 18:10:07 (+0800)

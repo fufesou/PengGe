@@ -1,7 +1,7 @@
 /**
  * @file msgprocess.h
  * @brief  This file contains various kinds of message handler functions.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-06
  * @modified  Tue 2016-01-12 23:12:07 (+0800)

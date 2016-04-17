@@ -1,7 +1,7 @@
 /**
  * @file msgpool_dispatch.c
  * @brief  
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
  * @modified  Tue 2016-01-05 23:26:56 (+0800)

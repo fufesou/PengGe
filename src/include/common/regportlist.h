@@ -1,7 +1,7 @@
 /**
  * @file regportlist.h
  * @brief  This file defines the interfaces of register port process, such as register, query, delete, etc.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-12
  * @modified  Wed 2016-01-13 22:54:03 (+0800)

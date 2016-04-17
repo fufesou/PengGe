@@ -1,7 +1,7 @@
 /**
  * @file account_macros.h
  * @brief  
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
  * @modified  Mon 2015-11-16 18:57:05 (+0800)

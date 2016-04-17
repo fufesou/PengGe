@@ -1,7 +1,7 @@
 /**
  * @file client.h
  * @brief This file provide the basic helper funstion for client struct.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
  * @modified  Wed 2016-01-06 21:09:43 (+0800)

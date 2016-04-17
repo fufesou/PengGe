@@ -1,7 +1,7 @@
 /**
  * @file requestingwidget.h
  * @brief  
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-11
  * @modified  Tue 2015-12-15 19:39:53 (+0800)

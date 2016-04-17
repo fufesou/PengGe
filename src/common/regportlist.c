@@ -1,7 +1,7 @@
 /**
  * @file regportlist.c
  * @brief  this file will define the register port list structure and the implementation of register port list operations.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-12
  * @modified  Wed 2016-01-13 22:53:27 (+0800)

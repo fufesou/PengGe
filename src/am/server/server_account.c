@@ -13,7 +13,7 @@
  *
  * Server maintains a list of loged user account, and the verification of these accounts is the 'struct sockaddr'.
  *
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
  * @modified  Sun 2015-12-06 18:06:30 (+0800)

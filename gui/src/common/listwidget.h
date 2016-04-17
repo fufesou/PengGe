@@ -1,7 +1,7 @@
 /**
  * @file listwidget.h
  * @brief  
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-06
  * @modified  Sun 2015-12-20 13:17:56 (+0800)

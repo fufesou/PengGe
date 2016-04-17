@@ -2,7 +2,7 @@
  * @file clearlist.h
  * @brief  This file defines a list that contains various clear functions for 
  * program to safely exit.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-19
  * @modified  Sun 2015-12-06 18:24:37 (+0800)

@@ -1,7 +1,7 @@
 /**
  * @file clientcontroller.cpp
  * @brief  
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-03
  * @modified  Wed 2015-12-16 20:45:47 (+0800)

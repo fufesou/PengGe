@@ -1,7 +1,7 @@
 /**
  * @file msgwrap.h  
  * @brief  This file describe the message header for sending and receiving.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
  * @modified  Mon 2016-01-04 23:58:31 (+0800)

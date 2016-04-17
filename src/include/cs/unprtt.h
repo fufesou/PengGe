@@ -1,7 +1,7 @@
 /**
  * @file unprtt.h
  * @brief This file comes from 'UNIX Network Programming' source code.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-09
  * @modified  Sun 2015-12-06 18:23:46 (+0800)

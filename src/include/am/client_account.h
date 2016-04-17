@@ -11,7 +11,7 @@
  * - (*) means this segement is not filled with data by now.
  * - ... means unused remainder place.
 
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
  * @modified  Sun 2015-12-06 18:21:47 (+0800)

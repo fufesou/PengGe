@@ -1,7 +1,7 @@
 /**
  * @file server.c
  * @brief  The functions prefexed with "s_" are static functions.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-28
  * @modified  Wed 2016-01-06 22:47:20 (+0800)

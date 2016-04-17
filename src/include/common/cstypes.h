@@ -1,7 +1,7 @@
 /**
  * @file cstypes.h
  * @brief This file defines common types.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-1
  * @modified  Sun 2015-12-06 18:24:43 (+0800)

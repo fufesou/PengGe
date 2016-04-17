@@ -1,7 +1,7 @@
 /**
  * @file guithread.h
  * @brief  This file provide basic thread class for network request.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-12-20
  * @modified  Sun 2015-12-20 22:10:04 (+0800)

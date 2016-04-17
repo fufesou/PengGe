@@ -1,7 +1,7 @@
 /**
  * @file bufarray.c
  * @brief  0.1
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-17
  * @modified  Mon 2015-12-07 20:23:30 (+0800)

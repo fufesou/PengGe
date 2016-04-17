@@ -1,7 +1,7 @@
 /**
  * @file msgprocess.c
  * @brief  This file defines various message process functions.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-06
  * @modified  Wed 2016-01-13 22:55:49 (+0800)

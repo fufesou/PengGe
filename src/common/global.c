@@ -1,7 +1,7 @@
 /**
  * @file global.c
  * @brief  
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-10
  * @modified  Thu 2015-11-26 22:09:20 (+0800)

@@ -1,7 +1,7 @@
 /**
  * @file main_listbuf.c
  * @brief  This demo routine use 'struct array_buf' as the buffer struct.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-14
  */

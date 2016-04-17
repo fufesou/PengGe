@@ -1,7 +1,7 @@
 /**
  * @file server_account.h
  * @brief  This file contains some server account operations.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-09
  * @modified  Fri 2015-11-20 18:30:07 (+0800)

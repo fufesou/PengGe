@@ -2,7 +2,7 @@
  * @file msgpool.h
  * @brief  This file defines message buffer pool operations.
  * With thread, mutex, semaphore used, This struct jxmsgpool can be used for constructing multithread environment.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-19
  * @modified  Sat 2015-11-07 14:52:40 (+0800)

@@ -11,7 +11,7 @@
  * 2. When prcess processed message. It firstly pull message from the processed pool,
  * then call process_af(if this function pointer is not NULL).
  *
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-07
  * @modified  Wed 2016-01-06 21:10:45 (+0800)

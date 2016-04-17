@@ -1,7 +1,7 @@
 /**
  * @file processlist.h
  * @brief  This file defines the utility functions for message process list.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2016-01-05
  * @modified  Wed 2016-01-06 22:18:15 (+0800)

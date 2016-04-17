@@ -1,7 +1,7 @@
 /**
  * @file account_file.h
  * @brief  This file process account writing and finding operations. A crude mutex protection is used here to promise atomic file operation.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-11
  * @modified  Sun 2015-12-06 18:22:33 (+0800)

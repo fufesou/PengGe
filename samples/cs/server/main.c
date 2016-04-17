@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @brief
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-25
  * @modifiedWed 2016-01-13 22:58:19 (+0800)

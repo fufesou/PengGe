@@ -1,7 +1,7 @@
 /**
  * @file clientprocess.h
  * @brief  
- * @author cxl, hermes-sys, <xiaolong.chen@hermes-sys.com>
+ * @author 298516439@qq.com, hermes-sys, <xiaolong.chen@hermes-sys.com>
  * @version 0.1
  * @date 2015-12-06
  * @modified  Sun 2015-12-06 13:39:27 (+0800)

@@ -1,7 +1,7 @@
 /**
  * @file client.c
  * @brief 
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-30
  * @modified  Wed 2016-01-13 21:11:26 (+0800)

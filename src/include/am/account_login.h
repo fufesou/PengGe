@@ -1,7 +1,7 @@
 /**
  * @file account_login.h
  * @brief  This file defines the login account operations for server.
- * @author cxl, <shuanlgongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanlgongchen@yeah.net>
  * @version 0.1
  * @date 2015-11-16
  * @modified  Sun 2015-11-29 17:40:12 (+0800)

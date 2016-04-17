@@ -1,7 +1,7 @@
 /**
  * @file timespan.h
  * @brief  This file defines "get time" functions and "time span" functions.
- * @author cxl, <shuanglongchen@yeah.net>
+ * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-10-26
  * @modified  Sat 2015-10-31 19:10:43 (+0800)
