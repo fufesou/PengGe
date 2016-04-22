@@ -8,6 +8,7 @@
 *.la
 *.lai
 *.dylib
+build
 
 # Qt-es
 

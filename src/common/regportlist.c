@@ -9,6 +9,7 @@
 
 #include  <malloc.h>
 #include  <string.h>
+#include  <stdio.h>
 #include    "common/cstypes.h"
 #include    "common/jxiot.h"
 #include    "common/utility_wrap.h"

@@ -113,10 +113,12 @@ ssize_t jxserver_recv(jxsock_t handle, void* inbuf, size_t inbytes)
 
 #ifdef _DEBUG
     {
+#ifndef __MINGW32__
         char addrstr[INET6_ADDRSTRLEN + 1];
         printf("server: recefrom() client ip: %s, port: %d.\n",
                jxsock_inet_ntop(AF_INET, &((struct sockaddr_in*)&cliaddr)->sin_addr, addrstr, sizeof(addrstr)),
                ntohs(((struct sockaddr_in*)&cliaddr)->sin_port));
+#endif
     }
 #endif
 
@@ -137,10 +139,12 @@ int jxserver_send(jxsock_t handle, void* sendbuf)
 
 #ifdef _DEBUG
     {
+#ifndef __MINGW32__
         char addrstr[INET6_ADDRSTRLEN + 1];
         printf("server: client ip: %s, port: %d.\n",
                jxsock_inet_ntop(AF_INET, &((struct sockaddr_in*)&msghdr->addr)->sin_addr, addrstr, sizeof(addrstr)),
                ntohs(((struct sockaddr_in*)&msghdr->addr)->sin_port));
+#endif
     }
 #endif
 

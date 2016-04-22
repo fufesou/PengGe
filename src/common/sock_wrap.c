@@ -1,6 +1,6 @@
 /**
  * @file sock_wrap.c
- * @brief 
+ * @brief
  * @author 298516439@qq.com, <shuanglongchen@yeah.net>
  * @version 0.1
  * @date 2015-09-20
@@ -11,6 +11,11 @@
 #include  <winsock2.h>
 #include  <ws2tcpip.h>
 #include  <windows.h>
+
+#if defined (__MINGW32__)
+#include    "common/inet_pton_mingw.h"
+#endif
+
 #define BLOCK_RW        0
 #define NONBLICK_RW     0
 #define SEND_NOSIGNAL   0
@@ -122,7 +127,7 @@ jxsock_t jxsock_open(int tcpudp)
     else if (tcpudp == SOCK_DGRAM) {
         protocol = IPPROTO_UDP;
     }
-    hsock = socket(AF_INET, tcpudp, protocol); 
+    hsock = socket(AF_INET, tcpudp, protocol);
     if (!IS_SOCK_HANDLE(hsock)) {
         error = 1;
         jxfatal_ext(&error, jxerr_exit, "error at socket(), error code: %d\n",  jxsock_get_last_error());
@@ -168,7 +173,7 @@ void jxsock_bind(jxsock_t handle, struct sockaddr* sa, jxsocklen_t addrlen)
         error = 1;
         jxfatal_ext(&error, jxerr_exit, "error at listen(), error code: %d\n", jxsock_get_last_error());
     }
-    
+
 }
 
 void jxsock_listen(jxsock_t handle, int maxconn)
@@ -267,69 +272,55 @@ int jxsock_getpeername(jxsock_t handle, struct sockaddr* addr, jxsocklen_t* addr
 #ifdef WIN32
 const char* jxsock_inet_ntop(int af, const void* src, char* dst, jxsocklen_t size)
 {
-    struct sockaddr_storage ss;
-    unsigned long s = size;
-    
-    ZeroMemory(&ss, sizeof(ss));
-    ss.ss_family = af;
+#ifdef _MSC_VER
 
-    switch (af) {
-        case AF_INET:
-            ((struct sockaddr_in*)&ss)->sin_addr = *(struct in_addr*)src;
-            break;
-        case AF_INET6:
-            ((struct sockaddr_in6*)&ss)->sin6_addr = *(struct in6_addr*)src;
-            break;
-
-        default:
-            return NULL;
-    }
-
-#ifdef UNICODE
-    {
-        LPWSTR wdst = (LPWSTR)malloc(sizeof(WCHAR) * s);
-        if (WSAAddressToString((struct sockaddr*)&ss, sizeof(ss), NULL, wdst, &s) != 0) {
-            return NULL;
-        }
-        WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, wdst, -1, dst, size,  NULL, NULL);
-        return dst;
-    }
+#ifndef UNICODE
+	return InetNtop(af, (void*)src, dst, size);
 #else
-    return (WSAAddressToString((struct sockaddr*)&ss, sizeof(ss), NULL, dst, &s) == 0) ? dst : NULL;
+	WCHAR wsrc[INET6_ADDRSTRLEN];
+	LPWSTR wdst = (LPWSTR)malloc(sizeof(WCHAR) * size);
+	swprintf_s(wsrc, sizeof(wsrc) / sizeof(wsrc[0]), L"%hs", (char*)src);
+	if (InetNtop(af, (PVOID)wsrc, wdst, size) == NULL) {
+		return NULL;
+	}
+	WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, wdst, -1, dst, size, NULL, NULL);
+	return dst;
+#endif
+
+#elif defined(__MINGW32__)
+    (void)af; (void)src; (void)dst; (void)size;
+    jxfatal("inet ntop not supported for now!\n");
+    return 0;
+#else
+#error unkown compile tool
 #endif
 }
 
 int jxsock_inet_pton(int af, const char* src, void* dst)
 {
-    struct sockaddr_storage ss;
-    int size = sizeof(ss);
+#ifdef _MSC_VER
 
-#ifdef UNICODE
-    WCHAR src_copy[INET6_ADDRSTRLEN];
+#ifndef UNICODE
+	return InetPton(af, src, dst);
 #else
-    char src_copy[INET6_ADDRSTRLEN];
+	int ret_flag = -1;
+	WCHAR wsrc[INET6_ADDRSTRLEN];
+	WCHAR wdst[INET6_ADDRSTRLEN];
+
+	swprintf_s(wsrc, sizeof(wsrc) / sizeof(wsrc[0]), L"%hs", src);
+
+	ret_flag = InetPton(af, wsrc, wdst);
+
+	// FIXME: assign 'INET6_ADDRSTRLEN' may be not safe here
+	WideCharToMultiByte(CP_ACP, WC_COMPOSITECHECK, wdst, -1, dst, INET6_ADDRSTRLEN, NULL, NULL);
+
+	return ret_flag;
 #endif
 
-    ZeroMemory(&ss, sizeof(ss));
-
-#ifdef UNICODE
-    swprintf_s(src_copy, sizeof(src_copy) / sizeof(src_copy[0]), L"%hs", src);
+#elif defined(__MINGW32__)
+	return inet_pton(af, src, dst);
 #else
-    strncpy_s(src_copy, sizeof(src_copy) / sizeof(src_copy[0]), src, INET6_ADDRSTRLEN);
+#error unkown compiler tool
 #endif
-
-    src_copy[INET6_ADDRSTRLEN] = 0;
-
-    if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr*)&ss, &size) == 0) {
-        switch (af) {
-            case AF_INET:
-                *(struct in_addr*)dst = ((struct sockaddr_in*)&ss)->sin_addr;
-                return 1;
-            case AF_INET6:
-                *(struct in6_addr*)dst = ((struct sockaddr_in6*)&ss)->sin6_addr;
-                return 1;
-        }
-    }
-    return 0;
 }
 #endif

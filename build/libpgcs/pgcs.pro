@@ -49,7 +49,8 @@ HEADERS += \
     ../../src/include/am/account_login.h \
     ../../src/include/am/account_macros.h \
     ../../src/include/am/client_account.h \
-    ../../src/include/am/server_account.h
+    ../../src/include/am/server_account.h \
+    ../../src/include/common/inet_pton_mingw.h
 
 SOURCES += \
     ../../src/common/bufarray.c \
@@ -76,5 +77,6 @@ SOURCES += \
     ../../src/am/common/account_file.c \
     ../../src/am/client/client_account.c \
     ../../src/am/server/account_login.c \
-    ../../src/am/server/server_account.c
+    ../../src/am/server/server_account.c \
+    ../../src/common/inet_pton_mingw.c
 

@@ -194,6 +194,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\common\inet_pton_mingw.c"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\common\sock_wrap.c"
 					>
 				</File>
@@ -278,6 +282,10 @@
 			</File>
 			<File
 				RelativePath="..\..\src\include\am\account_macros.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\include\am\inet_pton_mingw.h"
 				>
 			</File>
 			<File
