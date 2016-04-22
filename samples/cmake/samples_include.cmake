@@ -15,7 +15,7 @@ endif(WIN32)
 
 target_link_libraries (${TARGET} ${EXTRA_LIBS})
 
-if(CMAKE_COMPILE_IS_GNUC OR CMAKE_COMPILE_IS_GNUCXX)
+if(MINGW OR UNIX)
     target_link_libraries(${TARGET} pthread)
 endif()
 
